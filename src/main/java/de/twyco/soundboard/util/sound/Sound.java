@@ -1,0 +1,58 @@
+package de.twyco.soundboard.util.sound;
+
+import de.twyco.soundboard.util.keybinding.KeyCombo;
+import org.jetbrains.annotations.Nullable;
+
+import java.nio.file.Path;
+
+public class Sound {
+
+    private final String name;
+    private final Path path;
+
+    private int amplifier = 100;
+    private boolean loop = false;
+    @Nullable
+    private KeyCombo keyCombo = null;
+
+    public Sound(String name, Path path) {
+        this.name = name;
+        this.path = path;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public int getAmplifier() {
+        return amplifier;
+    }
+
+    public void setAmplifier(int amplifier) {
+        this.amplifier = Math.max(0, Math.min(amplifier, 300));
+    }
+
+    public boolean isLoop() {
+        return loop;
+    }
+
+    public void setLoop(boolean loop) {
+        this.loop = loop;
+    }
+
+    public @Nullable KeyCombo getKeyCombo() {
+        return keyCombo;
+    }
+
+    public void setKeyCombo(@Nullable KeyCombo keyCombo) {
+        this.keyCombo = keyCombo;
+    }
+
+    public void play() {
+        SoundManager.playSound(this);
+    }
+}
