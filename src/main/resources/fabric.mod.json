@@ -1,0 +1,32 @@
+{
+	"schemaVersion": 1,
+	"id": "soundboard",
+	"version": "${version}",
+	"name": "soundboard",
+	"description": "This mod adds an soundboard to the simple voice chat mod",
+	"authors": [
+		"Twyco"
+	],
+	"contact": {
+		"sources": "https://github.com/Twyco/soundboard"
+	},
+	"license": "MIT",
+	"icon": "assets/soundboard/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"de.twyco.soundboard.Soundboard"
+		]
+	},
+	"mixins": [],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*",
+		"cloth-config": ">=20.0.0"
+	},
+	"suggests": {
+		"another-mod": "modmenu"
+	}
+}
