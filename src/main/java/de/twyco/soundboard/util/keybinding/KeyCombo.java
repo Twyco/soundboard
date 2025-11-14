@@ -62,10 +62,7 @@ public class KeyCombo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        for(Integer keyCode : ((KeyCombo) o).keyCodes) {
-            if(!keyCodes.contains(keyCode)) return false;
-        }
-        return true;
+        return  keyCodes.equals(((KeyCombo) o).keyCodes);
     }
 
     public boolean allKeysPressed() {
@@ -73,5 +70,10 @@ public class KeyCombo {
             if(!KeyHelper.isKeyPressed(keyCode)) return false;
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return keyCodes.hashCode();
     }
 }
