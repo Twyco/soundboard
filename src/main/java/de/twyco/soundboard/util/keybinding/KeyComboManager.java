@@ -96,7 +96,7 @@ public class KeyComboManager {
 
     public static boolean handleRawKeyEvent(int action, KeyInput input) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if(client == null || client.currentScreen != null) {
+        if(client == null) {
             return false;
         }
         if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE && action != GLFW.GLFW_REPEAT) {
@@ -126,7 +126,9 @@ public class KeyComboManager {
             state.pressed = nowPressed;
 
             if (eventType != null) {
-                fireEvent(state.combo.getId(), eventType);
+                if(client.currentScreen == null) {
+                    fireEvent(state.combo.getId(), eventType);
+                }
                 consumed = true;
                 break;
             }

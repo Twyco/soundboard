@@ -12,7 +12,7 @@ public final class KeyCombo {
     private final String id;
     private final Set<Integer> keyCodes;
 
-    public KeyCombo(@NotNull String id, Set<Integer> keyCodes) {
+    private KeyCombo(@NotNull String id, Set<Integer> keyCodes) {
         this.id = id;
         this.keyCodes = new HashSet<>(keyCodes);
     }
