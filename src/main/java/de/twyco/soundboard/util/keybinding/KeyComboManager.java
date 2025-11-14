@@ -3,6 +3,9 @@ package de.twyco.soundboard.util.keybinding;
 import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.KeyInput;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -18,31 +21,6 @@ public class KeyComboManager {
 
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client == null || client.isPaused()) {
-                return;
-            }
-
-            for (KeyCombo combo : listeners.keySet()) {
-                boolean nowPressed = combo.allKeysPressed();
-                boolean wasPressed = Boolean.TRUE.equals(pressedStates.get(combo));
-
-                KeyComboEventType eventType = null;
-
-                if (nowPressed && !wasPressed) {
-                    eventType = KeyComboEventType.PRESS;
-                } else if (nowPressed && wasPressed) {
-                    eventType = KeyComboEventType.HOLD;
-                } else if(!nowPressed && wasPressed) {
-                    eventType = KeyComboEventType.RELEASE;
-                }
-
-                if(eventType != null) {
-                    fireEvent(combo, eventType);
-                }
-
-                pressedStates.put(combo, nowPressed);
-            }
-
             if(!pendingActions.isEmpty()) {
                 pendingActions.forEach(Runnable::run);
                 pendingActions.clear();
@@ -99,6 +77,60 @@ public class KeyComboManager {
         for(KeyComboCallback callback : callbacks) {
             callback.handle(combo);
         }
+    }
+
+    public static boolean handleRawKeyEvent(int action, KeyInput input) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if(client.currentScreen != null) {
+            return false;
+        }
+        if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE && action != GLFW.GLFW_REPEAT) {
+            return false;
+        }
+
+        int keyCode = input.key();
+
+        List<KeyCombo> combos = findMatchingCombos(keyCode);
+        if(combos.isEmpty()) {
+            return false;
+        }
+
+        boolean consumed = false;
+        for (KeyCombo combo : combos) {
+            boolean nowPressed = combo.allKeysPressed();
+            boolean wasPressed = Boolean.TRUE.equals(pressedStates.get(combo));
+
+
+            KeyComboEventType eventType = null;
+
+            if (nowPressed && !wasPressed) {
+                eventType = KeyComboEventType.PRESS;
+            } else if (nowPressed && wasPressed) {
+                eventType = KeyComboEventType.HOLD;
+            } else if (!nowPressed && wasPressed) {
+                eventType = KeyComboEventType.RELEASE;
+            }
+
+            if (eventType != null) {
+                fireEvent(combo, eventType);
+                consumed = true;
+                pressedStates.put(combo, nowPressed);
+                break;
+            }
+
+            pressedStates.put(combo, nowPressed);
+        }
+        return consumed;
+    }
+
+    private static List<KeyCombo> findMatchingCombos(int keyCode) {
+        List<KeyCombo> matches = new ArrayList<>();
+        for (KeyCombo combo : listeners.keySet()) {
+            if (combo.getKeyCodes().contains(keyCode)) {
+                matches.add(combo);
+            }
+        }
+        return matches;
     }
 
     public static void onPress(KeyCombo combo, KeyComboCallback callback) {
