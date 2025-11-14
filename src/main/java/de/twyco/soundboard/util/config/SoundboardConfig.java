@@ -11,9 +11,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class SoundboardConfig {
-    private static Logger LOG = Soundboard.LOGGER;
+    private static final Logger LOG = Soundboard.LOGGER;
+    private static final String CONFIG_FILE_NAME = Soundboard.MOD_ID + ".json";
 
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
@@ -32,8 +34,8 @@ public class SoundboardConfig {
             return;
         }
 
-        Path configDir = client.runDirectory.toPath().resolve("config").resolve(Soundboard.MOD_ID);
-        Path configFile = configDir.resolve("config.json");
+        Path configDir = client.runDirectory.toPath().resolve("config");
+        Path configFile = configDir.resolve(CONFIG_FILE_NAME);
 
         if(!Files.exists(configFile)) {
             LOG.info("[SoundboardConfig/init] Creating default config file");
@@ -62,9 +64,8 @@ public class SoundboardConfig {
             return;
         }
 
-        Path configDir = client.runDirectory.toPath().resolve("config").resolve(Soundboard.MOD_ID);
-        Path configFile = configDir.resolve("config.json");
-
+        Path configDir = client.runDirectory.toPath().resolve("config");
+        Path configFile = configDir.resolve(CONFIG_FILE_NAME);
         if(!Files.exists(configFile)) {
             LOG.error("[SoundboardConfig/load] Unable to find config file: {}", configFile);
             return;
@@ -72,11 +73,7 @@ public class SoundboardConfig {
 
         try (Reader reader = Files.newBufferedReader(configFile)) {
             SoundboardConfigData data = gson.fromJson(reader, SoundboardConfigData.class);
-            if(data != null) {
-                configData = data;
-            }else {
-                configData = SoundboardConfigData.createDefault();
-            }
+            configData = Objects.requireNonNullElseGet(data, SoundboardConfigData::createDefault);
         }catch (IOException e) {
             LOG.error("[SoundboardConfig/load] Unable to read config file: {}; {}", configFile, e.getMessage());
             LOG.warn("[SoundboardConfig/load] Continuing with default config");
@@ -91,8 +88,8 @@ public class SoundboardConfig {
             return;
         }
 
-        Path configDir = client.runDirectory.toPath().resolve("config").resolve(Soundboard.MOD_ID);
-        Path configFile = configDir.resolve("config.json");
+        Path configDir = client.runDirectory.toPath().resolve("config");
+        Path configFile = configDir.resolve(CONFIG_FILE_NAME);
 
         if(!Files.exists(configDir)) {
             LOG.warn("[SoundboardConfig/save] Unable to find config dir: {}", configDir);
