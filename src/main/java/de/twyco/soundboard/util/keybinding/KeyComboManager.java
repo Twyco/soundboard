@@ -59,15 +59,11 @@ public class KeyComboManager {
         });
     }
 
-    public static void unregister(@NotNull KeyCombo keyCombo) {
+    protected static void unregister(@NotNull KeyCombo keyCombo) {
         pendingActions.add(() -> combosById.remove(keyCombo.getId()));
     }
 
-    public static void unregister(@NotNull String keyComboId) {
-        pendingActions.add(() -> combosById.remove(keyComboId));
-    }
-
-    public static void unregister(@NotNull KeyCombo combo, @NotNull KeyComboEventType eventType) {
+    protected static void unregister(@NotNull KeyCombo combo, @NotNull KeyComboEventType eventType) {
         pendingActions.add(() -> {
             KeyComboState state = combosById.get(combo.getId());
             if(state == null) return;
@@ -78,21 +74,6 @@ public class KeyComboManager {
 
             if(listenersByType.isEmpty()) {
                 combosById.remove(combo.getId());
-            }
-        });
-    }
-
-    public static void unregister(@NotNull String keyComboId, @NotNull KeyComboEventType eventType) {
-        pendingActions.add(() -> {
-            KeyComboState state = combosById.get(keyComboId);
-            if(state == null) return;
-
-            EnumMap<KeyComboEventType, List<KeyComboCallback>> listenersByType = state.listeners;
-
-            listenersByType.remove(eventType);
-
-            if(listenersByType.isEmpty()) {
-                combosById.remove(keyComboId);
             }
         });
     }
@@ -163,15 +144,15 @@ public class KeyComboManager {
         return matchingComboStates;
     }
 
-    public static void onPress(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
+    protected static void onPress(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
         register(combo, KeyComboEventType.PRESS, callback);
     }
 
-    public static void onHold(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
+    protected static void onHold(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
         register(combo, KeyComboEventType.HOLD, callback);
     }
 
-    public static void onRelease(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
+    protected static void onRelease(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
         register(combo, KeyComboEventType.RELEASE, callback);
     }
 }
