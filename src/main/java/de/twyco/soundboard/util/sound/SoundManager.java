@@ -1,7 +1,11 @@
 package de.twyco.soundboard.util.sound;
 
 import de.twyco.soundboard.Soundboard;
+import de.twyco.soundboard.util.keybinding.KeyCombo;
+import de.twyco.soundboard.util.keybinding.KeyComboManager;
 import net.minecraft.client.MinecraftClient;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -55,20 +59,20 @@ public class SoundManager {
         LOG.info("[SoundManager/init] Successfully loaded {} sounds", soundsById.size());
     }
 
-    public static boolean isSupportedSoundFile(Path path) {
+    private static boolean isSupportedSoundFile(Path path) {
         String fileName = path.getFileName().toString().toLowerCase(Locale.ROOT);
         return fileName.endsWith(".mp3")
                 || fileName.endsWith(".wav")
                 || fileName.endsWith(".ogg");
     }
 
-    public static void registerFileAsSound(Path file) {
+    private static void registerFileAsSound(Path file) {
         String fileName = file.getFileName().toString();
         String nameWithoutExtension = stripExtension(fileName);
 
         String id = fileName;
 
-        Sound sound = new Sound(nameWithoutExtension, file);
+        Sound sound = new Sound(id, nameWithoutExtension, file);
 
         soundsById.put(id, sound);
 
@@ -91,7 +95,19 @@ public class SoundManager {
         return soundsById.get(id);
     }
 
-    public static void playSound(Sound sound) {
+    public static void updateSoundKeyCombo(Sound sound, @Nullable KeyCombo newCombo) {
+        KeyCombo oldCombo = sound.getKeyCombo();
+        if(oldCombo != null) {
+            KeyComboManager.unregister(oldCombo);
+        }
+
+        sound.setKeyCombo(newCombo);
+        if(newCombo != null) {
+            KeyComboManager.onPress(newCombo, c -> sound.play());
+        }
+    }
+
+    public static void playSound(@NotNull Sound sound) {
         LOG.info("[SoundManager/playSound] Start playing sound {}", sound.getPath());
     }
 }

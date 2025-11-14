@@ -7,6 +7,7 @@ import java.nio.file.Path;
 
 public class Sound {
 
+    private final String id;
     private final String name;
     private final Path path;
 
@@ -15,9 +16,14 @@ public class Sound {
     @Nullable
     private KeyCombo keyCombo = null;
 
-    public Sound(String name, Path path) {
+    public Sound(String id, String name, Path path) {
+        this.id = id;
         this.name = name;
         this.path = path;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {
