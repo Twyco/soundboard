@@ -5,15 +5,25 @@ import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.KeyInput;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
 public class KeyComboManager {
 
-    private static final Map<KeyCombo, EnumMap<KeyComboEventType, List<KeyComboCallback>>> listeners = new HashMap<>();
-    private static final Map<KeyCombo, Boolean> pressedStates = new HashMap<>();
+    private static class KeyComboState {
+        final KeyCombo combo;
+        final EnumMap<KeyComboEventType, List<KeyComboCallback>> listeners =
+                new EnumMap<>(KeyComboEventType.class);
+        boolean pressed = false;
 
+        KeyComboState(KeyCombo combo) {
+            this.combo = combo;
+        }
+    }
+
+    private static final Map<String, KeyComboState> combosById = new HashMap<>();
     private static final List<Runnable> pendingActions = new ArrayList<>();
 
     private KeyComboManager() {
@@ -22,126 +32,139 @@ public class KeyComboManager {
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if(!pendingActions.isEmpty()) {
-                pendingActions.forEach(Runnable::run);
+                List<Runnable> actions = new ArrayList<>(pendingActions);
                 pendingActions.clear();
+                actions.forEach(Runnable::run);
             }
         });
     }
 
-    public static void register(KeyCombo combo, KeyComboEventType eventType, KeyComboCallback callback) {
+    private static void register(KeyCombo combo, KeyComboEventType eventType, KeyComboCallback callback) {
         pendingActions.add(() -> {
-            EnumMap<KeyComboEventType, List<KeyComboCallback>> byType =
-                    listeners.computeIfAbsent(combo, c -> new EnumMap<>(KeyComboEventType.class));
-
+            KeyComboState state = combosById.computeIfAbsent(
+                    combo.getId(),
+                    id -> new KeyComboState(combo)
+            );
             List<KeyComboCallback> callbacks =
-                    byType.computeIfAbsent(eventType, t ->   new ArrayList<>());
+                    state.listeners.computeIfAbsent(eventType, t -> new ArrayList<>());
 
             callbacks.add(callback);
-
-            pressedStates.putIfAbsent(combo, false);
         });
     }
 
-    public static void unregister(KeyCombo combo) {
-        pendingActions.add(() -> {
-            listeners.remove(combo);
-            pressedStates.remove(combo);
-        });
+    public static void unregister(@NotNull KeyCombo keyCombo) {
+        pendingActions.add(() -> combosById.remove(keyCombo.getId()));
     }
 
-    public static void unregister(KeyCombo combo, KeyComboEventType eventType) {
+    public static void unregister(@NotNull String keyComboId) {
+        pendingActions.add(() -> combosById.remove(keyComboId));
+    }
+
+    public static void unregister(@NotNull KeyCombo combo, @NotNull KeyComboEventType eventType) {
         pendingActions.add(() -> {
-            EnumMap<KeyComboEventType, List<KeyComboCallback>> byType = listeners.get(combo);
-            if(byType == null) return;
+            KeyComboState state = combosById.get(combo.getId());
+            if(state == null) return;
 
-            byType.remove(eventType);
+            EnumMap<KeyComboEventType, List<KeyComboCallback>> listenersByType = state.listeners;
 
-            if(byType.isEmpty()) {
-                listeners.remove(combo);
-                pressedStates.remove(combo);
+            listenersByType.remove(eventType);
+
+            if(listenersByType.isEmpty()) {
+                combosById.remove(combo.getId());
             }
         });
     }
 
-    private static void fireEvent(KeyCombo combo, KeyComboEventType eventType) {
-        EnumMap<KeyComboEventType, List<KeyComboCallback>> byType = listeners.get(combo);
-        if (byType == null) {
+    public static void unregister(@NotNull String keyComboId, @NotNull KeyComboEventType eventType) {
+        pendingActions.add(() -> {
+            KeyComboState state = combosById.get(keyComboId);
+            if(state == null) return;
+
+            EnumMap<KeyComboEventType, List<KeyComboCallback>> listenersByType = state.listeners;
+
+            listenersByType.remove(eventType);
+
+            if(listenersByType.isEmpty()) {
+                combosById.remove(keyComboId);
+            }
+        });
+    }
+
+    private static void fireEvent(String keyComboId, KeyComboEventType eventType) {
+        KeyComboState state = combosById.get(keyComboId);
+        if (state == null) {
             return;
         }
 
-        List<KeyComboCallback> callbacks = byType.get(eventType);
+        List<KeyComboCallback> callbacks = state.listeners.get(eventType);
         if (callbacks == null || callbacks.isEmpty()) {
             return;
         }
 
         for(KeyComboCallback callback : callbacks) {
-            callback.handle(combo);
+            callback.handle(state.combo);
         }
     }
 
     public static boolean handleRawKeyEvent(int action, KeyInput input) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if(client.currentScreen != null) {
+        if(client == null || client.currentScreen != null) {
             return false;
         }
         if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE && action != GLFW.GLFW_REPEAT) {
             return false;
         }
 
-        int keyCode = input.key();
-
-        List<KeyCombo> combos = findMatchingCombos(keyCode);
-        if(combos.isEmpty()) {
+        List<KeyComboState> comboStates = findMatchingComboStates(input.key());
+        if(comboStates.isEmpty()) {
             return false;
         }
 
         boolean consumed = false;
-        for (KeyCombo combo : combos) {
-            boolean nowPressed = combo.allKeysPressed();
-            boolean wasPressed = Boolean.TRUE.equals(pressedStates.get(combo));
-
+        for (KeyComboState state : comboStates) {
+            boolean nowPressed = state.combo.allKeysPressed();
+            boolean wasPressed = state.pressed;
 
             KeyComboEventType eventType = null;
 
             if (nowPressed && !wasPressed) {
                 eventType = KeyComboEventType.PRESS;
-            } else if (nowPressed && wasPressed) {
+            } else if (nowPressed) {
                 eventType = KeyComboEventType.HOLD;
-            } else if (!nowPressed && wasPressed) {
+            } else if (wasPressed) {
                 eventType = KeyComboEventType.RELEASE;
             }
 
+            state.pressed = nowPressed;
+
             if (eventType != null) {
-                fireEvent(combo, eventType);
+                fireEvent(state.combo.getId(), eventType);
                 consumed = true;
-                pressedStates.put(combo, nowPressed);
                 break;
             }
-
-            pressedStates.put(combo, nowPressed);
         }
         return consumed;
     }
 
-    private static List<KeyCombo> findMatchingCombos(int keyCode) {
-        List<KeyCombo> matches = new ArrayList<>();
-        for (KeyCombo combo : listeners.keySet()) {
-            if (combo.getKeyCodes().contains(keyCode)) {
-                matches.add(combo);
+    private static List<KeyComboState> findMatchingComboStates(int keyCode) {
+        List<KeyComboState> matchingComboStates = new ArrayList<>();
+        for (KeyComboState comboState : combosById.values()) {
+            if (comboState.combo.getKeyCodes().contains(keyCode)) {
+                matchingComboStates.add(comboState);
             }
         }
-        return matches;
+        return matchingComboStates;
     }
 
-    public static void onPress(KeyCombo combo, KeyComboCallback callback) {
+    public static void onPress(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
         register(combo, KeyComboEventType.PRESS, callback);
     }
 
-    public static void onHold(KeyCombo combo, KeyComboCallback callback) {
+    public static void onHold(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
         register(combo, KeyComboEventType.HOLD, callback);
     }
 
-    public static void onRelease(KeyCombo combo, KeyComboCallback callback) {
+    public static void onRelease(@NotNull KeyCombo combo, @NotNull KeyComboCallback callback) {
         register(combo, KeyComboEventType.RELEASE, callback);
     }
 }
