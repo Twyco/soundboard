@@ -22,7 +22,7 @@ public class SoundManager {
     }
 
     public static void init() {
-        LOG.info("[SoundManager/init] Initializing Soundboard Manager");
+        LOG.info("[SoundManager/init] Initializing Sound Manager");
         reload();
     }
 
