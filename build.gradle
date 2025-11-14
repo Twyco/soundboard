@@ -11,9 +11,11 @@ base {
 }
 
 repositories {
-	maven { url =  "https://maven.architectury.dev/" }
 	maven { url = "https://maven.shedaniel.me/" }
-	maven { url = "https://maven.terraformersmc.com/releases" }
+	maven {
+		name = "Terraformers"
+		url = "https://maven.terraformersmc.com/"
+	}
 }
 
 dependencies {
@@ -22,9 +24,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-//
-//	modApi "dev.architectury:architectury-fabric:${project.architectury_fabric_version}"
+	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 	modImplementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 
 }
