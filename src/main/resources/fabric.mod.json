@@ -16,7 +16,8 @@
 	"entrypoints": {
 		"main": [
 			"de.twyco.soundboard.Soundboard"
-		]
+		],
+		"modmenu": [ "de.twyco.soundboard.modApiImpl.ModMenuApiImpl" ]
 	},
 	"mixins": [
 		"soundboard.mixins.json"
@@ -29,6 +30,6 @@
 		"cloth-config": ">=20.0.0"
 	},
 	"suggests": {
-		"another-mod": "modmenu"
+		"modmenu": "*"
 	}
 }
