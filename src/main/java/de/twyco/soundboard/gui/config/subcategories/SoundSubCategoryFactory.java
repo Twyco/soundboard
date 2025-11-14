@@ -1,4 +1,4 @@
-package de.twyco.soundboard.gui.config.categories;
+package de.twyco.soundboard.gui.config.subcategories;
 
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;

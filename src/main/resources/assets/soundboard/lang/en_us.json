@@ -1,6 +1,8 @@
 {
   "gui.soundboard.config.title": "Soundboard Config",
-  "gui.soundboard.config.category.sounds" : "Sound Settings",
+  "gui.soundboard.config.categories.general.title" : "General",
+  "gui.soundboard.config.categories.general.description" : "TODO Description how mod works",
+  "gui.soundboard.config.categories.sounds.title" : "Sound Settings",
   "gui.soundboard.config.sound.loop": "Loop Sound",
   "gui.soundboard.config.sound.amplifier": "Amplifier"
 }
