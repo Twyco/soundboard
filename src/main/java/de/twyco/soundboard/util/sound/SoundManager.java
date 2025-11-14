@@ -1,6 +1,9 @@
 package de.twyco.soundboard.util.sound;
 
 import de.twyco.soundboard.Soundboard;
+import de.twyco.soundboard.util.config.SoundboardConfig;
+import de.twyco.soundboard.util.config.SoundboardConfigData;
+import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
@@ -66,16 +69,36 @@ public class SoundManager {
     }
 
     private static void registerFileAsSound(Path file) {
+        SoundboardConfigData config = SoundboardConfig.get();
+
         String fileName = file.getFileName().toString();
         String nameWithoutExtension = stripExtension(fileName);
 
-        String id = fileName;
+        Sound sound = new Sound(fileName, fileName, file);
+        SoundEntry soundEntry = config.sounds.get(sound.getId());
 
-        Sound sound = new Sound(id, nameWithoutExtension, file);
+        if(soundEntry == null) {
+            soundEntry = SoundEntry.fromDefaults(config);
+            config.sounds.put(sound.getId(), soundEntry);
+            SoundboardConfig.save();
+        }
 
-        soundsById.put(id, sound);
+        sound.setAmplifier(soundEntry.amplifier);
+        sound.setLoop(soundEntry.loop);
 
-        LOG.info("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", id, nameWithoutExtension, file);
+        if(soundEntry.keyCombo != null && !soundEntry.keyCombo.isEmpty()) {
+            KeyCombo combo = KeyCombo.of(
+                    "soundboard.play." + fileName,
+                    soundEntry.keyCombo.stream().mapToInt(Integer::intValue).toArray()
+            );
+            updateSoundKeyCombo(sound, combo);
+        }else {
+            updateSoundKeyCombo(sound, null);
+        }
+
+        soundsById.put(fileName, sound);
+
+        LOG.info("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", fileName, nameWithoutExtension, file);
     }
 
     private static String stripExtension(String fileName) {
@@ -107,6 +130,6 @@ public class SoundManager {
     }
 
     public static void playSound(@NotNull Sound sound) {
-        LOG.info("[SoundManager/playSound] Start playing sound {}", sound.getPath());
+        LOG.info("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
     }
 }
