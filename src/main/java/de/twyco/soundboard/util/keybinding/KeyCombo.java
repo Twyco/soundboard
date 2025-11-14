@@ -1,36 +1,45 @@
 package de.twyco.soundboard.util.keybinding;
 
 import net.minecraft.client.util.InputUtil;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-public class KeyCombo {
-    private final HashSet<Integer> keyCodes;
+public final class KeyCombo {
+    private final String id;
+    private final Set<Integer> keyCodes;
 
-    public KeyCombo(Set<Integer> keyCodes) {
+    public KeyCombo(@NotNull String id, Set<Integer> keyCodes) {
+        this.id = id;
         this.keyCodes = new HashSet<>(keyCodes);
     }
 
-    public static KeyCombo of(int... keyCodes) {
+    public static KeyCombo of(@NotNull String id, int... keyCodes) {
         HashSet<Integer> s = new HashSet<>();
-        for (Integer i : keyCodes) {
+        for (int i : keyCodes) {
             s.add(i);
         }
-        return new KeyCombo(s);
+        return new KeyCombo(id, s);
     }
 
-    public HashSet<Integer> getKeyCodes() {
-        return keyCodes;
+    public String getId() {
+        return id;
     }
 
-    public static KeyCombo empty() {
-        return new KeyCombo(Set.of());
+    public Set<Integer> getKeyCodes() {
+        return Collections.unmodifiableSet(keyCodes);
     }
 
     public boolean isEmpty() {
         return keyCodes.isEmpty();
+    }
+
+    public boolean allKeysPressed() {
+        for(Integer keyCode : keyCodes) {
+            if(!KeyHelper.isKeyPressed(keyCode)) return false;
+        }
+        return true;
     }
 
     @Override
@@ -39,7 +48,9 @@ public class KeyCombo {
             return "Not Bound";
         }
         StringBuilder sb = new StringBuilder();
-        for(Integer keyCode : keyCodes) {
+        List<Integer> sorted = new ArrayList<>(keyCodes);
+        Collections.sort(sorted);
+        for (int keyCode : sorted) {
             if(!sb.isEmpty()) {
                 sb.append(" + ");
             }
@@ -61,19 +72,12 @@ public class KeyCombo {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return  keyCodes.equals(((KeyCombo) o).keyCodes);
-    }
-
-    public boolean allKeysPressed() {
-        for(Integer keyCode : keyCodes) {
-            if(!KeyHelper.isKeyPressed(keyCode)) return false;
-        }
-        return true;
+        if (!(o instanceof KeyCombo other)) return false;
+        return id.equals(other.id);
     }
 
     @Override
     public int hashCode() {
-        return keyCodes.hashCode();
+        return id.hashCode();
     }
 }
