@@ -2,7 +2,6 @@ package de.twyco.soundboard.util.sound;
 
 import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
-import de.twyco.soundboard.util.keybinding.KeyComboManager;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,12 +97,12 @@ public class SoundManager {
     public static void updateSoundKeyCombo(Sound sound, @Nullable KeyCombo newCombo) {
         KeyCombo oldCombo = sound.getKeyCombo();
         if(oldCombo != null) {
-            KeyComboManager.unregister(oldCombo);
+            oldCombo.unregister();
         }
 
         sound.setKeyCombo(newCombo);
         if(newCombo != null) {
-            KeyComboManager.onPress(newCombo, c -> sound.play());
+            newCombo.onPress(c -> sound.play());
         }
     }
 

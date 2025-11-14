@@ -1,5 +1,7 @@
 package de.twyco.soundboard.util.keybinding;
 
+import de.twyco.soundboard.enums.KeyComboEventType;
+import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -79,5 +81,25 @@ public final class KeyCombo {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public void onPress(@NotNull KeyComboCallback actionCallback) {
+        KeyComboManager.onPress(this, actionCallback);
+    }
+
+    public void onHold(@NotNull KeyComboCallback actionCallback) {
+        KeyComboManager.onHold(this, actionCallback);
+    }
+
+    public void onRelease(@NotNull KeyComboCallback actionCallback) {
+        KeyComboManager.onRelease(this, actionCallback);
+    }
+
+    public void unregister() {
+        KeyComboManager.unregister(this);
+    }
+
+    public void unregister(@NotNull KeyComboEventType  eventType) {
+        KeyComboManager.unregister(this, eventType);
     }
 }
