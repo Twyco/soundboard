@@ -58,6 +58,8 @@ public class SoundManager {
             LOG.error("[SoundManager/init] Error reading sounds from '{}': {}", soundsDir.toAbsolutePath(),  e.getMessage());
         }
 
+        applyConfigToSounds(SoundboardConfig.get());
+
         LOG.info("[SoundManager/init] Successfully loaded {} sounds", soundsById.size());
     }
 
@@ -69,36 +71,38 @@ public class SoundManager {
     }
 
     private static void registerFileAsSound(Path file) {
-        SoundboardConfigData config = SoundboardConfig.get();
-
         String fileName = file.getFileName().toString();
         String nameWithoutExtension = stripExtension(fileName);
 
         Sound sound = new Sound(fileName, fileName, file);
-        SoundEntry soundEntry = config.sounds.get(sound.getId());
-
-        if(soundEntry == null) {
-            soundEntry = SoundEntry.fromDefaults(config);
-            config.sounds.put(sound.getId(), soundEntry);
-            SoundboardConfig.save();
-        }
-
-        sound.setAmplifier(soundEntry.amplifier);
-        sound.setLoop(soundEntry.loop);
-
-        if(soundEntry.keyCombo != null && !soundEntry.keyCombo.isEmpty()) {
-            KeyCombo combo = KeyCombo.of(
-                    "soundboard.play." + fileName,
-                    soundEntry.keyCombo.stream().mapToInt(Integer::intValue).toArray()
-            );
-            updateSoundKeyCombo(sound, combo);
-        }else {
-            updateSoundKeyCombo(sound, null);
-        }
 
         soundsById.put(fileName, sound);
 
         LOG.info("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", fileName, nameWithoutExtension, file);
+    }
+
+    public static void applyConfigToSounds(SoundboardConfigData config) {
+        for (Sound sound : getAllSounds()) {
+            SoundEntry entry = config.sounds.get(sound.getId());
+            if (entry == null) {
+                entry = SoundEntry.fromDefaults(config);
+                config.sounds.put(sound.getId(), entry);
+                SoundboardConfig.save();
+            }
+
+            sound.setAmplifier(entry.amplifier);
+            sound.setLoop(entry.loop);
+
+            if (entry.keyCombo != null && !entry.keyCombo.isEmpty()) {
+                KeyCombo combo = KeyCombo.of(
+                        "soundboard.play." + sound.getId(),
+                        entry.keyCombo.stream().mapToInt(Integer::intValue).toArray()
+                );
+                updateSoundKeyCombo(sound, combo);
+            } else {
+                updateSoundKeyCombo(sound, null);
+            }
+        }
     }
 
     private static String stripExtension(String fileName) {
@@ -111,10 +115,6 @@ public class SoundManager {
 
     public static Collection<Sound> getAllSounds() {
         return Collections.unmodifiableCollection(soundsById.values());
-    }
-
-    public static Sound getSoundById(String id) {
-        return soundsById.get(id);
     }
 
     public static void updateSoundKeyCombo(Sound sound, @Nullable KeyCombo newCombo) {
