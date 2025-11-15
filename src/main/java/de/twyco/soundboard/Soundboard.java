@@ -1,5 +1,6 @@
 package de.twyco.soundboard;
 
+import de.twyco.soundboard.client.GlobalKeybinds;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.keybinding.KeyComboManager;
 import de.twyco.soundboard.util.sound.SoundManager;
@@ -18,6 +19,7 @@ public class Soundboard implements ModInitializer {
 		SoundboardConfig.init();
 		KeyComboManager.init();
 		SoundManager.init();
+		GlobalKeybinds.init();
 	}
 
 }

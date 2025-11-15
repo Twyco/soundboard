@@ -157,4 +157,9 @@ public class SoundManager {
                     soundsDir.toAbsolutePath(), e.getMessage());
         }
     }
+
+    public static void stopAllSounds() {
+        LOG.info("[SoundManager/stopAllSounds] Stopping all sounds");
+        LOG.warn("[SoundManager/stopAllSounds] not implemented yet");
+    }
 }
