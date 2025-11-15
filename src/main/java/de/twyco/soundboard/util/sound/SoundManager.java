@@ -6,9 +6,9 @@ import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -75,7 +75,7 @@ public class SoundManager {
         String fileName = file.getFileName().toString();
         String nameWithoutExtension = stripExtension(fileName);
 
-        Sound sound = new Sound(fileName, fileName, file);
+        Sound sound = new Sound(fileName, fileName, file, KeyCombo.empty("soundboard.play." + fileName));
 
         soundsById.put(fileName, sound);
 
@@ -94,15 +94,17 @@ public class SoundManager {
             sound.setAmplifier(entry.amplifier);
             sound.setLoop(entry.loop);
 
+            KeyCombo combo;
+
             if (entry.keyCombo != null && !entry.keyCombo.isEmpty()) {
-                KeyCombo combo = KeyCombo.of(
+                combo = KeyCombo.of(
                         "soundboard.play." + sound.getId(),
                         entry.keyCombo.stream().mapToInt(Integer::intValue).toArray()
                 );
-                updateSoundKeyCombo(sound, combo);
             } else {
-                updateSoundKeyCombo(sound, null);
+                combo = KeyCombo.empty("soundboard.play." + sound.getId());
             }
+            updateSoundKeyCombo(sound, combo);
         }
     }
 
@@ -118,19 +120,16 @@ public class SoundManager {
         return Collections.unmodifiableCollection(soundsById.values());
     }
 
-    public static void updateSoundKeyCombo(Sound sound, @Nullable KeyCombo newCombo) {
-        KeyCombo oldCombo = sound.getKeyCombo();
-        if(oldCombo != null) {
-            oldCombo.unregister();
-        }
+    public static void updateSoundKeyCombo(Sound sound, @NotNull KeyCombo newCombo) {
+        sound.getKeyCombo().unregister();
 
         sound.setKeyCombo(newCombo);
-        if(newCombo != null) {
-            newCombo.onPress(c -> sound.play());
-        }
+        newCombo.onPress(c -> sound.play());
     }
 
     public static void playSound(@NotNull Sound sound) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.inGameHud.getChatHud().addMessage(Text.literal("Start playing sound [name=" + sound.getName() + ", amplifier="+ sound.getAmplifier() +", loop="+ sound.isLoop() +"]"));
         LOG.info("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
     }
 

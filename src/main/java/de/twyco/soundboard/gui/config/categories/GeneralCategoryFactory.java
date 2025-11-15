@@ -44,9 +44,6 @@ public class GeneralCategoryFactory {
                         }
                 )
         );
-        category.addEntry(
-                entryBuilder.startTextDescription(Text.literal("TODO Reopen Screen")).build()
-        );
     }
 
 }

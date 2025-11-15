@@ -1,5 +1,6 @@
 package de.twyco.soundboard.gui.config.subcategories;
 
+import de.twyco.soundboard.gui.config.entries.KeyComboEntry;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
@@ -19,6 +20,8 @@ public class SoundSubCategoryFactory {
                 id -> SoundEntry.fromDefaults(configData)
         );
         SubCategoryBuilder builder = entryBuilder.startSubCategory(Text.literal(sound.getName()));
+
+        builder.add(new KeyComboEntry(sound, entry));
 
         builder.add(
                 entryBuilder

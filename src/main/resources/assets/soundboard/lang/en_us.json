@@ -5,6 +5,7 @@
   "gui.soundboard.config.categories.sounds.title" : "Sound Settings",
   "gui.soundboard.config.action.open_sounds_folder": "Open sound folder",
   "gui.soundboard.config.action.reload": "Reload sound files",
+  "gui.soundboard.config.keybind": "Keybind",
   "gui.soundboard.config.sound.loop": "Loop Sound",
   "gui.soundboard.config.sound.amplifier": "Amplifier"
 }
