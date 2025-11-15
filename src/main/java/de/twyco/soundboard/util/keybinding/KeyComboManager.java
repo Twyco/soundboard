@@ -101,6 +101,13 @@ public class KeyComboManager {
             return false;
         }
 
+        if(client.currentScreen != null) {
+            for(KeyComboState state : comboStates) {
+                state.pressed = false;
+            }
+            return false;
+        }
+
         boolean consumed = false;
         for (KeyComboState state : comboStates) {
             boolean nowPressed = state.combo.allKeysPressed();
@@ -119,11 +126,8 @@ public class KeyComboManager {
             state.pressed = nowPressed;
 
             if (eventType != null) {
-                if(client.currentScreen == null) {
-                    fireEvent(state.combo.getId(), eventType);
-                }
+                fireEvent(state.combo.getId(), eventType);
                 consumed = true;
-                break;
             }
         }
         return consumed;
