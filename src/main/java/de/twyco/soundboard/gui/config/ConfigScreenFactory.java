@@ -21,7 +21,7 @@ public class ConfigScreenFactory {
 
         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
 
-        GeneralCategoryFactory.create(builder, entryBuilder);
+        GeneralCategoryFactory.create(builder, entryBuilder, parent);
         SoundsCategoryFactory.create(builder, entryBuilder);
 
         return builder.build();

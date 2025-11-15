@@ -6,6 +6,7 @@ import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -131,5 +132,30 @@ public class SoundManager {
 
     public static void playSound(@NotNull Sound sound) {
         LOG.info("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
+    }
+
+    public static void openSoundsFolder() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null) {
+            return;
+        }
+
+        Path runDir = client.runDirectory.toPath();
+        Path soundsDir = runDir.resolve("sounds");
+
+        try {
+            Files.createDirectories(soundsDir);
+        } catch (IOException e) {
+            LOG.error("[SoundManager/openSoundsFolder] Failed to create sounds directory: {}", e.getMessage());
+            return;
+        }
+
+        try {
+            Util.getOperatingSystem().open(soundsDir.toFile());
+            LOG.info("[SoundManager/openSoundsFolder] Opened sounds directory '{}'", soundsDir.toAbsolutePath());
+        } catch (Exception e) {
+            LOG.error("[SoundManager/openSoundsFolder] Failed to open sounds directory '{}': {}",
+                    soundsDir.toAbsolutePath(), e.getMessage());
+        }
     }
 }
