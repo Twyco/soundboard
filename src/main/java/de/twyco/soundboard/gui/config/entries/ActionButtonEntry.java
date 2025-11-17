@@ -26,7 +26,7 @@ public class ActionButtonEntry extends AbstractConfigListEntry<Void> {
 
         button.setX(x);
         button.setY(y);
-        button.setWidth(150);
+        button.setWidth(entryWidth);
         button.setHeight(20);
 
         button.render(ctx, mouseX, mouseY, delta);

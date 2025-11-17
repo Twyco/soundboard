@@ -4,6 +4,7 @@ import de.twyco.soundboard.client.GlobalKeybinds;
 import de.twyco.soundboard.enums.GlobalKeybind;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 import de.twyco.soundboard.gui.config.entries.ActionButtonEntry;
+import de.twyco.soundboard.gui.config.entries.ActionButtonGridEntry;
 import de.twyco.soundboard.gui.config.entries.KeyComboEntry;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
@@ -30,27 +31,27 @@ public class GeneralCategoryFactory {
         category.addEntry(getKeyComboEntry(GlobalKeybind.OPEN_CONFIG));
         category.addEntry(getKeyComboEntry(GlobalKeybind.SOUND_STOP_ALL));
         category.addEntry(
-                new ActionButtonEntry(
-                        Text.translatable("gui.soundboard.config.action.open_sounds_folder"),
-                        Text.translatable("gui.soundboard.config.action.open_sounds_folder"),
-                        SoundManager::openSoundsFolder
-                )
-        );
-        category.addEntry(
-                new ActionButtonEntry(
-                        Text.translatable("gui.soundboard.config.action.reload"),
-                        Text.translatable("gui.soundboard.config.action.reload"),
-                        () -> {
-                            SoundboardConfig.load();
-                            SoundManager.reload();
-                            MinecraftClient client = MinecraftClient.getInstance();
-                            client.setScreen(ConfigScreenFactory.create(parent));
-                        }
+                new ActionButtonGridEntry(
+                        new ActionButtonEntry(
+                                Text.translatable("gui.soundboard.config.action.open_sounds_folder"),
+                                Text.translatable("gui.soundboard.config.action.open_sounds_folder"),
+                                SoundManager::openSoundsFolder
+                        ),
+                        new ActionButtonEntry(
+                                Text.translatable("gui.soundboard.config.action.reload"),
+                                Text.translatable("gui.soundboard.config.action.reload"),
+                                () -> {
+                                    SoundboardConfig.load();
+                                    SoundManager.reload();
+                                    MinecraftClient client = MinecraftClient.getInstance();
+                                    client.setScreen(ConfigScreenFactory.create(parent));
+                                }
+                        )
                 )
         );
     }
 
-    private static KeyComboEntry getKeyComboEntry(GlobalKeybind keybind){
+    private static KeyComboEntry getKeyComboEntry(GlobalKeybind keybind) {
         SoundboardConfigData configData = SoundboardConfig.get();
         KeyCombo combo = GlobalKeybinds.getKeyCombos().computeIfAbsent(
                 keybind.getId(),
