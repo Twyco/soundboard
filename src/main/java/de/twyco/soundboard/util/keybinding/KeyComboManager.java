@@ -1,6 +1,5 @@
 package de.twyco.soundboard.util.keybinding;
 
-import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -8,12 +7,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.KeyInput;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
 
 import java.util.*;
 
 public class KeyComboManager {
-    private static final Logger LOG = Soundboard.LOGGER;
 
     private static class KeyComboState {
         final KeyCombo combo;
@@ -43,10 +40,6 @@ public class KeyComboManager {
     }
 
     private static void register(KeyCombo combo, KeyComboEventType eventType, KeyComboCallback callback) {
-        if(combo.isEmpty()) {
-            LOG.warn("[KeyComboManager/register]  Tried to register an empty KeyCombo! KeyComboId='{}'", combo.getId());
-            return;
-        }
         pendingActions.add(() -> {
             KeyComboState state = combosById.computeIfAbsent(
                     combo.getId(),
@@ -108,6 +101,13 @@ public class KeyComboManager {
             return false;
         }
 
+        if(client.currentScreen != null) {
+            for(KeyComboState state : comboStates) {
+                state.pressed = false;
+            }
+            return false;
+        }
+
         boolean consumed = false;
         for (KeyComboState state : comboStates) {
             boolean nowPressed = state.combo.allKeysPressed();
@@ -126,11 +126,8 @@ public class KeyComboManager {
             state.pressed = nowPressed;
 
             if (eventType != null) {
-                if(client.currentScreen == null) {
-                    fireEvent(state.combo.getId(), eventType);
-                }
+                fireEvent(state.combo.getId(), eventType);
                 consumed = true;
-                break;
             }
         }
         return consumed;

@@ -1,10 +1,14 @@
 package de.twyco.soundboard.util.sound;
 
 import de.twyco.soundboard.Soundboard;
+import de.twyco.soundboard.util.config.SoundboardConfig;
+import de.twyco.soundboard.util.config.SoundboardConfigData;
+import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -55,6 +59,8 @@ public class SoundManager {
             LOG.error("[SoundManager/init] Error reading sounds from '{}': {}", soundsDir.toAbsolutePath(),  e.getMessage());
         }
 
+        applyConfigToSounds(SoundboardConfig.get());
+
         LOG.info("[SoundManager/init] Successfully loaded {} sounds", soundsById.size());
     }
 
@@ -69,13 +75,37 @@ public class SoundManager {
         String fileName = file.getFileName().toString();
         String nameWithoutExtension = stripExtension(fileName);
 
-        String id = fileName;
+        Sound sound = new Sound(fileName, fileName, file, KeyCombo.empty("soundboard.play." + fileName));
 
-        Sound sound = new Sound(id, nameWithoutExtension, file);
+        soundsById.put(fileName, sound);
 
-        soundsById.put(id, sound);
+        LOG.info("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", fileName, nameWithoutExtension, file);
+    }
 
-        LOG.info("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", id, nameWithoutExtension, file);
+    public static void applyConfigToSounds(SoundboardConfigData config) {
+        for (Sound sound : getAllSounds()) {
+            SoundEntry entry = config.sounds.get(sound.getId());
+            if (entry == null) {
+                entry = SoundEntry.fromDefaults(config);
+                config.sounds.put(sound.getId(), entry);
+                SoundboardConfig.save();
+            }
+
+            sound.setAmplifier(entry.amplifier);
+            sound.setLoop(entry.loop);
+
+            KeyCombo combo;
+
+            if (entry.keyCombo != null && !entry.keyCombo.isEmpty()) {
+                combo = KeyCombo.of(
+                        "soundboard.play." + sound.getId(),
+                        entry.keyCombo.stream().mapToInt(Integer::intValue).toArray()
+                );
+            } else {
+                combo = KeyCombo.empty("soundboard.play." + sound.getId());
+            }
+            updateSoundKeyCombo(sound, combo);
+        }
     }
 
     private static String stripExtension(String fileName) {
@@ -90,23 +120,46 @@ public class SoundManager {
         return Collections.unmodifiableCollection(soundsById.values());
     }
 
-    public static Sound getSoundById(String id) {
-        return soundsById.get(id);
-    }
-
-    public static void updateSoundKeyCombo(Sound sound, @Nullable KeyCombo newCombo) {
-        KeyCombo oldCombo = sound.getKeyCombo();
-        if(oldCombo != null) {
-            oldCombo.unregister();
-        }
+    public static void updateSoundKeyCombo(Sound sound, @NotNull KeyCombo newCombo) {
+        sound.getKeyCombo().unregister();
 
         sound.setKeyCombo(newCombo);
-        if(newCombo != null) {
-            newCombo.onPress(c -> sound.play());
-        }
+        newCombo.onPress(c -> sound.play());
     }
 
     public static void playSound(@NotNull Sound sound) {
-        LOG.info("[SoundManager/playSound] Start playing sound {}", sound.getPath());
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.inGameHud.getChatHud().addMessage(Text.literal("Start playing sound [name=" + sound.getName() + ", amplifier="+ sound.getAmplifier() +", loop="+ sound.isLoop() +"]"));
+        LOG.info("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
+    }
+
+    public static void openSoundsFolder() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null) {
+            return;
+        }
+
+        Path runDir = client.runDirectory.toPath();
+        Path soundsDir = runDir.resolve("sounds");
+
+        try {
+            Files.createDirectories(soundsDir);
+        } catch (IOException e) {
+            LOG.error("[SoundManager/openSoundsFolder] Failed to create sounds directory: {}", e.getMessage());
+            return;
+        }
+
+        try {
+            Util.getOperatingSystem().open(soundsDir.toFile());
+            LOG.info("[SoundManager/openSoundsFolder] Opened sounds directory '{}'", soundsDir.toAbsolutePath());
+        } catch (Exception e) {
+            LOG.error("[SoundManager/openSoundsFolder] Failed to open sounds directory '{}': {}",
+                    soundsDir.toAbsolutePath(), e.getMessage());
+        }
+    }
+
+    public static void stopAllSounds() {
+        LOG.info("[SoundManager/stopAllSounds] Stopping all sounds");
+        LOG.warn("[SoundManager/stopAllSounds] not implemented yet");
     }
 }

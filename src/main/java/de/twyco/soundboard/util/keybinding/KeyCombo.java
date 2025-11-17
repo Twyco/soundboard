@@ -25,6 +25,10 @@ public final class KeyCombo {
         return new KeyCombo(id, s);
     }
 
+    public static KeyCombo empty(@NotNull String id) {
+        return new KeyCombo(id, Set.of());
+    }
+
     public String getId() {
         return id;
     }
@@ -38,6 +42,9 @@ public final class KeyCombo {
     }
 
     public boolean allKeysPressed() {
+        if(keyCodes.isEmpty()) {
+            return false;
+        }
         for(Integer keyCode : keyCodes) {
             if(!KeyHelper.isKeyPressed(keyCode)) return false;
         }
