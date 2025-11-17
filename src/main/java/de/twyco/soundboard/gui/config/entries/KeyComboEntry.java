@@ -1,10 +1,6 @@
 package de.twyco.soundboard.gui.config.entries;
 
-import de.twyco.soundboard.util.config.SoundboardConfig;
-import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
-import de.twyco.soundboard.util.sound.Sound;
-import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,9 +8,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
@@ -23,24 +21,27 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
 
     private static KeyComboEntry currentlyListening = null;
 
-    private final Sound sound;
-    private final SoundEntry soundEntry;
     private final ButtonWidget button;
+    private final TextWidget textWidget;
+    private final java.util.function.Consumer<KeyCombo> onChange;
 
+    private KeyCombo combo;
     private boolean listening = false;
     private final Set<Integer> pressedKeys = new LinkedHashSet<>();
 
-
-    public KeyComboEntry(Sound sound, SoundEntry soundEntry) {
-        super(Text.translatable("gui.soundboard.config.keybind"), false);
-        this.sound = sound;
-        this.soundEntry = soundEntry;
+    public KeyComboEntry(@NotNull Text fieldLabel,
+                         @NotNull KeyCombo initialCombo,
+                         @NotNull java.util.function.Consumer<KeyCombo> onChange) {
+        super(fieldLabel, false);
+        this.combo = initialCombo;
+        this.onChange = onChange;
 
         this.button = ButtonWidget.builder(
-                        Text.literal(sound.getKeyCombo().toString()),
+                        Text.literal(initialCombo.toString()),
                         b -> onButtonClick()
                 )
                 .build();
+        this.textWidget = new TextWidget(fieldLabel, MinecraftClient.getInstance().textRenderer);
     }
 
     private void onButtonClick() {
@@ -71,11 +72,11 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     }
 
 
-    private void updateButtonMessage() {
+    public void updateButtonMessage() {
         if (listening) {
             Text listeningLabel = Text.empty()
                     .append(Text.literal("> ").formatted(Formatting.YELLOW))
-                    .append(Text.literal(sound.getKeyCombo().toString())
+                    .append(Text.literal(combo.toString())
                             .formatted(Formatting.WHITE, Formatting.UNDERLINE))
                     .append(Text.literal(" <").formatted(Formatting.YELLOW));
             button.setMessage(listeningLabel);
@@ -83,17 +84,15 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
             return;
         }
 
-        button.setMessage(Text.literal(sound.getKeyCombo().toString()));
+        button.setMessage(Text.literal(combo.toString()));
     }
 
     @Override
     public void render(DrawContext ctx, int index, int y, int x,
                        int entryWidth, int entryHeight,
                        int mouseX, int mouseY, boolean hovered, float delta) {
-        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
-        Text label = this.getFieldName();
-        ctx.drawText(tr, "test", 0, y, 0xFFFFFF, true);
 
         int buttonWidth = 150;
         int buttonHeight = 20;
@@ -107,6 +106,18 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         button.setFocused(listening);
 
         button.render(ctx, mouseX, mouseY, delta);
+
+
+        int labelWidth = Math.min(textRenderer.getWidth(textWidget.getMessage()), entryWidth - buttonWidth);
+        int labelHeight = 20;
+        int textY = y + (entryHeight - labelHeight) / 2;
+
+        textWidget.setX(x);
+        textWidget.setY(textY);
+        textWidget.setWidth(labelWidth);
+        textWidget.setHeight(labelHeight);
+
+        textWidget.render(ctx, mouseX, mouseY, delta);
     }
 
     @Override
@@ -115,11 +126,14 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
             return button.keyPressed(event) || super.keyPressed(event);
         }
 
-        if (event.key() == GLFW.GLFW_KEY_BACKSPACE || event.key() == GLFW.GLFW_KEY_DELETE || event.key() == GLFW.GLFW_KEY_ESCAPE) {
-            KeyCombo combo = KeyCombo.empty(sound.getKeyCombo().getId());
-            SoundManager.updateSoundKeyCombo(sound, combo);
-            soundEntry.keyCombo = combo.getKeyCodes();
-            SoundboardConfig.save();
+        if (event.key() == GLFW.GLFW_KEY_BACKSPACE
+                || event.key() == GLFW.GLFW_KEY_DELETE
+                || event.key() == GLFW.GLFW_KEY_ESCAPE
+        ) {
+            KeyCombo combo = KeyCombo.empty(this.combo.getId());
+            this.combo = combo;
+
+            onChange.accept(combo);
 
             stopListening();
             return true;
@@ -135,14 +149,11 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
             return button.keyReleased(event) || super.keyReleased(event);
         }
 
-        KeyCombo combo = KeyCombo.of(
-                sound.getKeyCombo().getId(),
-                pressedKeys.stream().mapToInt(Integer::intValue).toArray()
-        );
+        int[] codes = pressedKeys.stream().mapToInt(Integer::intValue).toArray();
+        KeyCombo combo = KeyCombo.of(this.combo.getId(), codes);
+        this.combo = combo;
 
-        SoundManager.updateSoundKeyCombo(sound, combo);
-        soundEntry.keyCombo = combo.getKeyCodes();
-        SoundboardConfig.save();
+        onChange.accept(combo);
 
         stopListening();
         return true;

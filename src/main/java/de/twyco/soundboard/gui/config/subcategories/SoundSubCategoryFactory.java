@@ -5,6 +5,7 @@ import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.sound.Sound;
+import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
@@ -21,7 +22,11 @@ public class SoundSubCategoryFactory {
         );
         SubCategoryBuilder builder = entryBuilder.startSubCategory(Text.literal(sound.getName()));
 
-        builder.add(new KeyComboEntry(sound, entry));
+        builder.add(new KeyComboEntry(Text.translatable("gui.soundboard.config.keybind.sound.keybind"), sound.getKeyCombo(), newCombo -> {
+            SoundManager.updateSoundKeyCombo(sound, newCombo);
+            entry.keyCombo = newCombo.getKeyCodes();
+            SoundboardConfig.save();
+        }));
 
         builder.add(
                 entryBuilder

@@ -6,6 +6,9 @@
   "gui.soundboard.config.action.open_sounds_folder": "Open sound folder",
   "gui.soundboard.config.action.reload": "Reload sound files",
   "gui.soundboard.config.keybind": "Keybind",
+  "gui.soundboard.config.keybind.sound.keybind": "Keybind",
+  "gui.soundboard.config.keybind.global.open_config": "Open this Config Menu",
+  "gui.soundboard.config.keybind.global.stop_all": "Stop all currently playing Sound",
   "gui.soundboard.config.sound.loop": "Loop Sound",
   "gui.soundboard.config.sound.amplifier": "Amplifier"
 }

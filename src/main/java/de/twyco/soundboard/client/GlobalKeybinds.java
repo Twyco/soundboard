@@ -1,6 +1,6 @@
 package de.twyco.soundboard.client;
 
-import de.twyco.soundboard.enums.GlobalKeyBind;
+import de.twyco.soundboard.enums.GlobalKeybind;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import de.twyco.soundboard.util.config.SoundboardConfig;
@@ -18,18 +18,19 @@ public class GlobalKeybinds {
 
     private static final Map<String, KeyCombo> keyCombos = new HashMap<>();
 
-    private GlobalKeybinds() {}
+    private GlobalKeybinds() {
+    }
 
     public static void init() {
         SoundboardConfigData configData = SoundboardConfig.get();
-        for (GlobalKeyBind keybind : GlobalKeyBind.values()) {
+        for (GlobalKeybind keybind : GlobalKeybind.values()) {
             Set<Integer> keyComboEntry = configData.globalKeyCombos.computeIfAbsent(keybind.getId(), k -> Set.of());
 
             KeyCombo combo;
 
-            if(!keyComboEntry.isEmpty()) {
+            if (!keyComboEntry.isEmpty()) {
                 combo = KeyCombo.of(keybind.getId(), keyComboEntry.stream().mapToInt(Integer::intValue).toArray());
-            }else {
+            } else {
                 combo = KeyCombo.empty(keybind.getId());
             }
 
@@ -40,12 +41,12 @@ public class GlobalKeybinds {
     }
 
     public static void reloadAll() {
-        for (GlobalKeyBind keybind : GlobalKeyBind.values()) {
+        for (GlobalKeybind keybind : GlobalKeybind.values()) {
             reload(keybind);
         }
     }
 
-    public static void reload(@NotNull GlobalKeyBind bind) {
+    public static void reload(@NotNull GlobalKeybind bind) {
         SoundboardConfigData config = SoundboardConfig.get();
         KeyCombo oldCombo = keyCombos.get(bind.getId());
         if (oldCombo != null) {
@@ -68,14 +69,18 @@ public class GlobalKeybinds {
         combo.onPress(getAction(bind));
     }
 
-        private static KeyComboCallback getAction(@NotNull GlobalKeyBind keybind) {
-        return switch (keybind){
-            case GlobalKeyBind.OPEN_CONFIG -> combo -> {
+    public static Map<String, KeyCombo> getKeyCombos() {
+        return keyCombos;
+    }
+
+    private static KeyComboCallback getAction(@NotNull GlobalKeybind keybind) {
+        return switch (keybind) {
+            case GlobalKeybind.OPEN_CONFIG -> combo -> {
                 MinecraftClient client = MinecraftClient.getInstance();
-                if(client == null) return;
+                if (client == null) return;
                 client.setScreen(ConfigScreenFactory.create(client.currentScreen));
             };
-            case GlobalKeyBind.SOUND_STOP_ALL -> combo -> SoundManager.stopAllSounds();
+            case GlobalKeybind.SOUND_STOP_ALL -> combo -> SoundManager.stopAllSounds();
         };
     }
 }

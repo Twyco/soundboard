@@ -1,19 +1,23 @@
 package de.twyco.soundboard.enums;
 
-import org.jetbrains.annotations.Nullable;
+public enum GlobalKeybind {
 
-public enum GlobalKeyBind {
-
-    OPEN_CONFIG("soundboard.config.open"),
-    SOUND_STOP_ALL("soundboard.sounds.stop_all");
+    OPEN_CONFIG("soundboard.config.open", "gui.soundboard.config.keybind.global.open_config"),
+    SOUND_STOP_ALL("soundboard.sounds.stop_all", "gui.soundboard.config.keybind.global.stop_all");
 
     private final String id;
+    private final String translationKey;
 
-    GlobalKeyBind(String id) {
+    GlobalKeybind(String id, String translationKey) {
         this.id = id;
+        this.translationKey = translationKey;
     }
 
     public String getId() {
         return this.id;
+    }
+
+    public String getTranslationKey() {
+        return this.translationKey;
     }
 }
