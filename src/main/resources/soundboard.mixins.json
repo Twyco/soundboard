@@ -1,14 +1,15 @@
 {
-	"required": true,
-	"package": "de.twyco.soundboard.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"KeyboardMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+  "required": true,
+  "package": "de.twyco.soundboard.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "KeyboardMixin",
+    "MinecraftClientFocusMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }

@@ -13,13 +13,11 @@ import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 public class GeneralCategoryFactory {
 
-    public static void create(ConfigBuilder builder, ConfigEntryBuilder entryBuilder, Screen parent) {
+    public static void create(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
         ConfigCategory category = builder.getOrCreateCategory(Text.translatable("gui.soundboard.config.categories.general.title"));
 
         category.addEntry(
@@ -43,8 +41,7 @@ public class GeneralCategoryFactory {
                                 () -> {
                                     SoundboardConfig.load();
                                     SoundManager.reload();
-                                    MinecraftClient client = MinecraftClient.getInstance();
-                                    client.setScreen(ConfigScreenFactory.create(parent));
+                                    ConfigScreenFactory.reloadConfigScreen();
                                 }
                         )
                 )
