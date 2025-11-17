@@ -24,6 +24,7 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     private final ButtonWidget button;
     private final TextWidget textWidget;
     private final java.util.function.Consumer<KeyCombo> onChange;
+    private final int fieldLabelColor;
 
     private KeyCombo combo;
     private boolean listening = false;
@@ -31,7 +32,16 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
 
     public KeyComboEntry(@NotNull Text fieldLabel,
                          @NotNull KeyCombo initialCombo,
-                         @NotNull java.util.function.Consumer<KeyCombo> onChange) {
+                         @NotNull java.util.function.Consumer<KeyCombo> onChange
+    ) {
+        this(fieldLabel, initialCombo, onChange, 0xFFFFFF);
+    }
+
+    public KeyComboEntry(@NotNull Text fieldLabel,
+                         @NotNull KeyCombo initialCombo,
+                         @NotNull java.util.function.Consumer<KeyCombo> onChange,
+                         int fieldLabelColor
+    ) {
         super(fieldLabel, false);
         this.combo = initialCombo;
         this.onChange = onChange;
@@ -42,6 +52,7 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
                 )
                 .build();
         this.textWidget = new TextWidget(fieldLabel, MinecraftClient.getInstance().textRenderer);
+        this.fieldLabelColor = fieldLabelColor;
     }
 
     private void onButtonClick() {
@@ -116,6 +127,7 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         textWidget.setY(textY);
         textWidget.setWidth(labelWidth);
         textWidget.setHeight(labelHeight);
+        textWidget.setTextColor(fieldLabelColor);
 
         textWidget.render(ctx, mouseX, mouseY, delta);
     }

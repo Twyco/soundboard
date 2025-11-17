@@ -26,7 +26,7 @@ public class SoundSubCategoryFactory {
             SoundManager.updateSoundKeyCombo(sound, newCombo);
             entry.keyCombo = newCombo.getKeyCodes();
             SoundboardConfig.save();
-        }));
+        }, 0xAAAAAA));
 
         builder.add(
                 entryBuilder
