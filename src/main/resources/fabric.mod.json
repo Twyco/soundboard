@@ -17,7 +17,12 @@
 		"main": [
 			"de.twyco.soundboard.Soundboard"
 		],
-		"modmenu": [ "de.twyco.soundboard.modApiImpl.ModMenuApiImpl" ]
+		"modmenu": [
+			"de.twyco.soundboard.modImplementations.modMenu.ModMenuApi"
+		],
+		"voicechat": [
+			"de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatApi"
+		]
 	},
 	"mixins": [
 		"soundboard.mixins.json"
@@ -27,7 +32,8 @@
 		"minecraft": "~1.21.10",
 		"java": ">=21",
 		"fabric-api": "*",
-		"cloth-config": ">=20.0.0"
+		"cloth-config": ">=20.0.0",
+		"voicechat_api": ">=2.6.0"
 	},
 	"suggests": {
 		"modmenu": "*"

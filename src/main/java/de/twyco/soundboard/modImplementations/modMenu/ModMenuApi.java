@@ -1,9 +1,8 @@
-package de.twyco.soundboard.modApiImpl;
+package de.twyco.soundboard.modImplementations.modMenu;
 
-import com.terraformersmc.modmenu.api.ModMenuApi;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 
-public class ModMenuApiImpl implements ModMenuApi {
+public class ModMenuApi implements com.terraformersmc.modmenu.api.ModMenuApi {
 
     @Override
     public com.terraformersmc.modmenu.api.ConfigScreenFactory<?> getModConfigScreenFactory() {
