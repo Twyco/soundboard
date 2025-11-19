@@ -6,9 +6,9 @@ import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 import de.twyco.soundboard.gui.config.entries.ActionButtonEntry;
 import de.twyco.soundboard.gui.config.entries.ActionButtonGridEntry;
 import de.twyco.soundboard.gui.config.entries.KeyComboEntry;
-import de.twyco.soundboard.util.client.SoundboardRuntimeState;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
+import de.twyco.soundboard.util.config.entries.GlobalStateEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -20,6 +20,9 @@ import net.minecraft.util.Formatting;
 public class GeneralCategoryFactory {
 
     public static void create(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
+        SoundboardConfigData configData = SoundboardConfig.get();
+        GlobalStateEntry defaultState = GlobalStateEntry.fromDefaults();
+        GlobalStateEntry state = configData.globalState;
         ConfigCategory category = builder.getOrCreateCategory(Text.translatable("gui.soundboard.config.categories.general.title"));
 
 //        category.addEntry(
@@ -33,20 +36,20 @@ public class GeneralCategoryFactory {
         category.addEntry(
                 entryBuilder.startBooleanToggle(
                                 Text.translatable("gui.soundboard.config.state.global.play_while_muted").formatted(Formatting.WHITE),
-                                SoundboardRuntimeState.isPlayWhileMuted()
+                                state.playWhileMuted
                         )
-                        .setDefaultValue(false)
-                        .setSaveConsumer(SoundboardRuntimeState::setPlayWhileMuted)
+                        .setDefaultValue(defaultState.playWhileMuted)
+                        .setSaveConsumer(newValue -> state.playWhileMuted = newValue)
                         .setTooltip(Text.translatable("gui.soundboard.config.state.global.play_while_muted.description"))
                         .build()
         );
         category.addEntry(
                 entryBuilder.startBooleanToggle(
                                 Text.translatable("gui.soundboard.config.state.global.show_sounds_in_hud").formatted(Formatting.WHITE),
-                                SoundboardRuntimeState.isShowPlayingSoundsHud()
+                                state.showPlayingSoundsHud
                         )
-                        .setDefaultValue(true)
-                        .setSaveConsumer(SoundboardRuntimeState::setShowPlayingSoundsHud)
+                        .setDefaultValue(defaultState.showPlayingSoundsHud)
+                        .setSaveConsumer(newValue -> state.showPlayingSoundsHud = newValue)
                         .build()
         );
         category.addEntry(
