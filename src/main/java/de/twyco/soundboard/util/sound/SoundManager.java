@@ -2,13 +2,14 @@ package de.twyco.soundboard.util.sound;
 
 import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
+import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatApi;
+import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatService;
 import de.twyco.soundboard.util.client.FocusActionScheduler;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -130,9 +131,12 @@ public class SoundManager {
     }
 
     public static void playSound(@NotNull Sound sound) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.inGameHud.getChatHud().addMessage(Text.literal("Start playing sound [name=" + sound.getName() + ", amplifier="+ sound.getAmplifier() +", loop="+ sound.isLoop() +"]"));
         LOG.info("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
+        if(SimpleVoicechatApi.isAvailable()) {
+            SimpleVoicechatService.playSound(sound);
+        } else {
+            LOG.warn("[SoundManager/playSound] Simple Voice Chat not available, skipping voice playback");
+        }
     }
 
     public static void openSoundsFolder() {
@@ -167,6 +171,10 @@ public class SoundManager {
 
     public static void stopAllSounds() {
         LOG.info("[SoundManager/stopAllSounds] Stopping all sounds");
-        LOG.warn("[SoundManager/stopAllSounds] not implemented yet");
+        if(SimpleVoicechatApi.isAvailable()) {
+            SimpleVoicechatService.stopAllSounds();
+        } else {
+            LOG.warn("[SoundManager/stopAllSounds] Simple Voice Chat not available, skipping voice playback");
+        }
     }
 }
