@@ -6,6 +6,7 @@ import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 import de.twyco.soundboard.gui.config.entries.ActionButtonEntry;
 import de.twyco.soundboard.gui.config.entries.ActionButtonGridEntry;
 import de.twyco.soundboard.gui.config.entries.KeyComboEntry;
+import de.twyco.soundboard.util.client.SoundboardRuntimeState;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
@@ -14,20 +15,40 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public class GeneralCategoryFactory {
 
     public static void create(ConfigBuilder builder, ConfigEntryBuilder entryBuilder) {
         ConfigCategory category = builder.getOrCreateCategory(Text.translatable("gui.soundboard.config.categories.general.title"));
 
-        category.addEntry(
-                entryBuilder
-                        .startTextDescription(Text.translatable("gui.soundboard.config.categories.general.description"))
-                        .build()
-        );
+//        category.addEntry(
+//                entryBuilder
+//                        .startTextDescription(Text.translatable("gui.soundboard.config.categories.general.description"))
+//                        .build()
+//        );
 
         category.addEntry(getKeyComboEntry(GlobalKeybind.OPEN_CONFIG));
         category.addEntry(getKeyComboEntry(GlobalKeybind.SOUND_STOP_ALL));
+        category.addEntry(
+                entryBuilder.startBooleanToggle(
+                                Text.translatable("gui.soundboard.config.state.global.play_while_muted").formatted(Formatting.WHITE),
+                                SoundboardRuntimeState.isPlayWhileMuted()
+                        )
+                        .setDefaultValue(false)
+                        .setSaveConsumer(SoundboardRuntimeState::setPlayWhileMuted)
+                        .setTooltip(Text.translatable("gui.soundboard.config.state.global.play_while_muted.description"))
+                        .build()
+        );
+        category.addEntry(
+                entryBuilder.startBooleanToggle(
+                                Text.translatable("gui.soundboard.config.state.global.show_sounds_in_hud").formatted(Formatting.WHITE),
+                                SoundboardRuntimeState.isShowPlayingSoundsHud()
+                        )
+                        .setDefaultValue(true)
+                        .setSaveConsumer(SoundboardRuntimeState::setShowPlayingSoundsHud)
+                        .build()
+        );
         category.addEntry(
                 new ActionButtonGridEntry(
                         new ActionButtonEntry(
@@ -63,7 +84,8 @@ public class GeneralCategoryFactory {
                     configData.globalKeyCombos.put(newCombo.getId(), newCombo.getKeyCodes());
                     SoundboardConfig.save();
                     GlobalKeybinds.reload(keybind);
-                }
+                },
+                0xAAAAAA
         );
     }
 }
