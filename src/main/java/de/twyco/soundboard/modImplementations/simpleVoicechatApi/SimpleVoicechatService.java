@@ -4,6 +4,7 @@ import de.maxhenkel.voicechat.api.VoicechatClientApi;
 import de.maxhenkel.voicechat.api.events.MergeClientSoundEvent;
 import de.maxhenkel.voicechat.api.mp3.Mp3Decoder;
 import de.twyco.soundboard.Soundboard;
+import de.twyco.soundboard.modImplementations.simpleVoicechatApi.util.PlayingSound;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.sound.Sound;
@@ -22,26 +23,6 @@ public class SimpleVoicechatService {
     private static final Logger LOG = Soundboard.LOGGER;
     private static VoicechatClientApi clientApi = null;
     private static final List<PlayingSound> activeSounds = new ArrayList<>();
-
-    private static class PlayingSound {
-        final String soundId;
-        final short[] samples;
-        int index = 0;
-
-        final boolean loop;
-        final float gain;
-
-        PlayingSound(Sound sound, short[] samples) {
-            this.soundId = sound.getId();
-            this.samples = samples;
-            this.loop = sound.isLoop();
-            this.gain = Math.max(0f, Math.min(sound.getAmplifier() / 100.0f, 3f));
-        }
-
-        boolean isFinished() {
-            return !loop && index >= samples.length;
-        }
-    }
 
     private SimpleVoicechatService() {
     }
@@ -126,7 +107,6 @@ public class SimpleVoicechatService {
 
                 int remaining = ps.samples.length - ps.index;
                 if (remaining <= 0 && ps.loop) {
-                    LOG.info("restarting");
                     ps.index = 0;
                     remaining = ps.samples.length;
                 }
@@ -217,5 +197,11 @@ public class SimpleVoicechatService {
         }
 
         return mono;
+    }
+
+    public static List<PlayingSound> getCurrentlyPlayingSounds() {
+        synchronized (activeSounds) {
+            return activeSounds;
+        }
     }
 }
