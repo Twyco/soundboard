@@ -4,7 +4,8 @@ import de.maxhenkel.voicechat.api.VoicechatClientApi;
 import de.maxhenkel.voicechat.api.events.MergeClientSoundEvent;
 import de.maxhenkel.voicechat.api.mp3.Mp3Decoder;
 import de.twyco.soundboard.Soundboard;
-import de.twyco.soundboard.util.client.SoundboardRuntimeState;
+import de.twyco.soundboard.util.config.SoundboardConfig;
+import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.sound.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -96,6 +97,7 @@ public class SimpleVoicechatService {
     //--------------------------------------
 
     public static void mixInto(MergeClientSoundEvent event) {
+        SoundboardConfigData config = SoundboardConfig.get();
         synchronized (activeSounds) {
             if (activeSounds.isEmpty()) {
                 return;
@@ -162,7 +164,7 @@ public class SimpleVoicechatService {
             return;
         }
 
-        if(SoundboardRuntimeState.isPlayWhileMuted() || !clientApi.isMuted()) {
+        if(config.globalState.playWhileMuted || !clientApi.isMuted()) {
             event.mergeAudio(mixed);
         }
     }
