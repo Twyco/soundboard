@@ -1,8 +1,8 @@
 {
   "gui.soundboard.config.title": "Soundboard Config",
-  "gui.soundboard.config.categories.general.title" : "General",
-  "gui.soundboard.config.categories.general.description" : "TODO Description how mod works",
-  "gui.soundboard.config.categories.sounds.title" : "Sound Settings",
+  "gui.soundboard.config.categories.general.title": "General",
+  "gui.soundboard.config.categories.general.description": "Open the sounds folder from the button below and drop in your .mp3 files.\nEach file becomes a sound entry where you can set its own amplifier and choose whether it should loop.\nYou can also assign a custom key combo (any number of keys) to each sound.\nPress the key combo in-game to start the sound; pressing it again stops that sound.",
+  "gui.soundboard.config.categories.sounds.title": "Sound Settings",
   "gui.soundboard.config.action.open_sounds_folder": "Open sound folder",
   "gui.soundboard.config.action.reload": "Reload sound files",
   "gui.soundboard.config.keybind": "Keybind",

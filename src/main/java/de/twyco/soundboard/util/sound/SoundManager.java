@@ -69,9 +69,9 @@ public class SoundManager {
 
     private static boolean isSupportedSoundFile(Path path) {
         String fileName = path.getFileName().toString().toLowerCase(Locale.ROOT);
-        return fileName.endsWith(".mp3")
-                || fileName.endsWith(".wav")
-                || fileName.endsWith(".ogg");
+        return fileName.endsWith(".mp3");
+// TODO not implemented yet
+//                || fileName.endsWith(".wav");
     }
 
     private static void registerFileAsSound(Path file) {

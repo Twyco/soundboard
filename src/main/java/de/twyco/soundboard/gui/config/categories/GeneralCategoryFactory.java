@@ -25,11 +25,11 @@ public class GeneralCategoryFactory {
         GlobalStateEntry state = configData.globalState;
         ConfigCategory category = builder.getOrCreateCategory(Text.translatable("gui.soundboard.config.categories.general.title"));
 
-//        category.addEntry(
-//                entryBuilder
-//                        .startTextDescription(Text.translatable("gui.soundboard.config.categories.general.description"))
-//                        .build()
-//        );
+        category.addEntry(
+                entryBuilder
+                        .startTextDescription(Text.translatable("gui.soundboard.config.categories.general.description"))
+                        .build()
+        );
 
         category.addEntry(getKeyComboEntry(GlobalKeybind.OPEN_CONFIG));
         category.addEntry(getKeyComboEntry(GlobalKeybind.SOUND_STOP_ALL));
