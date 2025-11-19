@@ -4,7 +4,10 @@ import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
 import de.maxhenkel.voicechat.api.events.ClientVoicechatConnectionEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
+import de.maxhenkel.voicechat.api.events.MergeClientSoundEvent;
 import de.twyco.soundboard.Soundboard;
+import de.twyco.soundboard.modImplementations.simpleVoicechatApi.listener.ClientVoicechatConnectionListener;
+import de.twyco.soundboard.modImplementations.simpleVoicechatApi.listener.MergeClientSoundListener;
 
 public class SimpleVoicechatApi implements VoicechatPlugin {
 
@@ -25,8 +28,13 @@ public class SimpleVoicechatApi implements VoicechatPlugin {
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(
                 ClientVoicechatConnectionEvent.class,
-                SimpleVoicechatService::onClientVoicechatConnection,
+                new ClientVoicechatConnectionListener()::onEvent,
                 0
+        );
+        registration.registerEvent(
+                MergeClientSoundEvent.class,
+                new MergeClientSoundListener()::onEvent,
+                100
         );
     }
 
