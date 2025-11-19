@@ -48,6 +48,10 @@ public class SimpleVoicechatService {
         synchronized (activeSounds) {
             for (PlayingSound ps : activeSounds) {
                 if(ps.soundId.equals(sound.getId())) {
+                    if(ps.loop) {
+                        activeSounds.remove(ps);
+                        return;
+                    }
                     ps.index = 0;
                     LOG.info("[SimpleVoicechatService/playSound] Restart playing sound '{}' (active={})",
                             sound.getName(), activeSounds.size());
