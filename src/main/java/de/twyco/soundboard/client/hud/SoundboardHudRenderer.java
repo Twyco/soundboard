@@ -2,7 +2,8 @@ package de.twyco.soundboard.client.hud;
 
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatService;
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.util.PlayingSound;
-import de.twyco.soundboard.util.client.SoundboardRuntimeState;
+import de.twyco.soundboard.util.config.SoundboardConfig;
+import de.twyco.soundboard.util.config.SoundboardConfigData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -19,7 +20,8 @@ public class SoundboardHudRenderer {
 
 
     public static void render(DrawContext drawContext, RenderTickCounter renderTickCounter) {
-        if (!SoundboardRuntimeState.isShowPlayingSoundsHud()) {
+        SoundboardConfigData config = SoundboardConfig.get();
+        if (!config.globalState.showPlayingSoundsHud) {
             return;
         }
 
