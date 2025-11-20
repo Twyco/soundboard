@@ -3,12 +3,13 @@
 	"id": "soundboard",
 	"version": "${version}",
 	"name": "soundboard",
-	"description": "This mod adds an soundboard to the simple voice chat mod",
+	"description": "Soundboard for Simple Voice Chat that lets you play custom .mp3 sounds in-game.",
 	"authors": [
 		"Twyco"
 	],
 	"contact": {
-		"sources": "https://github.com/Twyco/soundboard"
+		"sources": "https://github.com/Twyco/soundboard",
+		"issues": "https://github.com/Twyco/soundboard/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/soundboard/icon.png",

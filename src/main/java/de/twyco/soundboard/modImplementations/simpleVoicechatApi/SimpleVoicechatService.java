@@ -48,9 +48,7 @@ public class SimpleVoicechatService {
         synchronized (activeSounds) {
             for (PlayingSound ps : activeSounds) {
                 if(ps.soundId.equals(sound.getId())) {
-                    ps.index = 0;
-                    LOG.info("[SimpleVoicechatService/playSound] Restart playing sound '{}' (active={})",
-                            sound.getName(), activeSounds.size());
+                    activeSounds.remove(ps);
                     return;
                 }
             }
@@ -75,7 +73,7 @@ public class SimpleVoicechatService {
         LOG.info("[SimpleVoicechatService/clearClientApi] ClientApi cleared");
     }
 
-    //--------------------------------------
+    //-------------------- helper --------------------
 
     public static void mixInto(MergeClientSoundEvent event) {
         SoundboardConfigData config = SoundboardConfig.get();
