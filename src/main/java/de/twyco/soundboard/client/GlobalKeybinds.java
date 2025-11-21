@@ -100,8 +100,7 @@ public class GlobalKeybinds {
 
     private static KeyBindingCallback getKeyBindingAction(@NotNull GlobalKeyBindings keybind) {
         return switch (keybind) {
-            case GlobalKeyBindings.OPEN_CONFIG -> combo -> {
-                MinecraftClient client = MinecraftClient.getInstance();
+            case GlobalKeyBindings.OPEN_CONFIG -> client -> {
                 if (client == null) return;
                 client.setScreen(ConfigScreenFactory.create(client.currentScreen));
             };
