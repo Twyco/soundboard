@@ -8,10 +8,12 @@
   "gui.soundboard.config.keybind": "Keybind",
   "gui.soundboard.config.keybind.sound.keybind": "Keybind",
   "gui.soundboard.config.keybind.global.open_config": "Open this Config Menu",
-  "gui.soundboard.config.keybind.global.stop_all": "Stop all currently playing Sound",
   "gui.soundboard.config.state.global.play_while_muted": "Playing sounds, while muted",
   "gui.soundboard.config.state.global.play_while_muted.description": "Other player can only hear the sound not your microphone.",
   "gui.soundboard.config.state.global.show_sounds_in_hud": "Show all currently playing sound in game Hud",
   "gui.soundboard.config.sound.loop": "Loop Sound",
-  "gui.soundboard.config.sound.amplifier": "Amplifier"
+  "gui.soundboard.config.sound.amplifier": "Amplifier",
+  "key.category.soundboard.general": "Soundboard",
+  "key.soundboard.open_config": "Open Config Menu",
+  "key.soundboard.stop_all": "Stop all currently playing Sound"
 }

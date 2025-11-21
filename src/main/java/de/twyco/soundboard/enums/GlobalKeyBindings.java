@@ -1,14 +1,13 @@
 package de.twyco.soundboard.enums;
 
-public enum GlobalKeybind {
+public enum GlobalKeyBindings {
 
-    OPEN_CONFIG("soundboard.config.open", "gui.soundboard.config.keybind.global.open_config"),
-    SOUND_STOP_ALL("soundboard.sounds.stop_all", "gui.soundboard.config.keybind.global.stop_all");
+    OPEN_CONFIG("soundboard.config.open", "key.soundboard.open_config");
 
     private final String id;
     private final String translationKey;
 
-    GlobalKeybind(String id, String translationKey) {
+    GlobalKeyBindings(String id, String translationKey) {
         this.id = id;
         this.translationKey = translationKey;
     }
