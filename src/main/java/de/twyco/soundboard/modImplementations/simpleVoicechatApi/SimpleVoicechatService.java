@@ -11,6 +11,7 @@ import de.twyco.soundboard.util.sound.Sound;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -44,6 +45,8 @@ public class SimpleVoicechatService {
             LOG.error("[SimpleVoicechatService/playSound] No PCM data for '{}'", sound.getName());
             return;
         }
+        double seconds = samples.length / 48000.0;
+        LOG.debug("Decoded samples: {}, duration ~{}s", samples.length, seconds);
 
         synchronized (activeSounds) {
             for (PlayingSound ps : activeSounds) {
@@ -53,7 +56,7 @@ public class SimpleVoicechatService {
                 }
             }
             activeSounds.add(new PlayingSound(sound, samples));
-            LOG.info("[SimpleVoicechatService/playSound] Queued sound '{}' (active={})",
+            LOG.debug("[SimpleVoicechatService/playSound] Queued sound '{}' (active={})",
                     sound.getName(), activeSounds.size());
         }
     }
@@ -64,13 +67,13 @@ public class SimpleVoicechatService {
 
     public static void setClientApi(VoicechatClientApi api) {
         clientApi = api;
-        LOG.info("[SimpleVoicechatService/setClientApi] ClientApi set: {}", api.getClass().getName());
+        LOG.debug("[SimpleVoicechatService/setClientApi] ClientApi set: {}", api.getClass().getName());
     }
 
     public static void clearClientApi() {
         clientApi = null;
         stopAllSounds();
-        LOG.info("[SimpleVoicechatService/clearClientApi] ClientApi cleared");
+        LOG.debug("[SimpleVoicechatService/clearClientApi] ClientApi cleared");
     }
 
     //-------------------- helper --------------------
@@ -160,8 +163,27 @@ public class SimpleVoicechatService {
                     return null;
                 }
 
-                short[] stereoOrMono = decoder.decode();
-                return stereoToMono(stereoOrMono);
+                short[] raw = decoder.decode();
+                AudioFormat format = decoder.getAudioFormat();
+
+                float sampleRate = format.getSampleRate();
+                int channels = format.getChannels();
+
+                double frames = raw.length / (double) channels;
+
+                double seconds = frames / sampleRate;
+
+                LOG.debug(
+                        "Decoded samples: {}, channels={}, sampleRate={}, duration~{}s",
+                        raw.length,
+                        channels,
+                        sampleRate,
+                        seconds
+                );
+                if(format.getChannels() == 2) {
+                    return stereoToMono(raw);
+                }
+                return raw;
             } else {
                 LOG.warn("[SimpleVoicechatService/decodeSoundToPcm] Unsupported format for now: {}", fileName);
                 return null;

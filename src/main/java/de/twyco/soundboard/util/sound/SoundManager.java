@@ -82,7 +82,7 @@ public class SoundManager {
 
         soundsById.put(fileName, sound);
 
-        LOG.info("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", fileName, nameWithoutExtension, file);
+        LOG.debug("[SoundManager/registerFileAsSound] Registered sound id='{}', name='{}', file='{}'", fileName, nameWithoutExtension, file);
     }
 
     public static void applyConfigToSounds(SoundboardConfigData config) {
@@ -131,7 +131,7 @@ public class SoundManager {
     }
 
     public static void playSound(@NotNull Sound sound) {
-        LOG.info("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
+        LOG.debug("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
         if(SimpleVoicechatApi.isAvailable()) {
             SimpleVoicechatService.playSound(sound);
         } else {
@@ -162,7 +162,7 @@ public class SoundManager {
                 SoundManager.reload();
                 ConfigScreenFactory.reloadConfigScreen();
             });
-            LOG.info("[SoundManager/openSoundsFolder] Opened sounds directory '{}'", soundsDir.toAbsolutePath());
+            LOG.debug("[SoundManager/openSoundsFolder] Opened sounds directory '{}'", soundsDir.toAbsolutePath());
         } catch (Exception e) {
             LOG.error("[SoundManager/openSoundsFolder] Failed to open sounds directory '{}': {}",
                     soundsDir.toAbsolutePath(), e.getMessage());
