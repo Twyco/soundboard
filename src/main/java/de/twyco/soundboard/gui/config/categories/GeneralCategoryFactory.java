@@ -1,7 +1,7 @@
 package de.twyco.soundboard.gui.config.categories;
 
 import de.twyco.soundboard.client.GlobalKeybinds;
-import de.twyco.soundboard.enums.GlobalKeybind;
+import de.twyco.soundboard.enums.GlobalKeyCombos;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 import de.twyco.soundboard.gui.config.entries.ActionButtonEntry;
 import de.twyco.soundboard.gui.config.entries.ActionButtonGridEntry;
@@ -31,8 +31,7 @@ public class GeneralCategoryFactory {
                         .build()
         );
 
-        category.addEntry(getKeyComboEntry(GlobalKeybind.OPEN_CONFIG));
-        category.addEntry(getKeyComboEntry(GlobalKeybind.SOUND_STOP_ALL));
+        category.addEntry(getKeyComboEntry(GlobalKeyCombos.SOUND_STOP_ALL));
         category.addEntry(
                 entryBuilder.startBooleanToggle(
                                 Text.translatable("gui.soundboard.config.state.global.play_while_muted").formatted(Formatting.WHITE),
@@ -72,7 +71,7 @@ public class GeneralCategoryFactory {
         );
     }
 
-    private static KeyComboEntry getKeyComboEntry(GlobalKeybind keybind) {
+    private static KeyComboEntry getKeyComboEntry(GlobalKeyCombos keybind) {
         SoundboardConfigData configData = SoundboardConfig.get();
         KeyCombo combo = GlobalKeybinds.getKeyCombos().computeIfAbsent(
                 keybind.getId(),
@@ -86,7 +85,7 @@ public class GeneralCategoryFactory {
                     configData.globalKeyCombos.remove(keybind.getId());
                     configData.globalKeyCombos.put(newCombo.getId(), newCombo.getKeyCodes());
                     SoundboardConfig.save();
-                    GlobalKeybinds.reload(keybind);
+                    GlobalKeybinds.reloadKeyCombo(keybind);
                 },
                 0xAAAAAA
         );
