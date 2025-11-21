@@ -2,6 +2,8 @@ package de.twyco.soundboard.modImplementations.simpleVoicechatApi;
 
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
+import de.maxhenkel.voicechat.api.VolumeCategory;
+import de.maxhenkel.voicechat.api.audiochannel.ClientStaticAudioChannel;
 import de.maxhenkel.voicechat.api.events.ClientVoicechatConnectionEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MergeClientSoundEvent;
@@ -12,6 +14,8 @@ import de.twyco.soundboard.modImplementations.simpleVoicechatApi.listener.MergeC
 public class SimpleVoicechatApi implements VoicechatPlugin {
 
     private static VoicechatApi voicechatApi = null;
+    private static VolumeCategory soundboardVolumeCategory = null;
+    private static ClientStaticAudioChannel audioChannel = null;
 
     @Override
     public String getPluginId() {
@@ -44,5 +48,22 @@ public class SimpleVoicechatApi implements VoicechatPlugin {
 
     public static boolean isAvailable() {
         return voicechatApi != null;
+    }
+
+
+    public static void setSoundboardVolumeCategory(VolumeCategory soundboardVolumeCategory) {
+        SimpleVoicechatApi.soundboardVolumeCategory = soundboardVolumeCategory;
+    }
+
+    public static VolumeCategory getSoundboardVolumeCategory() {
+        return soundboardVolumeCategory;
+    }
+
+    public static void setAudioChannel(ClientStaticAudioChannel audioChannel) {
+        SimpleVoicechatApi.audioChannel = audioChannel;
+    }
+
+    public static ClientStaticAudioChannel getAudioChannel() {
+        return audioChannel;
     }
 }
