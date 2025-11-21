@@ -31,8 +31,8 @@ public class ClientVoicechatConnectionListener implements SimpleVoicechatClientE
             SimpleVoicechatApi.setSoundboardVolumeCategory(volumeCategory);
             SimpleVoicechatApi.setAudioChannel(audioChannel);
         } else {
-            SimpleVoicechatService.clearClientApi();
             clientApi.unregisterClientVolumeCategory(SimpleVoicechatApi.getSoundboardVolumeCategory());
+            SimpleVoicechatService.clearClientApi();
         }
         SimpleVoicechatService.stopAllSounds();
     }
