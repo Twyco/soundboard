@@ -144,6 +144,7 @@ public class SimpleVoicechatService {
 
         if(config.globalState.playWhileMuted || !clientApi.isMuted()) {
             event.mergeAudio(mixed);
+            SimpleVoicechatApi.getAudioChannel().play(mixed);
         }
     }
 
