@@ -10,6 +10,7 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.input.KeyInput;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,6 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     private final ButtonWidget button;
     private final TextWidget textWidget;
     private final java.util.function.Consumer<KeyCombo> onChange;
-    private final int fieldLabelColor;
 
     private KeyCombo combo;
     private boolean listening = false;
@@ -42,7 +42,7 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
                          @NotNull java.util.function.Consumer<KeyCombo> onChange,
                          int fieldLabelColor
     ) {
-        super(fieldLabel, false);
+        super(createLabel(fieldLabel, fieldLabelColor), false);
         this.combo = initialCombo;
         this.onChange = onChange;
 
@@ -52,7 +52,15 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
                 )
                 .build();
         this.textWidget = new TextWidget(fieldLabel, MinecraftClient.getInstance().textRenderer);
-        this.fieldLabelColor = fieldLabelColor;
+    }
+
+    private static Text createLabel(Text fieldLabel, int fieldLabelColor) {
+        Formatting formatting = Formatting.byColorIndex(fieldLabelColor);
+        MutableText text = fieldLabel.copy();
+        if (formatting != null) {
+            text.formatted(formatting);
+        }
+        return text;
     }
 
     private void onButtonClick() {
@@ -127,7 +135,6 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         textWidget.setY(textY);
         textWidget.setWidth(labelWidth);
         textWidget.setHeight(labelHeight);
-        textWidget.setTextColor(fieldLabelColor);
 
         textWidget.render(ctx, mouseX, mouseY, delta);
     }
