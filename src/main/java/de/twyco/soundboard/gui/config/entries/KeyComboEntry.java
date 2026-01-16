@@ -9,11 +9,9 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -132,44 +130,44 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         textWidget.render(ctx, mouseX, mouseY, delta);
     }
 
-    @Override
-    public boolean keyPressed(KeyInput event) {
-        if (!listening) {
-            return button.keyPressed(event) || super.keyPressed(event);
-        }
-
-        if (event.key() == GLFW.GLFW_KEY_BACKSPACE
-                || event.key() == GLFW.GLFW_KEY_DELETE
-                || event.key() == GLFW.GLFW_KEY_ESCAPE
-        ) {
-            KeyCombo combo = KeyCombo.empty(this.combo.getId());
-            this.combo = combo;
-
-            onChange.accept(combo);
-
-            stopListening();
-            return true;
-        }
-
-        pressedKeys.add(event.key());
-        return true;
-    }
-
-    @Override
-    public boolean keyReleased(KeyInput event) {
-        if (!listening) {
-            return button.keyReleased(event) || super.keyReleased(event);
-        }
-
-        int[] codes = pressedKeys.stream().mapToInt(Integer::intValue).toArray();
-        KeyCombo combo = KeyCombo.of(this.combo.getId(), codes);
-        this.combo = combo;
-
-        onChange.accept(combo);
-
-        stopListening();
-        return true;
-    }
+//    @Override
+//    public boolean keyPressed(KeyInput event) {
+//        if (!listening) {
+//            return button.keyPressed(event) || super.keyPressed(event);
+//        }
+//
+//        if (event.key() == GLFW.GLFW_KEY_BACKSPACE
+//                || event.key() == GLFW.GLFW_KEY_DELETE
+//                || event.key() == GLFW.GLFW_KEY_ESCAPE
+//        ) {
+//            KeyCombo combo = KeyCombo.empty(this.combo.getId());
+//            this.combo = combo;
+//
+//            onChange.accept(combo);
+//
+//            stopListening();
+//            return true;
+//        }
+//
+//        pressedKeys.add(event.key());
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean keyReleased(KeyInput event) {
+//        if (!listening) {
+//            return button.keyReleased(event) || super.keyReleased(event);
+//        }
+//
+//        int[] codes = pressedKeys.stream().mapToInt(Integer::intValue).toArray();
+//        KeyCombo combo = KeyCombo.of(this.combo.getId(), codes);
+//        this.combo = combo;
+//
+//        onChange.accept(combo);
+//
+//        stopListening();
+//        return true;
+//    }
 
     @Override
     public Optional<Void> getDefaultValue() {

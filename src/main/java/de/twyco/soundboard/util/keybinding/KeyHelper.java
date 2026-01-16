@@ -10,7 +10,7 @@ public class KeyHelper {
 
     protected static boolean isKeyPressed(int keyCode) {
         MinecraftClient client = MinecraftClient.getInstance();
-        Window windowHandle = client.getWindow();
-        return InputUtil.isKeyPressed(windowHandle, keyCode);
+        Window window = client.getWindow();
+        return InputUtil.isKeyPressed(window.getHandle(), keyCode);
     }
 }

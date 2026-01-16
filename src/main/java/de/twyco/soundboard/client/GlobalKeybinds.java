@@ -1,6 +1,5 @@
 package de.twyco.soundboard.client;
 
-import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.enums.GlobalKeyBindings;
 import de.twyco.soundboard.enums.GlobalKeyCombos;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
@@ -12,10 +11,8 @@ import de.twyco.soundboard.util.keybinding.KeyBindingManager;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.SoundManager;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,7 +23,6 @@ import java.util.Set;
 public class GlobalKeybinds {
 
     private static final Map<String, KeyCombo> keyCombos = new HashMap<>();
-    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(Soundboard.MOD_ID, "general"));
 
     private GlobalKeybinds() {
     }
@@ -51,7 +47,7 @@ public class GlobalKeybinds {
                     keybind.getTranslationKey(),
                     InputUtil.Type.KEYSYM,
                     GLFW.GLFW_KEY_O,
-                    CATEGORY
+                    "key.category.soundboard.general"
             ));
             KeyBindingManager.register(keyBinding, getKeyBindingAction(keybind));
         }

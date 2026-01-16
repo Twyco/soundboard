@@ -4,7 +4,6 @@ import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.KeyInput;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -87,7 +86,7 @@ public class KeyComboManager {
         }
     }
 
-    public static boolean handleRawKeyEvent(int action, KeyInput input) {
+    public static boolean handleRawKeyEvent(int action, int keyCode) {
         MinecraftClient client = MinecraftClient.getInstance();
         if(client == null) {
             return false;
@@ -96,7 +95,7 @@ public class KeyComboManager {
             return false;
         }
 
-        List<KeyComboState> comboStates = findMatchingComboStates(input.key());
+        List<KeyComboState> comboStates = findMatchingComboStates(keyCode);
         if(comboStates.isEmpty()) {
             return false;
         }
