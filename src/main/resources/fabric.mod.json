@@ -29,7 +29,7 @@
 		"soundboard.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.18.4",
+		"fabricloader": ">=0.17.0",
 		"minecraft": "1.21.8",
 		"fabric-api": "*",
 		"cloth-config": ">=19.0.0",
