@@ -12,6 +12,7 @@ import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -128,6 +129,46 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         textWidget.setTextColor(fieldLabelColor);
 
         textWidget.render(ctx, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!listening) {
+            return button.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_BACKSPACE
+                || keyCode == GLFW.GLFW_KEY_DELETE
+                || keyCode == GLFW.GLFW_KEY_ESCAPE
+        ) {
+            KeyCombo combo = KeyCombo.empty(this.combo.getId());
+            this.combo = combo;
+
+            onChange.accept(combo);
+
+            stopListening();
+            return true;
+        }
+
+        pressedKeys.add(keyCode);
+        return true;
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+
+        if (!listening) {
+            return button.keyReleased(keyCode, scanCode, modifiers) || super.keyReleased(keyCode, scanCode, modifiers);
+        }
+
+        int[] codes = pressedKeys.stream().mapToInt(Integer::intValue).toArray();
+        KeyCombo combo = KeyCombo.of(this.combo.getId(), codes);
+        this.combo = combo;
+
+        onChange.accept(combo);
+
+        stopListening();
+        return true;
     }
 
     @Override
