@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import javax.sound.sampled.AudioFormat;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +23,8 @@ public class SimpleVoicechatService {
     private static final Logger LOG = Soundboard.LOGGER;
     private static VoicechatClientApi clientApi = null;
     private static final List<PlayingSound> activeSounds = new ArrayList<>();
+
+    private static final int TARGET_SAMPLE_RATE = 48_000;
 
     private SimpleVoicechatService() {
     }
@@ -45,7 +46,7 @@ public class SimpleVoicechatService {
             LOG.error("[SimpleVoicechatService/playSound] No PCM data for '{}'", sound.getName());
             return;
         }
-        double seconds = samples.length / 48000.0;
+        double seconds = (double) samples.length / TARGET_SAMPLE_RATE;
         LOG.debug("Decoded samples: {}, duration ~{}s", samples.length, seconds);
 
         synchronized (activeSounds) {
@@ -76,6 +77,12 @@ public class SimpleVoicechatService {
         LOG.debug("[SimpleVoicechatService/clearClientApi] ClientApi cleared");
     }
 
+    public static List<PlayingSound> getCurrentlyPlayingSounds() {
+        synchronized (activeSounds) {
+            return activeSounds;
+        }
+    }
+
     //-------------------- helper --------------------
 
     public static void mixInto(MergeClientSoundEvent event) {
@@ -86,7 +93,7 @@ public class SimpleVoicechatService {
             }
         }
 
-        int chunkSize = 960; // 20ms @ 48kHz, mono TODO CHECK
+        int chunkSize = 960;
         short[] mixed = new short[chunkSize];
         boolean any = false;
 
@@ -156,41 +163,40 @@ public class SimpleVoicechatService {
         String fileName = path.getFileName().toString().toLowerCase(Locale.ROOT);
 
         try (InputStream in = Files.newInputStream(path)) {
-            if (fileName.endsWith(".mp3")) {
-                Mp3Decoder decoder = api.createMp3Decoder(in);
-                if (decoder == null) {
-                    LOG.warn("[SimpleVoicechatService/decodeSoundToPcm] Mp3Decoder is null (not supported?)");
-                    return null;
-                }
-
-                short[] raw = decoder.decode();
-                AudioFormat format = decoder.getAudioFormat();
-
-                float sampleRate = format.getSampleRate();
-                int channels = format.getChannels();
-
-                double frames = raw.length / (double) channels;
-
-                double seconds = frames / sampleRate;
-
-                LOG.debug(
-                        "Decoded samples: {}, channels={}, sampleRate={}, duration~{}s",
-                        raw.length,
-                        channels,
-                        sampleRate,
-                        seconds
-                );
-                if(format.getChannels() == 2) {
-                    return stereoToMono(raw);
-                }
-                return raw;
-            } else {
+            if (!fileName.endsWith(".mp3")) {
                 LOG.warn("[SimpleVoicechatService/decodeSoundToPcm] Unsupported format for now: {}", fileName);
                 return null;
             }
-        } catch (IOException e) {
-            LOG.error("[SimpleVoicechatService/decodeSoundToPcm] Failed to read sound file '{}': {}",
-                    path, e.getMessage());
+
+            Mp3Decoder decoder = api.createMp3Decoder(in);
+            if (decoder == null) {
+                LOG.warn("[SimpleVoicechatService/decodeSoundToPcm] Mp3Decoder is null (not supported?)");
+                return null;
+            }
+
+            short[] raw = decoder.decode();
+            AudioFormat format = decoder.getAudioFormat();
+
+            float srcRate = format.getSampleRate();
+            int channels = format.getChannels();
+
+            short[] mono = raw;
+            if(channels == 2) {
+                mono = stereoToMono(raw);
+            } else if(channels != 1) {
+                LOG.warn("[SimpleVoicechatService/decodeSoundToPcm] Unsupported channel count: {}", channels);
+                return  null;
+            }
+
+            short[] pcm48k = mono;
+            if (Math.round(srcRate) != TARGET_SAMPLE_RATE) {
+                pcm48k = resampleLinear(mono, srcRate, TARGET_SAMPLE_RATE);
+            }
+
+            LOG.debug("Decoded '{}' {}Hz/{}ch -> {}Hz/mono, samples={}",
+                    sound.getName(), (int) srcRate, channels, TARGET_SAMPLE_RATE, pcm48k.length);
+
+            return pcm48k;
         } catch (Exception e) {
             LOG.error("[SimpleVoicechatService/decodeSoundToPcm] Failed to decode sound file '{}': {}",
                     path, e.getMessage());
@@ -220,9 +226,29 @@ public class SimpleVoicechatService {
         return mono;
     }
 
-    public static List<PlayingSound> getCurrentlyPlayingSounds() {
-        synchronized (activeSounds) {
-            return activeSounds;
+    private static short[] resampleLinear(short[] in, float srcRate, int dstRate) {
+        if (in == null || in.length == 0) return in;
+        if (Math.round(srcRate) == dstRate) return in;
+
+        double ratio = dstRate / (double) srcRate;
+        int outLen = (int) Math.round(in.length * ratio);
+        if (outLen <= 0) return new short[0];
+
+        short[] out = new short[outLen];
+        double step = srcRate / (double) dstRate;
+
+        for (int i = 0; i < outLen; i++) {
+            double srcPos = i * step;
+            int i0 = (int) Math.floor(srcPos);
+            int i1 = Math.min(i0 + 1, in.length - 1);
+            double frac = srcPos - i0;
+
+            double v = (1.0 - frac) * in[i0] + frac * in[i1];
+            int iv = (int) Math.round(v);
+            if (iv > Short.MAX_VALUE) iv = Short.MAX_VALUE;
+            if (iv < Short.MIN_VALUE) iv = Short.MIN_VALUE;
+            out[i] = (short) iv;
         }
+        return out;
     }
 }
