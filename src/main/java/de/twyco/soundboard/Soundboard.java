@@ -2,6 +2,7 @@ package de.twyco.soundboard;
 
 import de.twyco.soundboard.client.GlobalKeybinds;
 import de.twyco.soundboard.client.hud.HudService;
+import de.twyco.soundboard.util.client.FocusWatcher;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.keybinding.KeyBindingManager;
 import de.twyco.soundboard.util.keybinding.KeyComboManager;
@@ -24,6 +25,7 @@ public class Soundboard implements ModInitializer {
         SoundManager.init();
         GlobalKeybinds.init();
         HudService.init();
+        FocusWatcher.init();
     }
 
 }

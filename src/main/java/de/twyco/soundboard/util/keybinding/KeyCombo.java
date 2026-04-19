@@ -1,8 +1,8 @@
 package de.twyco.soundboard.util.keybinding;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
-import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -63,9 +63,9 @@ public final class KeyCombo {
             if(!sb.isEmpty()) {
                 sb.append(" + ");
             }
-            InputUtil.Key key =InputUtil.Type.KEYSYM.createFromCode(keyCode);
-            String s = key.getTranslationKey();
-            if (s != null && !s.isBlank()) {
+            InputConstants.Key key =InputConstants.Type.KEYSYM.getOrCreate(keyCode);
+            String s = key.getName();
+            if (!s.isBlank()) {
                 s = s.replace("key.keyboard.", "")
                         .replace("left.", "L-")
                         .replace("right.", "R-");

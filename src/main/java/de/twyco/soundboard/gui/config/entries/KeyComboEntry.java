@@ -2,17 +2,17 @@ package de.twyco.soundboard.gui.config.entries;
 
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -22,22 +22,22 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
 
     private static KeyComboEntry currentlyListening = null;
 
-    private final ButtonWidget button;
-    private final TextWidget textWidget;
+    private final Button button;
+    private final StringWidget textWidget;
     private final java.util.function.Consumer<KeyCombo> onChange;
 
     private KeyCombo combo;
     private boolean listening = false;
     private final Set<Integer> pressedKeys = new LinkedHashSet<>();
 
-    public KeyComboEntry(@NotNull Text fieldLabel,
+    public KeyComboEntry(@NotNull Component fieldLabel,
                          @NotNull KeyCombo initialCombo,
                          @NotNull java.util.function.Consumer<KeyCombo> onChange
     ) {
         this(fieldLabel, initialCombo, onChange, 0xFFFFFF);
     }
 
-    public KeyComboEntry(@NotNull Text fieldLabel,
+    public KeyComboEntry(@NotNull Component fieldLabel,
                          @NotNull KeyCombo initialCombo,
                          @NotNull java.util.function.Consumer<KeyCombo> onChange,
                          int fieldLabelColor
@@ -46,19 +46,19 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         this.combo = initialCombo;
         this.onChange = onChange;
 
-        this.button = ButtonWidget.builder(
-                        Text.literal(initialCombo.toString()),
+        this.button = Button.builder(
+                        Component.literal(initialCombo.toString()),
                         b -> onButtonClick()
                 )
                 .build();
-        this.textWidget = new TextWidget(fieldLabel, MinecraftClient.getInstance().textRenderer);
+        this.textWidget = new StringWidget(fieldLabel, Minecraft.getInstance().font);
     }
 
-    private static Text createLabel(Text fieldLabel, int fieldLabelColor) {
-        Formatting formatting = Formatting.byColorIndex(fieldLabelColor);
-        MutableText text = fieldLabel.copy();
+    private static Component createLabel(Component fieldLabel, int fieldLabelColor) {
+        ChatFormatting formatting = ChatFormatting.getById(fieldLabelColor);
+        MutableComponent text = fieldLabel.copy();
         if (formatting != null) {
-            text.formatted(formatting);
+            text.withStyle(formatting);
         }
         return text;
     }
@@ -93,24 +93,24 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
 
     public void updateButtonMessage() {
         if (listening) {
-            Text listeningLabel = Text.empty()
-                    .append(Text.literal("> ").formatted(Formatting.YELLOW))
-                    .append(Text.literal(combo.toString())
-                            .formatted(Formatting.WHITE, Formatting.UNDERLINE))
-                    .append(Text.literal(" <").formatted(Formatting.YELLOW));
+            Component listeningLabel = Component.empty()
+                    .append(Component.literal("> ").withStyle(ChatFormatting.YELLOW))
+                    .append(Component.literal(combo.toString())
+                            .withStyle(ChatFormatting.WHITE, ChatFormatting.UNDERLINE))
+                    .append(Component.literal(" <").withStyle(ChatFormatting.YELLOW));
             button.setMessage(listeningLabel);
 
             return;
         }
 
-        button.setMessage(Text.literal(combo.toString()));
+        button.setMessage(Component.literal(combo.toString()));
     }
 
     @Override
-    public void render(DrawContext ctx, int index, int y, int x,
+    public void extractRenderState(GuiGraphicsExtractor ctx, int index, int y, int x,
                        int entryWidth, int entryHeight,
                        int mouseX, int mouseY, boolean hovered, float delta) {
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        Font textRenderer = Minecraft.getInstance().font;
 
 
         int buttonWidth = 150;
@@ -124,10 +124,10 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         button.setHeight(buttonHeight);
         button.setFocused(listening);
 
-        button.render(ctx, mouseX, mouseY, delta);
+        button.extractRenderState(ctx, mouseX, mouseY, delta);
 
 
-        int labelWidth = Math.min(textRenderer.getWidth(textWidget.getMessage()), entryWidth - buttonWidth);
+        int labelWidth = Math.min(textRenderer.width(textWidget.getMessage()), entryWidth - buttonWidth);
         int labelHeight = 20;
         int textY = y + (entryHeight - labelHeight) / 2;
 
@@ -136,11 +136,11 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
         textWidget.setWidth(labelWidth);
         textWidget.setHeight(labelHeight);
 
-        textWidget.render(ctx, mouseX, mouseY, delta);
+        textWidget.extractRenderState(ctx, mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean keyPressed(KeyInput event) {
+    public boolean keyPressed(KeyEvent event) {
         if (!listening) {
             return button.keyPressed(event) || super.keyPressed(event);
         }
@@ -163,7 +163,7 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     }
 
     @Override
-    public boolean keyReleased(KeyInput event) {
+    public boolean keyReleased(KeyEvent event) {
         if (!listening) {
             return button.keyReleased(event) || super.keyReleased(event);
         }
@@ -189,12 +189,12 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     }
 
     @Override
-    public List<? extends Selectable> narratables() {
+    public List<? extends NarratableEntry> narratables() {
         return List.of(button);
     }
 
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         return List.of(button);
     }
 }

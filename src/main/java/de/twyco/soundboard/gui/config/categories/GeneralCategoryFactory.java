@@ -14,8 +14,8 @@ import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 public class GeneralCategoryFactory {
 
@@ -23,28 +23,28 @@ public class GeneralCategoryFactory {
         SoundboardConfigData configData = SoundboardConfig.get();
         GlobalStateEntry defaultState = GlobalStateEntry.fromDefaults();
         GlobalStateEntry state = configData.globalState;
-        ConfigCategory category = builder.getOrCreateCategory(Text.translatable("gui.soundboard.config.categories.general.title"));
+        ConfigCategory category = builder.getOrCreateCategory(Component.translatable("gui.soundboard.config.categories.general.title"));
 
         category.addEntry(
                 entryBuilder
-                        .startTextDescription(Text.translatable("gui.soundboard.config.categories.general.description"))
+                        .startTextDescription(Component.translatable("gui.soundboard.config.categories.general.description"))
                         .build()
         );
 
         category.addEntry(getKeyComboEntry(GlobalKeyCombos.SOUND_STOP_ALL));
         category.addEntry(
                 entryBuilder.startBooleanToggle(
-                                Text.translatable("gui.soundboard.config.state.global.play_while_muted").formatted(Formatting.WHITE),
+                                Component.translatable("gui.soundboard.config.state.global.play_while_muted").withStyle(ChatFormatting.WHITE),
                                 state.playWhileMuted
                         )
                         .setDefaultValue(defaultState.playWhileMuted)
                         .setSaveConsumer(newValue -> state.playWhileMuted = newValue)
-                        .setTooltip(Text.translatable("gui.soundboard.config.state.global.play_while_muted.description"))
+                        .setTooltip(Component.translatable("gui.soundboard.config.state.global.play_while_muted.description"))
                         .build()
         );
         category.addEntry(
                 entryBuilder.startBooleanToggle(
-                                Text.translatable("gui.soundboard.config.state.global.show_sounds_in_hud").formatted(Formatting.WHITE),
+                                Component.translatable("gui.soundboard.config.state.global.show_sounds_in_hud").withStyle(ChatFormatting.WHITE),
                                 state.showPlayingSoundsHud
                         )
                         .setDefaultValue(defaultState.showPlayingSoundsHud)
@@ -54,13 +54,13 @@ public class GeneralCategoryFactory {
         category.addEntry(
                 new ActionButtonGridEntry(
                         new ActionButtonEntry(
-                                Text.translatable("gui.soundboard.config.action.open_sounds_folder"),
-                                Text.translatable("gui.soundboard.config.action.open_sounds_folder"),
+                                Component.translatable("gui.soundboard.config.action.open_sounds_folder"),
+                                Component.translatable("gui.soundboard.config.action.open_sounds_folder"),
                                 SoundManager::openSoundsFolder
                         ),
                         new ActionButtonEntry(
-                                Text.translatable("gui.soundboard.config.action.reload"),
-                                Text.translatable("gui.soundboard.config.action.reload"),
+                                Component.translatable("gui.soundboard.config.action.reload"),
+                                Component.translatable("gui.soundboard.config.action.reload"),
                                 () -> {
                                     SoundboardConfig.load();
                                     SoundManager.reload();
@@ -79,7 +79,7 @@ public class GeneralCategoryFactory {
         );
 
         return new KeyComboEntry(
-                Text.translatable(keybind.getTranslationKey()),
+                Component.translatable(keybind.getTranslationKey()),
                 combo,
                 newCombo -> {
                     configData.globalKeyCombos.remove(keybind.getId());

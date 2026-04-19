@@ -1,5 +1,6 @@
 package de.twyco.soundboard.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.enums.GlobalKeyBindings;
 import de.twyco.soundboard.enums.GlobalKeyCombos;
@@ -11,11 +12,9 @@ import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.keybinding.KeyBindingManager;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.SoundManager;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,7 +25,7 @@ import java.util.Set;
 public class GlobalKeybinds {
 
     private static final Map<String, KeyCombo> keyCombos = new HashMap<>();
-    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(Soundboard.MOD_ID, "general"));
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(Soundboard.MOD_ID, "general"));
 
     private GlobalKeybinds() {
     }
@@ -47,9 +46,9 @@ public class GlobalKeybinds {
             keyCombos.put(combo.getId(), combo);
         }
         for (GlobalKeyBindings keybind : GlobalKeyBindings.values()) {
-            KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            KeyMapping keyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                     keybind.getTranslationKey(),
-                    InputUtil.Type.KEYSYM,
+                    InputConstants.Type.KEYSYM,
                     GLFW.GLFW_KEY_O,
                     CATEGORY
             ));
@@ -102,7 +101,7 @@ public class GlobalKeybinds {
         return switch (keybind) {
             case GlobalKeyBindings.OPEN_CONFIG -> client -> {
                 if (client == null) return;
-                client.setScreen(ConfigScreenFactory.create(client.currentScreen));
+                client.setScreen(ConfigScreenFactory.create(client.screen));
             };
         };
     }

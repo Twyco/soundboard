@@ -9,7 +9,7 @@ import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -36,10 +36,9 @@ public class SoundManager {
     public static void reload() {
         soundsById.clear();
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null) return;
+        Minecraft client = Minecraft.getInstance();
 
-        Path runDir = client.runDirectory.toPath();
+        Path runDir = client.gameDirectory.toPath();
         Path soundsDir = runDir.resolve("sounds");
         if (!Files.exists(soundsDir)) {
             LOG.info("[SoundManager/init] Creating sounds directory");
@@ -140,12 +139,9 @@ public class SoundManager {
     }
 
     public static void openSoundsFolder() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null) {
-            return;
-        }
+        Minecraft client = Minecraft.getInstance();
 
-        Path runDir = client.runDirectory.toPath();
+        Path runDir = client.gameDirectory.toPath();
         Path soundsDir = runDir.resolve("sounds");
 
         try {
@@ -156,7 +152,7 @@ public class SoundManager {
         }
 
         try {
-            Util.getOperatingSystem().open(soundsDir.toFile());
+            Util.getPlatform().openFile(soundsDir.toFile());
             FocusActionScheduler.addActionNextFocus(() -> {
                 SoundboardConfig.load();
                 SoundManager.reload();

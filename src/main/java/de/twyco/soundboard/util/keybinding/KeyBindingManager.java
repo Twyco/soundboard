@@ -2,7 +2,7 @@ package de.twyco.soundboard.util.keybinding;
 
 import de.twyco.soundboard.interfaces.KeyBindingCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class KeyBindingManager {
 
-    private static final Map<@NotNull KeyBinding, @NotNull KeyBindingCallback> keyBindings = new HashMap<>();
+    private static final Map<@NotNull KeyMapping, @NotNull KeyBindingCallback> keyBindings = new HashMap<>();
     private static final List<Runnable> pendingActions = new ArrayList<>();
 
     private KeyBindingManager() {}
@@ -24,15 +24,15 @@ public class KeyBindingManager {
                 pendingActions.clear();
                 actions.forEach(Runnable::run);
             }
-            for (KeyBinding keyBinding : keyBindings.keySet()) {
-                if(keyBinding.wasPressed()) {
+            for (KeyMapping keyBinding : keyBindings.keySet()) {
+                if(keyBinding.consumeClick()) {
                     keyBindings.get(keyBinding).handle(client);
                 }
             }
         });
     }
 
-    public static void register(@NotNull KeyBinding keyBinding, @NotNull KeyBindingCallback callback) {
+    public static void register(@NotNull KeyMapping keyBinding, @NotNull KeyBindingCallback callback) {
         pendingActions.add(() -> keyBindings.put(keyBinding, callback));
     }
 }

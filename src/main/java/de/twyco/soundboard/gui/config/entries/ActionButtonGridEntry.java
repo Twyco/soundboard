@@ -1,10 +1,11 @@
 package de.twyco.soundboard.gui.config.entries;
 
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +20,15 @@ public class ActionButtonGridEntry extends AbstractConfigListEntry<Void> {
     }
 
     public ActionButtonGridEntry(int spacing, ActionButtonEntry... buttonEntries) {
-        super(Text.empty(), false);
+        super(Component.empty(), false);
         this.buttonEntries = List.of(buttonEntries);
         this.spacing = Math.max(0, spacing);
     }
 
     @Override
-    public void render(DrawContext ctx, int index, int y, int x,
-                       int entryWidth, int entryHeight,
-                       int mouseX, int mouseY, boolean hovered, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor ctx, int index, int y, int x,
+                                   int entryWidth, int entryHeight,
+                                   int mouseX, int mouseY, boolean hovered, float delta) {
 
         if(buttonEntries.isEmpty()) {
             return;
@@ -40,7 +41,7 @@ public class ActionButtonGridEntry extends AbstractConfigListEntry<Void> {
         int currentX = x;
 
         for (ActionButtonEntry button : buttonEntries) {
-            button.render(ctx, index, y, currentX, buttonWidth, entryHeight, mouseX, mouseY, hovered, delta);
+            button.extractRenderState(ctx, index, y, currentX, buttonWidth, entryHeight, mouseX, mouseY, hovered, delta);
             currentX += buttonWidth + spacing;
         }
     }
@@ -56,14 +57,14 @@ public class ActionButtonGridEntry extends AbstractConfigListEntry<Void> {
     }
 
     @Override
-    public List<? extends Selectable> narratables() {
+    public List<? extends NarratableEntry> narratables() {
         return this.buttonEntries.stream()
                 .flatMap(e -> e.narratables().stream())
                 .toList();
     }
 
     @Override
-    public List<? extends Element> children() {
+    public List<? extends GuiEventListener> children() {
         return this.buttonEntries.stream()
                 .flatMap(e -> e.children().stream())
                 .toList();

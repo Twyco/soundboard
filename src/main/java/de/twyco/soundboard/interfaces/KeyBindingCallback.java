@@ -1,8 +1,8 @@
 package de.twyco.soundboard.interfaces;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 @FunctionalInterface
 public interface KeyBindingCallback {
-    void handle(MinecraftClient client);
+    void handle(Minecraft client);
 }

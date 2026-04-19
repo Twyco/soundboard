@@ -6,9 +6,9 @@ import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class ConfigScreenFactory {
 
@@ -16,7 +16,7 @@ public class ConfigScreenFactory {
 
     public static Screen create(Screen parent) {
         ConfigScreenFactory.parent = parent;
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Text.translatable("gui.soundboard.config.title"));
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Component.translatable("gui.soundboard.config.title"));
 
         builder.setSavingRunnable(() -> {
             SoundboardConfig.save();
@@ -32,9 +32,9 @@ public class ConfigScreenFactory {
     }
 
     public static void reloadConfigScreen() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        Screen currentScreen = client.currentScreen;
-        if (currentScreen == null || currentScreen.getTitle() == null || !currentScreen.getTitle().equals(Text.translatable("gui.soundboard.config.title"))) {
+        Minecraft client = Minecraft.getInstance();
+        Screen currentScreen = client.screen;
+        if (currentScreen == null || !currentScreen.getTitle().equals(Component.translatable("gui.soundboard.config.title"))) {
             return;
         }
         client.setScreen(create(parent));

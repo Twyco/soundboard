@@ -4,29 +4,28 @@ import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechat
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.util.PlayingSound;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class SoundboardHudRenderer {
 
 
-    public static void render(DrawContext drawContext, RenderTickCounter renderTickCounter) {
+    public static void extractRenderState(GuiGraphicsExtractor drawContext, DeltaTracker renderTickCounter) {
         SoundboardConfigData config = SoundboardConfig.get();
         if (!config.globalState.showPlayingSoundsHud) {
             return;
         }
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        if(client == null || client.options.hudHidden) {
+        Minecraft client = Minecraft.getInstance();
+        if(client.options.hideGui) {
             return;
         }
 
@@ -39,39 +38,39 @@ public class SoundboardHudRenderer {
             return;
         }
 
-        TextRenderer tr = client.textRenderer;
+        Font tr = client.font;
 
-        List<Text> lines = new ArrayList<>();
-        lines.add(Text.literal("Currently Playing").formatted(Formatting.RED, Formatting.UNDERLINE));
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.literal("Currently Playing").withStyle(ChatFormatting.RED, ChatFormatting.UNDERLINE));
         for (PlayingSound sound : playing) {
-            MutableText displayName = Text.literal(sound.displayName).formatted(Formatting.WHITE);
+            MutableComponent displayName = Component.literal(sound.displayName).withStyle(ChatFormatting.WHITE);
             if(sound.loop){
-                displayName.append(Text.literal(" Looping").formatted(Formatting.GRAY));
+                displayName.append(Component.literal(" Looping").withStyle(ChatFormatting.GRAY));
             }
             lines.add(displayName);
         }
 
-        int screenWidth = client.getWindow().getScaledWidth();
-        int screenHeight = client.getWindow().getScaledHeight();
+        int screenWidth = client.getWindow().getGuiScaledWidth();
+        int screenHeight = client.getWindow().getGuiScaledHeight();
 
         int padding = 5;
         int lineSpacing = 2;
 
         int maxWidth = 0;
-        for (Text line : lines) {
-            int w = tr.getWidth(line);
+        for (Component line : lines) {
+            int w = tr.width(line);
             if (w > maxWidth) {
                 maxWidth = w;
             }
         }
 
-        int lineHeight = tr.fontHeight + lineSpacing;
+        int lineHeight = tr.lineHeight + lineSpacing;
         int totalHeight = lines.size() * lineHeight;
 
         int x = screenWidth - maxWidth - padding;
         int startY = screenHeight - totalHeight - padding;
 
-        float delta = renderTickCounter.getDynamicDeltaTicks();
+        float delta = renderTickCounter.getGameTimeDeltaTicks();
 
         int bgPadding = 3;
 
@@ -84,17 +83,17 @@ public class SoundboardHudRenderer {
 
         int y = startY;
         boolean title = true;
-        for (Text line : lines) {
-            TextWidget widget = new TextWidget(line, tr);
+        for (Component line : lines) {
+            StringWidget widget = new StringWidget(line, tr);
             widget.setX(x);
             widget.setY(y);
             widget.setWidth(maxWidth);
-            widget.setHeight(tr.fontHeight);
-            widget.render(drawContext, 0, 0, delta);
+            widget.setHeight(tr.lineHeight);
+            widget.extractRenderState(drawContext, 0, 0, delta);
 
             y += lineHeight;
             if(title){
-                y += tr.fontHeight / 2;
+                y += tr.lineHeight / 2;
                 title = false;
             }
         }

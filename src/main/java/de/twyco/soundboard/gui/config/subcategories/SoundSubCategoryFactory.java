@@ -9,7 +9,7 @@ import de.twyco.soundboard.util.sound.SoundManager;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 public class SoundSubCategoryFactory {
@@ -20,9 +20,9 @@ public class SoundSubCategoryFactory {
                 sound.getId(),
                 id -> SoundEntry.fromDefaults(configData)
         );
-        SubCategoryBuilder builder = entryBuilder.startSubCategory(Text.literal(sound.getName()));
+        SubCategoryBuilder builder = entryBuilder.startSubCategory(Component.literal(sound.getName()));
 
-        builder.add(new KeyComboEntry(Text.translatable("gui.soundboard.config.keybind.sound.keybind"), sound.getKeyCombo(), newCombo -> {
+        builder.add(new KeyComboEntry(Component.translatable("gui.soundboard.config.keybind.sound.keybind"), sound.getKeyCombo(), newCombo -> {
             SoundManager.updateSoundKeyCombo(sound, newCombo);
             entry.keyCombo = newCombo.getKeyCodes();
             SoundboardConfig.save();
@@ -31,7 +31,7 @@ public class SoundSubCategoryFactory {
         builder.add(
                 entryBuilder
                         .startBooleanToggle(
-                                Text.translatable("gui.soundboard.config.sound.loop"),
+                                Component.translatable("gui.soundboard.config.sound.loop"),
                                 entry.loop
                         )
                         .setDefaultValue(configData.defaultLoop)
@@ -42,7 +42,7 @@ public class SoundSubCategoryFactory {
         builder.add(
                 entryBuilder
                         .startIntSlider(
-                                Text.translatable("gui.soundboard.config.sound.amplifier"),
+                                Component.translatable("gui.soundboard.config.sound.amplifier"),
                                 entry.amplifier,
                                 0,
                                 300
