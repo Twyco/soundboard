@@ -101,7 +101,7 @@ public class GlobalKeybinds {
         return switch (keybind) {
             case GlobalKeyBindings.OPEN_CONFIG -> client -> {
                 if (client == null) return;
-                client.setScreen(ConfigScreenFactory.create(client.screen));
+                client.gui.setScreen(ConfigScreenFactory.create(client.gui.screen()));
             };
         };
     }

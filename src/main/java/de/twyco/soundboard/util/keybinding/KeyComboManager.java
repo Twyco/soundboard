@@ -98,7 +98,7 @@ public class KeyComboManager {
             return false;
         }
 
-        if(client.screen != null) {
+        if(client.gui.screen() != null) {
             for(KeyComboState state : comboStates) {
                 state.pressed = false;
             }

@@ -55,12 +55,8 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     }
 
     private static Component createLabel(Component fieldLabel, int fieldLabelColor) {
-        ChatFormatting formatting = ChatFormatting.getById(fieldLabelColor);
         MutableComponent text = fieldLabel.copy();
-        if (formatting != null) {
-            text.withStyle(formatting);
-        }
-        return text;
+        return text.withColor(fieldLabelColor);
     }
 
     private void onButtonClick() {
