@@ -33,7 +33,7 @@ public class GlobalKeybinds {
     public static void init() {
         SoundboardConfigData configData = SoundboardConfig.get();
         for (GlobalKeyCombos keybind : GlobalKeyCombos.values()) {
-            Set<Integer> keyComboEntry = configData.globalKeyCombos.computeIfAbsent(keybind.getId(), k -> Set.of());
+            Set<Integer> keyComboEntry = configData.globalKeyCombos.computeIfAbsent(keybind.getId(), _ -> Set.of());
 
             KeyCombo combo;
 
@@ -93,7 +93,7 @@ public class GlobalKeybinds {
 
     private static KeyComboCallback getKeyComboAction(@NotNull GlobalKeyCombos keybind) {
         return switch (keybind) {
-            case GlobalKeyCombos.SOUND_STOP_ALL -> combo -> SoundManager.stopAllSounds();
+            case GlobalKeyCombos.SOUND_STOP_ALL -> _ -> SoundManager.stopAllSounds();
         };
     }
 
@@ -101,7 +101,7 @@ public class GlobalKeybinds {
         return switch (keybind) {
             case GlobalKeyBindings.OPEN_CONFIG -> client -> {
                 if (client == null) return;
-                client.setScreen(ConfigScreenFactory.create(client.screen));
+                client.gui.setScreen(ConfigScreenFactory.create(client.gui.screen()));
             };
         };
     }

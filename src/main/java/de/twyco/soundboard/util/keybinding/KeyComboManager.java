@@ -30,7 +30,7 @@ public class KeyComboManager {
     }
 
     public static void init() {
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        ClientTickEvents.END_CLIENT_TICK.register(_ -> {
             if(!pendingActions.isEmpty()) {
                 List<Runnable> actions = new ArrayList<>(pendingActions);
                 pendingActions.clear();
@@ -43,10 +43,10 @@ public class KeyComboManager {
         pendingActions.add(() -> {
             KeyComboState state = combosById.computeIfAbsent(
                     combo.getId(),
-                    id -> new KeyComboState(combo)
+                    _ -> new KeyComboState(combo)
             );
             List<KeyComboCallback> callbacks =
-                    state.listeners.computeIfAbsent(eventType, t -> new ArrayList<>());
+                    state.listeners.computeIfAbsent(eventType, _ -> new ArrayList<>());
 
             callbacks.add(callback);
         });
@@ -98,7 +98,7 @@ public class KeyComboManager {
             return false;
         }
 
-        if(client.screen != null) {
+        if(client.gui.screen() != null) {
             for(KeyComboState state : comboStates) {
                 state.pressed = false;
             }

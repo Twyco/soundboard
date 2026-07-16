@@ -33,11 +33,11 @@ public class ConfigScreenFactory {
 
     public static void reloadConfigScreen() {
         Minecraft client = Minecraft.getInstance();
-        Screen currentScreen = client.screen;
+        Screen currentScreen = client.gui.screen();
         if (currentScreen == null || !currentScreen.getTitle().equals(Component.translatable("gui.soundboard.config.title"))) {
             return;
         }
-        client.setScreen(create(parent));
+        client.gui.setScreen(create(parent));
     }
 
 }

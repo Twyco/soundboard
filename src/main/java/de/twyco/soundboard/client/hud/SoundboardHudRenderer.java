@@ -25,7 +25,7 @@ public class SoundboardHudRenderer {
         }
 
         Minecraft client = Minecraft.getInstance();
-        if(client.options.hideGui) {
+        if(client.gui.hud.isHidden()) {
             return;
         }
 

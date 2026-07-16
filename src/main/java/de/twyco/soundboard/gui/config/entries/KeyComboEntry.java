@@ -12,8 +12,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
@@ -42,25 +42,16 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
                          @NotNull java.util.function.Consumer<KeyCombo> onChange,
                          int fieldLabelColor
     ) {
-        super(createLabel(fieldLabel, fieldLabelColor), false);
+        super(fieldLabel.copy().withColor(fieldLabelColor), false);
         this.combo = initialCombo;
         this.onChange = onChange;
 
         this.button = Button.builder(
                         Component.literal(initialCombo.toString()),
-                        b -> onButtonClick()
+                        _ -> onButtonClick()
                 )
                 .build();
         this.textWidget = new StringWidget(fieldLabel, Minecraft.getInstance().font);
-    }
-
-    private static Component createLabel(Component fieldLabel, int fieldLabelColor) {
-        ChatFormatting formatting = ChatFormatting.getById(fieldLabelColor);
-        MutableComponent text = fieldLabel.copy();
-        if (formatting != null) {
-            text.withStyle(formatting);
-        }
-        return text;
     }
 
     private void onButtonClick() {
@@ -194,7 +185,7 @@ public class KeyComboEntry extends AbstractConfigListEntry<Void> {
     }
 
     @Override
-    public List<? extends GuiEventListener> children() {
+    public @NonNull List<? extends GuiEventListener> children() {
         return List.of(button);
     }
 }
