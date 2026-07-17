@@ -3,11 +3,9 @@
 ## Komponentenuebersicht
 
 ```text
-KeyboardMixin ----> KeyComboManager ----> Sound.play()
-                                             |
-Config Screen ----> SoundManager ------------+
-                                             v
-                              SimpleVoicechatService
+KeyboardMixin -> KeyComboManager -> Sound.play() -> SoundManager
+Config Screen -> ConfigDraft -> SoundManager
+SoundManager -> SimpleVoicechatService
                                |                  |
                                | mergeAudio()     | ClientStaticAudioChannel
                                v                  v
@@ -132,15 +130,17 @@ Minecraft- oder Mod-Tastenbelegungen kollidieren.
 
 ## Config-Screen und Nachladen
 
-Cloth Config stellt zwei Hauptkategorien bereit:
+Der eigene Vanilla-Minecraft-Screen stellt zwei Hauptbereiche bereit:
 
 - **General:** globale Stop-Combo, Wiedergabe bei stummem Mikrofon, HUD sowie
   Aktionen zum Oeffnen und Nachladen des Sound-Ordners
-- **Sound Settings:** je Datei Key Combo, Loop und Verstaerkung
+- **Sound Settings:** nach Dateiname filterbare Soundliste sowie je Datei Key
+  Combo, Loop und Verstaerkung
 
-Beim normalen Speichern schreibt `ConfigScreenFactory` die JSON-Datei und wendet
-die Einstellungen erneut auf alle `Sound`-Objekte an. Key Combos speichern ihre
-Aenderungen bereits unmittelbar bei der Aufnahme.
+Widgets aendern zunaechst nur einen lokalen `ConfigDraft`. `Apply` uebernimmt den
+Entwurf in die aktive Konfiguration, speichert die JSON-Datei und laedt Sound-
+sowie globale Key-Combo-Zustaende neu. `Done` fuehrt dieselben Schritte aus und
+schliesst den Screen. `Cancel` und Escape verwerfen den Entwurf.
 
 Beim Oeffnen des externen Sound-Ordners wird eine Aktion fuer den naechsten
 Fensterfokus vorgemerkt. Nach der Rueckkehr zu Minecraft werden Konfiguration,

@@ -47,18 +47,18 @@ SLF4J-Logger werden ebenfalls hier definiert.
 
 ### `gui.config`
 
-- `ConfigScreenFactory` baut den Cloth-Config-Bildschirm und speichert
-  Aenderungen.
-- `categories.GeneralCategoryFactory` baut globale Optionen und Aktionen.
-- `categories.SoundsCategoryFactory` fuegt pro geladener Datei eine Unterkategorie
-  hinzu.
-- `subcategories.SoundSubCategoryFactory` baut Key Combo, Loop und Verstaerkung
-  eines Sounds.
-- `entries.ActionButtonEntry` kapselt eine einzelne Aktionsschaltflaeche.
-- `entries.ActionButtonGridEntry` ordnet mehrere Aktionsschaltflaechen in einer
-  Zeile an.
-- `entries.KeyComboEntry` zeichnet die Eingabekomponente und zeichnet neue
-  Tastenkombinationen auf.
+- `ConfigScreenFactory` erzeugt den eigenen Vanilla-Minecraft-Config-Screen und
+  reicht Reloads an eine geoeffnete Instanz weiter.
+- `SoundboardConfigScreen` verwaltet Tabs, Footer-Aktionen, den lokalen Entwurf
+  und die Aufnahme von Tastenkombinationen.
+- `ConfigDraft` trennt noch nicht gespeicherte UI-Werte von der aktiven
+  Laufzeitkonfiguration.
+- `widget.SoundboardConfigList` stellt globale Optionen und Sound-Einstellungen
+  als scrollbare, responsive Vanilla-Liste dar.
+- `widget.KeyComboButton` kapselt Aufnahmezustand und Aenderungs-Callback einer
+  Tastenkombination.
+- `widget.AmplifierSlider` bildet den Wertebereich von 0 bis 300 Prozent auf
+  einen Minecraft-Slider ab.
 
 ### `interfaces`
 
