@@ -3,6 +3,8 @@
   "gui.soundboard.config.categories.general.title": "Allgemein",
   "gui.soundboard.config.categories.general.description": "Öffne mit der Schaltfläche unten den Sound-Ordner und lege dort deine MP3-Dateien ab.\nJede Datei wird als eigener Sound angezeigt. Für jeden Sound kannst du die Lautstärke und die Wiedergabeschleife einstellen.\nAußerdem kannst du jedem Sound eine Tastenkombination mit beliebig vielen Tasten zuweisen.\nDrücke die Tastenkombination im Spiel, um den Sound zu starten. Erneutes Drücken stoppt ihn.",
   "gui.soundboard.config.categories.sounds.title": "Sound-Einstellungen",
+  "gui.soundboard.config.sections.general": "Allgemein",
+  "gui.soundboard.config.sections.sound_wheel": "Sound-Rad-Einstellungen",
   "gui.soundboard.config.action.open_sounds_folder": "Sound-Ordner öffnen",
   "gui.soundboard.config.action.reload": "Sounddateien neu laden",
   "gui.soundboard.config.action.apply": "Anwenden",

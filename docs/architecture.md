@@ -153,8 +153,10 @@ without triggering additional playback.
 
 The custom Vanilla-style screen has two main tabs:
 
-- **General:** wheel and stop combos, wheel behavior, play-while-muted behavior,
-  HUD visibility, and actions to open or reload the sound folder
+- **General:** collapsible General and Sound Wheel Settings sections. Their
+  expansion state is persisted with the other global options. General contains
+  the stop combo, play-while-muted behavior, HUD visibility, and folder actions;
+  Sound Wheel Settings contains the wheel combo and wheel behavior.
 - **Sound Settings:** search, ascending or descending name sorting, bound and
   loop filters, and per-file combo, loop, and amplification settings
 
