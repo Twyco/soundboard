@@ -32,7 +32,6 @@
 		"fabricloader": ">=0.18.1",
 		"minecraft": "1.21.11",
 		"fabric-api": "*",
-		"cloth-config": ">=21.11.151",
 		"voicechat_api": ">=2.6.0"
 	},
 	"suggests": {
