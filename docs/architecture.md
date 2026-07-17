@@ -134,8 +134,8 @@ Der eigene Vanilla-Minecraft-Screen stellt zwei Hauptbereiche bereit:
 
 - **General:** globale Stop-Combo, Wiedergabe bei stummem Mikrofon, HUD sowie
   Aktionen zum Oeffnen und Nachladen des Sound-Ordners
-- **Sound Settings:** nach Dateiname filterbare Soundliste sowie je Datei Key
-  Combo, Loop und Verstaerkung
+- **Sound Settings:** Suche, auf- oder absteigende Namenssortierung, Filter fuer
+  Keybind- und Loop-Zustand sowie je Datei Key Combo, Loop und Verstaerkung
 
 Widgets aendern zunaechst nur einen lokalen `ConfigDraft`. `Apply` uebernimmt den
 Entwurf in die aktive Konfiguration, speichert die JSON-Datei und laedt Sound-
