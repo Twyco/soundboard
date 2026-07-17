@@ -1,19 +1,18 @@
-# Laufzeitkonfiguration
+# Runtime configuration
 
-## Dateien und Verzeichnisse
+## Files and directories
 
-Alle Pfade beziehen sich auf das Minecraft-Spielverzeichnis der jeweiligen
-Instanz.
+All paths are relative to the Minecraft game directory of the current instance.
 
-| Pfad | Inhalt |
+| Path | Contents |
 | --- | --- |
-| `sounds/` | Vom Benutzer bereitgestellte MP3-Dateien |
-| `config/soundboard.json` | Globale Optionen, Key Combos und Sound-Einstellungen |
+| `sounds/` | User-provided MP3 files |
+| `config/soundboard.json` | Global options, key combos, and sound settings |
 
-Der Mod erzeugt beide Verzeichnisse bei Bedarf. Der Sound-Ordner ist absichtlich
-nicht Teil des Repositorys und wird nicht rekursiv durchsucht.
+The mod creates both directories when needed. The sound folder is deliberately
+not part of the repository and is not scanned recursively.
 
-## Beispielkonfiguration
+## Example configuration
 
 ```json
 {
@@ -27,92 +26,77 @@ nicht Teil des Repositorys und wird nicht rekursiv durchsucht.
     "example.mp3": {
       "amplifier": 100,
       "loop": false,
-      "keyCombo": [
-        341,
-        75
-      ]
+      "keyCombo": [341, 75]
     }
   },
   "globalKeyCombos": {
-    "soundboard.sounds.open_wheel": [
-      341,
-      82
-    ],
-    "soundboard.sounds.stop_all": [
-      341,
-      88
-    ]
+    "soundboard.sounds.open_wheel": [341, 82],
+    "soundboard.sounds.stop_all": [341, 88]
   }
 }
 ```
 
-Die Ganzzahlen in `keyCombo` und `globalKeyCombos` sind GLFW-Keycodes. Die
-Reihenfolge ist semantisch irrelevant, da sie beim Laden als Menge behandelt
-werden.
+Values in `keyCombo` and `globalKeyCombos` are GLFW key codes. Their order has no
+semantic meaning because they are loaded as a set.
 
-## Felder
+## Fields
 
 ### `globalState`
 
-| Feld | Standard | Bedeutung |
+| Field | Default | Meaning |
 | --- | --- | --- |
-| `playWhileMuted` | `false` | Sound auch ausgeben, wenn das Voicechat-Mikrofon stumm ist |
-| `showPlayingSoundsHud` | `true` | Aktive Sounds im HUD anzeigen |
+| `playWhileMuted` | `false` | Output sounds while the voice-chat microphone is muted |
+| `showPlayingSoundsHud` | `true` | Display active sounds in the HUD |
 
-### Globale Sound-Defaults
+### Global sound defaults
 
-| Feld | Standard | Bedeutung |
+| Field | Default | Meaning |
 | --- | --- | --- |
-| `defaultLoop` | `false` | Loop-Standard fuer neu erkannte Dateien |
-| `defaultAmplifier` | `100` | Verstaerkungsstandard in Prozent |
+| `defaultLoop` | `false` | Loop default for newly discovered files |
+| `defaultAmplifier` | `100` | Amplification default in percent |
 
-Diese Werte dienen beim Anlegen eines bisher unbekannten `SoundEntry` als
-Vorlage. Sie veraendern bestehende Eintraege nicht automatisch.
+These values are templates for new `SoundEntry` objects. They do not
+automatically update existing entries.
 
 ### `sounds`
 
-Der Map-Schluessel ist exakt der Dateiname inklusive `.mp3`. Jeder Eintrag
-enthaelt:
+Each map key is the exact file name including `.mp3`. Every entry contains:
 
-| Feld | Bereich | Bedeutung |
+| Field | Range | Meaning |
 | --- | --- | --- |
-| `amplifier` | `0` bis `300` | Gain in Prozent; 100 entspricht Faktor 1,0 |
-| `loop` | Boolean | Nach dem Ende wieder von vorne beginnen |
-| `keyCombo` | Menge von Keycodes | Kombination zum Starten und Stoppen |
+| `amplifier` | `0` to `300` | Gain in percent; 100 equals a factor of 1.0 |
+| `loop` | Boolean | Restart playback after reaching the end |
+| `keyCombo` | Set of key codes | Combo that starts or stops the sound |
 
-Die Laufzeitklasse `Sound` begrenzt die Verstaerkung zusaetzlich auf 0 bis 300.
-Konfigurationseintraege entfernter Dateien bleiben im JSON erhalten und werden
-ignoriert, solange die Datei fehlt.
+The runtime `Sound` class also clamps amplification to 0 through 300. Entries for
+removed files remain in JSON and are ignored until that file exists again.
 
 ### `globalKeyCombos`
 
-Die Map speichert Kombinationen fuer globale Aktionen:
-
-| ID | Aktion |
+| ID | Action |
 | --- | --- |
-| `soundboard.sounds.open_wheel` | Sound-Rad oeffnen und bis zum Loslassen halten |
-| `soundboard.sounds.stop_all` | Alle laufenden Sounds stoppen |
+| `soundboard.sounds.open_wheel` | Open and hold the sound wheel |
+| `soundboard.sounds.stop_all` | Stop all active sounds |
 
-## Bedienung der Key-Combo-Eingabe
+## Recording a key combo
 
-1. Im Config-Screen die Schaltflaeche der gewuenschten Kombination anklicken.
-2. Alle gewuenschten Tasten druecken.
-3. Beim Loslassen einer Taste wird die bis dahin erfasste Kombination gespeichert.
+1. Click the combo button in the config screen.
+2. Press every key that should belong to the combo.
+3. Release a key to store the keys captured so far.
 
-Backspace, Delete oder Escape waehrend der Aufnahme loeschen die Belegung. Es
-kann immer nur eine Kombination gleichzeitig aufgenommen werden.
+Backspace, Delete, or Escape clears a combo while it is being recorded. Only one
+combo can be recorded at a time.
 
-## Laden und Speichern
+## Loading and saving
 
-- Beim ersten Start wird eine Standardkonfiguration erzeugt.
-- Bei jedem Start wird die vorhandene JSON-Datei mit Gson geladen.
-- Neu gefundene Sounddateien erhalten automatisch einen Eintrag.
-- `Apply` speichert, ohne den Config-Screen zu schliessen.
-- `Done` speichert und kehrt zum vorherigen Screen zurueck.
-- `Cancel` und Escape verwerfen alle noch nicht angewendeten Aenderungen.
-- Key-Combo-Aenderungen bleiben bis `Apply` oder `Done` im lokalen Entwurf.
-- "Reload sound files" liest Config und Sound-Ordner erneut ein.
+- The first launch creates a default configuration.
+- Every launch loads the existing JSON through Gson.
+- Newly discovered sound files receive entries automatically.
+- `Apply` saves without closing the config screen.
+- `Done` saves and returns to the previous screen.
+- `Cancel` and Escape discard unapplied changes.
+- Combo changes remain in the local draft until `Apply` or `Done`.
+- `Reload sound files` reloads both the config and sound folder.
 
-Es gibt derzeit keine explizite Schema-Version oder Migrationsschicht. Neue
-Konfigurationsfelder sollten deshalb mit rueckwaertskompatiblen Defaults
-eingefuehrt werden.
+There is currently no explicit schema version or migration layer. New config
+fields must therefore use backward-compatible defaults.

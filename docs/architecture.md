@@ -1,6 +1,6 @@
-# Architektur und Ablaeufe
+# Architecture and runtime flows
 
-## Komponentenuebersicht
+## Component overview
 
 ```text
 KeyboardMixin -> KeyComboManager -> Sound.play() -> SoundManager
@@ -9,177 +9,163 @@ SoundManager -> SimpleVoicechatService
                                |                  |
                                | mergeAudio()     | ClientStaticAudioChannel
                                v                  v
-                         Voice-Chat-Ausgabe   lokale Wiedergabe
+                         voice-chat output     local playback
 
 SoundboardConfig <---- GUI / SoundManager / GlobalKeybinds
 SimpleVoicechatService ----> SoundboardHudRenderer
 ```
 
-Die Klassen sind ueberwiegend statische Services. Es gibt keinen Dependency-
-Injection-Container und keinen eigenen Event-Bus.
+Most components are static services. The project has no dependency-injection
+container and no custom event bus.
 
-## Initialisierung
+## Initialization
 
-Fabric ruft `Soundboard.onInitialize()` auf. Die Reihenfolge ist relevant:
+Fabric calls `Soundboard.onInitialize()`. Initialization order matters:
 
-1. `SoundboardConfig.init()` laedt oder erzeugt `config/soundboard.json`.
-2. `KeyComboManager.init()` registriert seine Tick-Verarbeitung.
-3. `KeyBindingManager.init()` registriert Minecraft-Key-Binding-Verarbeitung.
-4. `SoundManager.init()` scannt den Ordner `sounds/` und wendet die Config an.
-5. `GlobalKeybinds.init()` registriert globale Aktionen und speichert Defaults.
-6. `HudService.init()` registriert das HUD-Element.
-7. `FocusWatcher.init()` beobachtet den Fensterfokus.
+1. `SoundboardConfig.init()` loads or creates `config/soundboard.json`.
+2. `KeyComboManager.init()` registers combo tick processing.
+3. `KeyBindingManager.init()` registers Minecraft key-binding processing.
+4. `SoundManager.init()` scans `sounds/` and applies the configuration.
+5. `GlobalKeybinds.init()` registers global actions and persists defaults.
+6. `HudService.init()` registers the HUD element.
+7. `FocusWatcher.init()` observes window focus.
 
-Unabhaengig davon erzeugt Fabric ueber den `voicechat`-Entrypoint eine Instanz von
-`SimpleVoicechatApi`. Simple Voice Chat ruft dort `initialize()` und
-`registerEvents()` auf.
+Separately, Fabric creates `SimpleVoicechatApi` through the `voicechat`
+entrypoint. Simple Voice Chat calls its `initialize()` and `registerEvents()`
+methods.
 
-## Verbindung mit Simple Voice Chat
+## Simple Voice Chat connection
 
-Bei einer erfolgreichen Client-Verbindung:
+After a successful client connection:
 
-1. Der `VoicechatClientApi` wird im `SimpleVoicechatService` gespeichert.
-2. Eine Lautstaerkekategorie mit der ID `soundboardsounds` und dem Namen
-   `Soundboard` wird registriert.
-3. Ein `ClientStaticAudioChannel` mit zufaelliger UUID wird erstellt.
-4. Der Kanal wird der Soundboard-Lautstaerkekategorie zugeordnet.
+1. The `VoicechatClientApi` is stored in `SimpleVoicechatService`.
+2. A volume category named `Soundboard` with ID `soundboardsounds` is registered.
+3. A `ClientStaticAudioChannel` with a random UUID is created.
+4. The channel is assigned to the Soundboard volume category.
 
-Beim Trennen wird die Kategorie abgemeldet, die Client-API entfernt und jede
-aktive Wiedergabe beendet.
+Disconnecting unregisters the category, clears the client API reference, and
+stops every active sound.
 
-## Laden der Sounddateien
+## Loading sound files
 
-`SoundManager.reload()` leert die Laufzeitliste und liest alle regulaeren Dateien
-direkt unterhalb von `<gameDirectory>/sounds`. Unterordner werden nicht rekursiv
-durchsucht. Aktuell werden nur Dateinamen akzeptiert, die ohne Beachtung der
-Gross-/Kleinschreibung auf `.mp3` enden.
+`SoundManager.reload()` clears the runtime list and reads regular files directly
+below `<gameDirectory>/sounds`. Subdirectories are not scanned recursively. File
+names are accepted when they end in `.mp3`, ignoring case.
 
-Die Sound-ID und der sichtbare Name sind jeweils der vollstaendige Dateiname
-inklusive Erweiterung. Dadurch ist der Dateiname zugleich der stabile Schluessel
-in der JSON-Konfiguration. Fuer jede neue Datei wird bei Bedarf sofort ein
-`SoundEntry` mit den globalen Standardwerten erzeugt und gespeichert.
+The sound ID and display name are both the complete file name including its
+extension. The file name is therefore also the stable JSON configuration key.
+When a new file is found, the mod creates and saves a `SoundEntry` using the
+global defaults.
 
-## Start, Umschalten und Stopp
+## Starting, toggling, and stopping sounds
 
-Eine Sound-Combo registriert einen `PRESS`-Callback auf `Sound.play()`. Der
-`SimpleVoicechatService` dekodiert die MP3 vollstaendig in ein `short[]` und
-normalisiert sie auf:
+A sound combo registers a `PRESS` callback on `Sound.play()`.
+`SimpleVoicechatService` decodes the entire MP3 into a `short[]` and normalizes it
+to:
 
-- 48.000 Samples pro Sekunde
-- Mono
-- vorzeichenbehaftete 16-Bit-PCM-Samples
+- 48,000 samples per second
+- mono
+- signed 16-bit PCM samples
 
-Stereo wird durch Mittelung beider Kanaele in Mono umgewandelt. Andere
-Kanalzahlen werden abgewiesen. Abweichende Sampleraten werden linear auf 48 kHz
-umgerechnet.
+Stereo input is converted to mono by averaging both channels. Other channel
+counts are rejected. Sample rates other than 48 kHz are resampled linearly.
 
-Ist dieselbe Sound-ID bereits aktiv, soll der erneute Start den vorhandenen
-Eintrag entfernen. Andernfalls wird ein neues `PlayingSound` angelegt. Andere
-Sound-IDs bleiben aktiv und werden parallel gemischt. Die globale Stop-Combo
-leert die gesamte Liste.
+If the same sound ID is already active, triggering it removes the existing
+playback. Otherwise, a new `PlayingSound` is added. Other sound IDs remain active
+and are mixed in parallel. The global stop combo clears the complete playback
+list.
 
-`PlayingSound` uebernimmt Loop- und Gain-Werte beim Start. Aenderungen an der
-Konfiguration beeinflussen daher bereits laufende Instanzen nicht rueckwirkend.
+`PlayingSound` copies loop and gain values when playback starts. Later config
+changes do not retroactively affect an already running instance.
 
-## Mischen und Wiedergabe
+## Mixing and playback
 
-Das `MergeClientSoundEvent` fordert fortlaufend Audiobloecke an. Pro Event wird
-ein Block mit 960 Samples erzeugt, entsprechend 20 ms bei 48 kHz.
+`MergeClientSoundEvent` continuously requests blocks of 960 samples, equal to
+20 ms at 48 kHz. For each active sound, the service:
 
-Fuer jeden aktiven Sound wird:
+1. reads samples from the current position,
+2. multiplies each sample by `amplifier / 100`,
+3. adds it to the other active sounds,
+4. clamps the result to the Java `short` range,
+5. advances the playback position, and
+6. removes a finished non-looping sound on the next pass.
 
-1. ab der aktuellen Position gelesen,
-2. jedes Sample mit `amplifier / 100` multipliziert,
-3. mit den anderen aktiven Sounds addiert,
-4. auf den Bereich eines Java-`short` begrenzt,
-5. die Abspielposition fortgeschrieben und
-6. ein beendeter Nicht-Loop beim folgenden Durchlauf entfernt.
+When `playWhileMuted` is enabled or the voice-chat microphone is not muted, the
+mixed block is sent to both destinations:
 
-Wenn `playWhileMuted` aktiviert oder das Voicechat-Mikrofon nicht stummgeschaltet
-ist, geht derselbe gemischte Block an zwei Ziele:
+- `event.mergeAudio(mixed)` adds it to the Simple Voice Chat client stream.
+- `ClientStaticAudioChannel.play(mixed)` plays it locally in the Soundboard
+  volume category.
 
-- `event.mergeAudio(mixed)` mischt ihn in den von Simple Voice Chat verarbeiteten
-  Client-Audiostream.
-- `ClientStaticAudioChannel.play(mixed)` spielt ihn lokal in der eigenen
-  Soundboard-Lautstaerkekategorie ab.
+When the microphone is muted and `playWhileMuted` is disabled, positions still
+advance, but no audio block is output.
 
-Ist das Mikrofon stumm und `playWhileMuted` deaktiviert, werden Positionen weiter
-fortgeschrieben, der Block wird jedoch nicht ausgegeben.
+## Keyboard input
 
-## Tastatureingaben
+The project uses two input mechanisms:
 
-Das Projekt unterscheidet zwei Mechanismen:
-
-| Mechanismus | Verwendung | Verarbeitung |
+| Mechanism | Usage | Processing |
 | --- | --- | --- |
-| Minecraft `KeyMapping` | Config-Menue oeffnen | `consumeClick()` am Tick-Ende |
-| Eigene `KeyCombo` | Sounds, Sound-Rad und globaler Stopp | rohes Ereignis im Mixin |
+| Minecraft `KeyMapping` | Open the config screen | `consumeClick()` at tick end |
+| Custom `KeyCombo` | Sounds, sound wheel, and global stop | Raw keyboard mixin event |
 
-Eine `KeyCombo` besteht aus einer ID und einer ungeordneten Menge von GLFW-
-Keycodes. Sie gilt als gedrueckt, wenn alle enthaltenen Tasten aktuell gedrueckt
-sind. Leere Kombinationen werden nie ausgeloest.
+A `KeyCombo` contains an ID and an unordered set of GLFW key codes. It is held
+when every configured key is currently pressed. Empty combos never trigger.
 
-Der `KeyComboManager` merkt sich pro ID, ob die Kombination zuvor gedrueckt war,
-und leitet daraus `PRESS`, `HOLD` oder `RELEASE` ab. Registrierungen und
-Abmeldungen werden bis zum Ende des Client-Ticks gepuffert. Bei geoeffnetem
-Minecraft-Screen werden keine Combo-Callbacks ausgeloest.
+`KeyComboManager` tracks whether each combo was previously held and derives
+`PRESS`, `HOLD`, and `RELEASE` events. Registration changes are queued until the
+end of the client tick. Combo callbacks are not triggered while a normal
+Minecraft screen is open.
 
-Sobald ein Combo-Ereignis ausgeloest wurde, konsumiert `KeyboardMixin` das rohe
-Tastaturereignis. Dieses Verhalten ist beabsichtigt, kann aber mit anderen
-Minecraft- oder Mod-Tastenbelegungen kollidieren.
+When a combo event triggers, `KeyboardMixin` consumes the raw keyboard event.
+This is intentional, but it can conflict with Minecraft or mod key bindings that
+use the same keys.
 
-## Sound-Rad
+## Sound wheel
 
-Die globale Combo `soundboard.sounds.open_wheel` oeffnet bei `PRESS` einen nicht
-pausierenden `SoundWheelScreen`. Das Oeffnen ist nur ohne bereits aktiven
-Minecraft-Screen moeglich. Der Screen gibt den Mauszeiger frei, waehrend die
-Voicechat- und Spielsimulation weiterlaufen. Die konfigurierten KeyMappings fuer
-Vorwaerts-, Rueckwaerts- und Seitwaertsbewegung sowie Springen, Schleichen und
-Sprinten werden waehrenddessen an die Spielsteuerung weitergereicht. Andere
-Gameplay- und Screen-Shortcuts bleiben blockiert.
+The global combo `soundboard.sounds.open_wheel` opens a non-pausing
+`SoundWheelScreen` on `PRESS`. It only opens when no other Minecraft screen is
+active. The screen releases the mouse cursor while voice chat and game simulation
+continue. Configured movement mappings for walking, jumping, sneaking, and
+sprinting are forwarded to game controls. Other gameplay and screen shortcuts
+remain blocked.
 
-Sound-Rad und Config-Screen verwenden dieselbe Minecraft-nahe UI-Palette aus
-`SoundboardUi`: graue pixelige Bevel- und Inset-Flaechen, helle und dunkle
-Rahmenkanten sowie Gruen fuer aktive Wiedergabe. Die Seitennavigation des Rads
-nutzt Vanilla-Minecraft-Sprites.
+The wheel and config screen share the Minecraft-inspired palette and rendering
+helpers in `SoundboardUi`. Wheel page controls use Vanilla Minecraft sprites.
 
-Die Sounds werden beim Oeffnen ohne Beachtung der Gross-/Kleinschreibung nach
-Dateiname sortiert und in Seiten mit jeweils sechs Eintraegen aufgeteilt. Die
-Sektoren beginnen oben und laufen im Uhrzeigersinn. Mausrad sowie linke und rechte
-Pfeiltaste wechseln zyklisch zwischen den Seiten. Zusaetzlich erscheinen an den
-oberen Aussenseiten des Rads klickbare Pfeile, sofern in der jeweiligen Richtung
-eine Seite vorhanden ist. Ein Mausrad-Icon in der Mitte weist bei mehreren Seiten
-auf die Scroll-Navigation hin.
+Sounds are sorted by file name without case sensitivity and split into pages of
+six. Sectors start at the top and continue clockwise. The mouse wheel and left or
+right arrow keys cycle through pages. Clickable page arrows appear beside the
+wheel when a page exists in that direction. A mouse-wheel icon indicates scroll
+navigation when multiple pages exist.
 
-Die Mausposition bestimmt ueber ihren Winkel zum Bildschirmzentrum den aktiven
-Sektor. Innerhalb der mittleren toten Zone bleibt die Auswahl leer. Ein primaerer
-Mausklick startet oder stoppt den markierten Sound, ohne das Rad zu schliessen.
-Dadurch koennen waehrend einer Rad-Sitzung mehrere Sounds gestartet werden.
-Laufende Sounds sind gruen markiert und tragen ein Wiedergabe-Icon; Loop-Sounds
-tragen ein Wiederholen-Icon. Das Loslassen einer Taste der Oeffnen-Combo oder
-Escape schliesst das Rad ohne eine weitere Wiedergabe auszuloesen.
+The mouse angle relative to the screen center selects a sector. The inner dead
+zone has no selection. Primary click starts or stops the selected sound without
+closing the wheel, allowing several sounds to be controlled in one wheel session.
+Playing sounds are green and show a play icon; looping sounds show a loop icon.
+Releasing a key from the opening combo or pressing Escape closes the wheel
+without triggering additional playback.
 
-## Config-Screen und Nachladen
+## Config screen and reload flow
 
-Der eigene Vanilla-Minecraft-Screen stellt zwei Hauptbereiche bereit:
+The custom Vanilla-style screen has two main tabs:
 
-- **General:** Sound-Rad- und Stop-Combo, Wiedergabe bei stummem Mikrofon, HUD
-  sowie Aktionen zum Oeffnen und Nachladen des Sound-Ordners
-- **Sound Settings:** Suche, auf- oder absteigende Namenssortierung, Filter fuer
-  Keybind- und Loop-Zustand sowie je Datei Key Combo, Loop und Verstaerkung
+- **General:** wheel and stop combos, play-while-muted behavior, HUD visibility,
+  and actions to open or reload the sound folder
+- **Sound Settings:** search, ascending or descending name sorting, bound and
+  loop filters, and per-file combo, loop, and amplification settings
 
-Widgets aendern zunaechst nur einen lokalen `ConfigDraft`. `Apply` uebernimmt den
-Entwurf in die aktive Konfiguration, speichert die JSON-Datei und laedt Sound-
-sowie globale Key-Combo-Zustaende neu. `Done` fuehrt dieselben Schritte aus und
-schliesst den Screen. `Cancel` und Escape verwerfen den Entwurf.
+Widgets edit a local `ConfigDraft`. `Apply` writes the draft to the active config,
+saves JSON, and reloads sound and global combo state. `Done` performs the same
+steps and closes the screen. `Cancel` and Escape discard the draft.
 
-Beim Oeffnen des externen Sound-Ordners wird eine Aktion fuer den naechsten
-Fensterfokus vorgemerkt. Nach der Rueckkehr zu Minecraft werden Konfiguration,
-Dateiliste und ein gegebenenfalls noch offener Config-Screen neu aufgebaut.
+Opening the external sound folder schedules an action for the next focus regain.
+After Minecraft regains focus, the mod reloads the configuration, file list, and
+an open config screen.
 
 ## HUD
 
-Das HUD-Element wird vor dem Vanilla-Chat registriert. Wenn HUD und Option aktiv
-sind, Simple Voice Chat verbunden ist und Sounds laufen, zeigt es rechts unten
-die Ueberschrift `Currently Playing`, alle Dateinamen und gegebenenfalls den
-Zusatz `Looping` an.
+The HUD element is registered before Vanilla chat. When the HUD option is active,
+Simple Voice Chat is connected, and sounds are playing, it shows `Currently
+Playing`, every active file name, and a `Looping` suffix where applicable in the
+bottom-right corner.
