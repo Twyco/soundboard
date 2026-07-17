@@ -60,6 +60,13 @@ SLF4J-Logger werden ebenfalls hier definiert.
 - `widget.AmplifierSlider` bildet den Wertebereich von 0 bis 300 Prozent auf
   einen Minecraft-Slider ab.
 
+### `gui.component`
+
+`SoundboardUi` definiert die gemeinsame Minecraft-nahe Farbpalette und
+pixelige Zeichenprimitive fuer Config-Screen und Sound-Rad. Dazu gehoeren
+Bevel- und Inset-Panels, Listenzeilen, Textkuerzung, Kreis- und Mausrad-Rendering
+sowie die Anbindung der Vanilla-Seitenpfeil-Sprites.
+
 ### `gui.soundwheel`
 
 `SoundWheelScreen` zeigt bis zu sechs alphabetisch sortierte Sounds radial an.

@@ -1,6 +1,7 @@
 package de.twyco.soundboard.gui.config;
 
 import de.twyco.soundboard.client.GlobalKeybinds;
+import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.gui.config.widget.SoundboardConfigList;
 import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
@@ -38,6 +39,9 @@ public final class SoundboardConfigScreen extends Screen {
     private SoundSort soundSort = SoundSort.NAME_ASCENDING;
     private KeybindFilter keybindFilter = KeybindFilter.ALL;
     private LoopFilter loopFilter = LoopFilter.ALL;
+    private int pageX;
+    private int pageWidth;
+    private int listY;
     private boolean clearFocusNextTick;
     private boolean refreshSoundListNextTick;
 
@@ -56,8 +60,8 @@ public final class SoundboardConfigScreen extends Screen {
     protected void init() {
         stopKeyComboCapture();
 
-        int pageWidth = Math.min(PAGE_MAX_WIDTH, Math.max(1, width - PAGE_MARGIN * 2));
-        int pageX = (width - pageWidth) / 2;
+        pageWidth = Math.min(PAGE_MAX_WIDTH, Math.max(1, width - PAGE_MARGIN * 2));
+        pageX = (width - pageWidth) / 2;
         int tabWidth = Math.max(1, (pageWidth - GAP) / 2);
 
         generalTabButton = addRenderableWidget(
@@ -78,7 +82,7 @@ public final class SoundboardConfigScreen extends Screen {
         );
         updateTabButtons();
 
-        int listY = HEADER_HEIGHT;
+        listY = HEADER_HEIGHT;
         if (selectedTab == Tab.SOUNDS) {
             EditBox searchBox = new EditBox(
                     font,
@@ -151,8 +155,24 @@ public final class SoundboardConfigScreen extends Screen {
             int mouseY,
             float delta
     ) {
+        SoundboardUi.drawRaisedPanel(
+                graphics,
+                pageX - 6,
+                4,
+                pageWidth + 12,
+                height - 8,
+                SoundboardUi.SURFACE
+        );
+        SoundboardUi.drawInsetPanel(
+                graphics,
+                pageX - 2,
+                listY - 3,
+                pageWidth + 4,
+                Math.max(1, height - listY - FOOTER_HEIGHT + 6),
+                SoundboardUi.SURFACE_DARK
+        );
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
+        graphics.centeredText(font, title, width / 2, 10, SoundboardUi.TEXT_PRIMARY);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package de.twyco.soundboard.gui.soundwheel;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatService;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.Sound;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -25,21 +25,9 @@ public final class SoundWheelScreen extends Screen {
     private static final int SOUNDS_PER_PAGE = 6;
     private static final int MAX_OUTER_RADIUS = 120;
     private static final int MIN_OUTER_RADIUS = 54;
-    private static final int PAGE_BUTTON_SIZE = 22;
     private static final int PAGE_BUTTON_GAP = 8;
     private static final double FULL_CIRCLE = Math.PI * 2.0D;
     private static final double SECTOR_ANGLE = FULL_CIRCLE / SOUNDS_PER_PAGE;
-
-    private static final int WHEEL_COLOR = 0xDD20242A;
-    private static final int SELECTED_COLOR = 0xDD278C82;
-    private static final int PLAYING_COLOR = 0xDD287A46;
-    private static final int PLAYING_SELECTED_COLOR = 0xDD36A564;
-    private static final int CENTER_COLOR = 0xEE111418;
-    private static final int DIVIDER_COLOR = 0xAAE6E6E6;
-    private static final int TEXT_COLOR = 0xFFE8E8E8;
-    private static final int SELECTED_TEXT_COLOR = 0xFFFFFFFF;
-    private static final int BUTTON_COLOR = 0xCC20242A;
-    private static final int BUTTON_HOVER_COLOR = 0xDD278C82;
 
     private final Screen parent;
     private final KeyCombo activationCombo;
@@ -81,7 +69,7 @@ public final class SoundWheelScreen extends Screen {
         centerY = height / 2;
         int availableRadius = Math.min(width, height) / 2 - 34;
         outerRadius = Math.max(MIN_OUTER_RADIUS, Math.min(MAX_OUTER_RADIUS, availableRadius));
-        innerRadius = Math.max(22, (int) Math.round(outerRadius * 0.38D));
+        innerRadius = Math.max(28, (int) Math.round(outerRadius * 0.4D));
         buildSectorSpans();
         page = Math.min(page, getPageCount() - 1);
         updateMovementKeyStates();
@@ -101,7 +89,34 @@ public final class SoundWheelScreen extends Screen {
         }
         Set<String> playingSoundIds = SimpleVoicechatService.getCurrentlyPlayingSoundIds();
 
-        drawCircle(graphics, centerX, centerY, outerRadius, WHEEL_COLOR);
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX + 2,
+                centerY + 2,
+                outerRadius + 4,
+                SoundboardUi.SHADOW
+        );
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX,
+                centerY,
+                outerRadius + 3,
+                SoundboardUi.BORDER_DARK
+        );
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX,
+                centerY,
+                outerRadius + 2,
+                SoundboardUi.BORDER_LIGHT
+        );
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX,
+                centerY,
+                outerRadius,
+                SoundboardUi.SURFACE
+        );
         drawPlayingSectors(graphics, playingSoundIds);
         if (selectedSector >= 0) {
             Sound selectedSound = getSelectedSound();
@@ -110,26 +125,58 @@ public final class SoundWheelScreen extends Screen {
             drawSector(
                     graphics,
                     selectedSector,
-                    selectedSoundPlaying ? PLAYING_SELECTED_COLOR : SELECTED_COLOR
+                    selectedSoundPlaying
+                            ? SoundboardUi.PLAYING_HOVERED
+                            : SoundboardUi.SURFACE_SELECTED
             );
         }
-        drawCircle(graphics, centerX, centerY, innerRadius, CENTER_COLOR);
         drawDividers(graphics);
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX,
+                centerY,
+                innerRadius + 3,
+                SoundboardUi.BORDER_DARK
+        );
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX,
+                centerY,
+                innerRadius + 1,
+                SoundboardUi.BORDER_LIGHT
+        );
+        SoundboardUi.drawCircle(
+                graphics,
+                centerX,
+                centerY,
+                innerRadius,
+                SoundboardUi.SURFACE_DARK
+        );
         drawLabels(graphics, playingSoundIds);
 
+        int titleWidth = font.width(title) + 12;
+        int titleY = centerY - outerRadius - 28;
+        SoundboardUi.drawRaisedPanel(
+                graphics,
+                centerX - titleWidth / 2,
+                titleY,
+                titleWidth,
+                18,
+                SoundboardUi.SURFACE
+        );
         graphics.centeredText(
                 font,
                 title,
                 centerX,
-                centerY - outerRadius - 22,
-                TEXT_COLOR
+                titleY + 5,
+                SoundboardUi.TEXT_PRIMARY
         );
         graphics.centeredText(
                 font,
                 Component.translatable("gui.soundboard.wheel.page", page + 1, getPageCount()),
                 centerX,
                 centerY - font.lineHeight / 2,
-                TEXT_COLOR
+                SoundboardUi.TEXT_PRIMARY
         );
         drawPageControls(graphics, mouseX, mouseY);
     }
@@ -335,7 +382,7 @@ public final class SoundWheelScreen extends Screen {
     }
 
     private int getPreviousPageButtonX() {
-        return centerX - outerRadius - PAGE_BUTTON_GAP - PAGE_BUTTON_SIZE;
+        return centerX - outerRadius - PAGE_BUTTON_GAP - SoundboardUi.PAGE_BUTTON_WIDTH;
     }
 
     private int getNextPageButtonX() {
@@ -347,21 +394,30 @@ public final class SoundWheelScreen extends Screen {
     }
 
     private boolean isInsidePreviousPageButton(double mouseX, double mouseY) {
-        return isInsideButton(mouseX, mouseY, getPreviousPageButtonX(), getPageButtonY());
+        return SoundboardUi.contains(
+                mouseX,
+                mouseY,
+                getPreviousPageButtonX(),
+                getPageButtonY(),
+                SoundboardUi.PAGE_BUTTON_WIDTH,
+                SoundboardUi.PAGE_BUTTON_HEIGHT
+        );
     }
 
     private boolean isInsideNextPageButton(double mouseX, double mouseY) {
-        return isInsideButton(mouseX, mouseY, getNextPageButtonX(), getPageButtonY());
+        return SoundboardUi.contains(
+                mouseX,
+                mouseY,
+                getNextPageButtonX(),
+                getPageButtonY(),
+                SoundboardUi.PAGE_BUTTON_WIDTH,
+                SoundboardUi.PAGE_BUTTON_HEIGHT
+        );
     }
 
     private boolean isOverVisiblePageButton(double mouseX, double mouseY) {
         return hasPreviousPage() && isInsidePreviousPageButton(mouseX, mouseY)
                 || hasNextPage() && isInsideNextPageButton(mouseX, mouseY);
-    }
-
-    private static boolean isInsideButton(double mouseX, double mouseY, int x, int y) {
-        return mouseX >= x && mouseX < x + PAGE_BUTTON_SIZE
-                && mouseY >= y && mouseY < y + PAGE_BUTTON_SIZE;
     }
 
     private void buildSectorSpans() {
@@ -406,7 +462,7 @@ public final class SoundWheelScreen extends Screen {
         List<Sound> pageSounds = getSoundsOnCurrentPage();
         for (int i = 0; i < pageSounds.size(); i++) {
             if (playingSoundIds.contains(pageSounds.get(i).getId())) {
-                drawSector(graphics, i, PLAYING_COLOR);
+                drawSector(graphics, i, SoundboardUi.PLAYING);
             }
         }
     }
@@ -429,7 +485,20 @@ public final class SoundWheelScreen extends Screen {
             graphics.pose().pushMatrix();
             graphics.pose().translate(centerX, centerY);
             graphics.pose().rotate(angle);
-            graphics.fill(innerRadius, -1, outerRadius + 1, 1, DIVIDER_COLOR);
+            graphics.fill(
+                    innerRadius,
+                    -1,
+                    outerRadius + 1,
+                    2,
+                    SoundboardUi.BORDER_DARK
+            );
+            graphics.fill(
+                    innerRadius + 2,
+                    -1,
+                    outerRadius,
+                    0,
+                    SoundboardUi.BORDER_MID
+            );
             graphics.pose().popMatrix();
         }
     }
@@ -437,11 +506,11 @@ public final class SoundWheelScreen extends Screen {
     private void drawPageControls(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int buttonY = getPageButtonY();
         if (hasPreviousPage()) {
-            drawPageButton(
+            SoundboardUi.drawPageButton(
                     graphics,
                     getPreviousPageButtonX(),
                     buttonY,
-                    "\u25c0",
+                    false,
                     isInsidePreviousPageButton(mouseX, mouseY)
             );
             if (isInsidePreviousPageButton(mouseX, mouseY)) {
@@ -453,11 +522,11 @@ public final class SoundWheelScreen extends Screen {
             }
         }
         if (hasNextPage()) {
-            drawPageButton(
+            SoundboardUi.drawPageButton(
                     graphics,
                     getNextPageButtonX(),
                     buttonY,
-                    "\u25b6",
+                    true,
                     isInsideNextPageButton(mouseX, mouseY)
             );
             if (isInsideNextPageButton(mouseX, mouseY)) {
@@ -469,9 +538,9 @@ public final class SoundWheelScreen extends Screen {
             }
         }
         if (getPageCount() > 1) {
-            drawMouseWheelIcon(graphics, centerX, centerY + 8);
+            SoundboardUi.drawMouseWheelIcon(graphics, centerX, centerY + 9);
             if (mouseX >= centerX - 6 && mouseX < centerX + 6
-                    && mouseY >= centerY + 6 && mouseY < centerY + 24) {
+                    && mouseY >= centerY + 7 && mouseY < centerY + 25) {
                 graphics.setTooltipForNextFrame(
                         Component.translatable("gui.soundboard.wheel.mouse_wheel"),
                         mouseX,
@@ -481,48 +550,10 @@ public final class SoundWheelScreen extends Screen {
         }
     }
 
-    private void drawPageButton(
-            GuiGraphicsExtractor graphics,
-            int x,
-            int y,
-            String icon,
-            boolean hovered
-    ) {
-        graphics.fill(
-                x,
-                y,
-                x + PAGE_BUTTON_SIZE,
-                y + PAGE_BUTTON_SIZE,
-                hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR
-        );
-        graphics.outline(x, y, PAGE_BUTTON_SIZE, PAGE_BUTTON_SIZE, DIVIDER_COLOR);
-        graphics.centeredText(
-                font,
-                icon,
-                x + PAGE_BUTTON_SIZE / 2,
-                y + (PAGE_BUTTON_SIZE - font.lineHeight) / 2,
-                SELECTED_TEXT_COLOR
-        );
-    }
-
-    private static void drawMouseWheelIcon(GuiGraphicsExtractor graphics, int centerX, int y) {
-        int left = centerX - 5;
-        int right = centerX + 5;
-        graphics.fill(left + 2, y, right - 2, y + 1, TEXT_COLOR);
-        graphics.fill(left, y + 2, left + 1, y + 12, TEXT_COLOR);
-        graphics.fill(right - 1, y + 2, right, y + 12, TEXT_COLOR);
-        graphics.fill(left + 2, y + 13, right - 2, y + 14, TEXT_COLOR);
-        graphics.fill(left + 1, y + 1, left + 2, y + 2, TEXT_COLOR);
-        graphics.fill(right - 2, y + 1, right - 1, y + 2, TEXT_COLOR);
-        graphics.fill(left + 1, y + 12, left + 2, y + 13, TEXT_COLOR);
-        graphics.fill(right - 2, y + 12, right - 1, y + 13, TEXT_COLOR);
-        graphics.fill(centerX - 1, y + 2, centerX + 1, y + 6, SELECTED_COLOR);
-    }
-
     private void drawLabels(GuiGraphicsExtractor graphics, Set<String> playingSoundIds) {
         List<Sound> pageSounds = getSoundsOnCurrentPage();
-        int labelRadius = (innerRadius + outerRadius) / 2;
-        int maxTextWidth = Math.max(36, (int) (outerRadius * 0.72D));
+        int labelRadius = (innerRadius + outerRadius) / 2 - 2;
+        int maxTextWidth = Math.max(30, (int) (outerRadius * 0.5D));
 
         for (int i = 0; i < pageSounds.size(); i++) {
             Sound sound = pageSounds.get(i);
@@ -532,44 +563,17 @@ public final class SoundWheelScreen extends Screen {
             boolean playing = playingSoundIds.contains(sound.getId());
             String prefix = (playing ? "\u25b6 " : "") + (sound.isLoop() ? "\u27f3 " : "");
             int nameWidth = Math.max(0, maxTextWidth - font.width(prefix));
-            String name = prefix + fitText(font, sound.getName(), nameWidth);
+            String name = prefix + SoundboardUi.fitText(font, sound.getName(), nameWidth);
             graphics.centeredText(
                     font,
                     name,
                     x,
                     y - font.lineHeight / 2,
-                    i == selectedSector ? SELECTED_TEXT_COLOR : TEXT_COLOR
+                    i == selectedSector
+                            ? SoundboardUi.TEXT_PRIMARY
+                            : SoundboardUi.TEXT_SECONDARY
             );
         }
-    }
-
-    private static void drawCircle(
-            GuiGraphicsExtractor graphics,
-            int centerX,
-            int centerY,
-            int radius,
-            int color
-    ) {
-        int radiusSquared = radius * radius;
-        for (int y = -radius; y <= radius; y++) {
-            int halfWidth = (int) Math.floor(Math.sqrt(radiusSquared - y * y));
-            graphics.fill(
-                    centerX - halfWidth,
-                    centerY + y,
-                    centerX + halfWidth + 1,
-                    centerY + y + 1,
-                    color
-            );
-        }
-    }
-
-    private static String fitText(Font font, String text, int maxWidth) {
-        if (font.width(text) <= maxWidth) {
-            return text;
-        }
-        String suffix = "...";
-        int availableWidth = Math.max(0, maxWidth - font.width(suffix));
-        return font.plainSubstrByWidth(text, availableWidth) + suffix;
     }
 
     private record Span(int y, int startX, int endX) {
