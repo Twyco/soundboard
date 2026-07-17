@@ -3,6 +3,9 @@ package de.twyco.soundboard.gui.config.widget;
 import de.twyco.soundboard.enums.GlobalKeyCombos;
 import de.twyco.soundboard.gui.config.ConfigDraft;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen;
+import de.twyco.soundboard.gui.config.SoundboardConfigScreen.KeybindFilter;
+import de.twyco.soundboard.gui.config.SoundboardConfigScreen.LoopFilter;
+import de.twyco.soundboard.gui.config.SoundboardConfigScreen.SoundSort;
 import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.Sound;
@@ -88,24 +91,40 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             ConfigDraft draft,
             SoundboardConfigData config,
             Collection<Sound> sounds,
-            String searchQuery
+            String searchQuery,
+            SoundSort sort,
+            KeybindFilter keybindFilter,
+            LoopFilter loopFilter
     ) {
         clearEntries();
         int contentWidth = getRowWidth() - 8;
         String normalizedSearch = searchQuery.trim().toLowerCase(Locale.ROOT);
-        List<Sound> sortedSounds = sounds.stream()
-                .filter(sound -> normalizedSearch.isEmpty()
-                        || sound.getName().toLowerCase(Locale.ROOT).contains(normalizedSearch))
-                .sorted(Comparator.comparing(Sound::getName, String.CASE_INSENSITIVE_ORDER))
+        Comparator<SoundRowData> comparator = Comparator.comparing(
+                data -> data.sound().getName(),
+                String.CASE_INSENSITIVE_ORDER
+        );
+        if (sort == SoundSort.NAME_DESCENDING) {
+            comparator = comparator.reversed();
+        }
+
+        List<SoundRowData> sortedSounds = sounds.stream()
+                .map(sound -> new SoundRowData(sound, draft.getSound(sound, config)))
+                .filter(data -> normalizedSearch.isEmpty()
+                        || data.sound().getName().toLowerCase(Locale.ROOT).contains(normalizedSearch))
+                .filter(data -> matchesKeybindFilter(data, keybindFilter))
+                .filter(data -> matchesLoopFilter(data, loopFilter))
+                .sorted(comparator)
                 .toList();
 
         if (sortedSounds.isEmpty()) {
             addConfigRow(
                     new TextRow(
                             font,
-                            Component.translatable(sounds.isEmpty()
-                                    ? "gui.soundboard.config.sounds.empty"
-                                    : "gui.soundboard.config.search.empty")
+                            Component.translatable(
+                                    sounds.isEmpty()
+                                            ? "gui.soundboard.config.sounds.empty"
+                                            : "gui.soundboard.config.filters.empty"
+                            )
                     ),
                     40
             );
@@ -115,12 +134,29 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         int rowHeight = contentWidth >= 560
                 ? DEFAULT_ROW_HEIGHT
                 : contentWidth >= 320 ? 52 : contentWidth >= 140 ? 76 : 100;
-        for (Sound sound : sortedSounds) {
+        for (SoundRowData data : sortedSounds) {
             addConfigRow(
-                    new SoundRow(font, sound, draft.getSound(sound, config), screen),
+                    new SoundRow(font, data.sound(), data.draft(), screen),
                     rowHeight
             );
         }
+    }
+
+    private static boolean matchesKeybindFilter(SoundRowData data, KeybindFilter filter) {
+        boolean bound = !data.draft().getKeyCombo(data.sound().getId()).isEmpty();
+        return switch (filter) {
+            case ALL -> true;
+            case BOUND -> bound;
+            case UNBOUND -> !bound;
+        };
+    }
+
+    private static boolean matchesLoopFilter(SoundRowData data, LoopFilter filter) {
+        return switch (filter) {
+            case ALL -> true;
+            case ENABLED -> data.draft().isLoop();
+            case DISABLED -> !data.draft().isLoop();
+        };
     }
 
     @Override
@@ -130,6 +166,9 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
     private void addConfigRow(ConfigRow row, int height) {
         addEntry(row, height);
+    }
+
+    private record SoundRowData(Sound sound, ConfigDraft.SoundDraft draft) {
     }
 
     public abstract static class ConfigRow extends ContainerObjectSelectionList.Entry<ConfigRow> {
@@ -351,7 +390,10 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             keyComboButton = new KeyComboButton(
                     screen,
                     combo,
-                    draft::setKeyCombo,
+                    newCombo -> {
+                        draft.setKeyCombo(newCombo);
+                        screen.requestKeybindFilterRefresh();
+                    },
                     Component.translatable(
                             "gui.soundboard.config.keybind.sound.tooltip",
                             sound.getName()
@@ -362,7 +404,10 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                             font
                     )
                     .selected(draft.isLoop())
-                    .onValueChange((_, value) -> draft.setLoop(value))
+                    .onValueChange((_, value) -> {
+                        draft.setLoop(value);
+                        screen.requestLoopFilterRefresh();
+                    })
                     .build();
             amplifierSlider = new AmplifierSlider(draft.getAmplifier(), draft::setAmplifier);
             amplifierSlider.setTooltip(Tooltip.create(

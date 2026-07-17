@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -34,7 +35,11 @@ public final class SoundboardConfigScreen extends Screen {
     private Button soundsTabButton;
     private SoundboardConfigList configList;
     private String soundSearch = "";
+    private SoundSort soundSort = SoundSort.NAME_ASCENDING;
+    private KeybindFilter keybindFilter = KeybindFilter.ALL;
+    private LoopFilter loopFilter = LoopFilter.ALL;
     private boolean clearFocusNextTick;
+    private boolean refreshSoundListNextTick;
 
     private Button capturingButton;
     private KeyCombo capturingCombo;
@@ -88,6 +93,7 @@ public final class SoundboardConfigScreen extends Screen {
             searchBox.setResponder(this::updateSoundSearch);
             addRenderableWidget(searchBox);
             listY += BUTTON_HEIGHT + GAP;
+            listY += addSoundListControls(pageX, listY, pageWidth);
         }
 
         int listHeight = Math.max(20, height - listY - FOOTER_HEIGHT);
@@ -155,6 +161,10 @@ public final class SoundboardConfigScreen extends Screen {
         if (clearFocusNextTick) {
             setFocused(null);
             clearFocusNextTick = false;
+        }
+        if (refreshSoundListNextTick) {
+            populateSoundList();
+            refreshSoundListNextTick = false;
         }
     }
 
@@ -231,6 +241,14 @@ public final class SoundboardConfigScreen extends Screen {
         rebuildWidgets();
     }
 
+    public void requestKeybindFilterRefresh() {
+        refreshSoundListNextTick |= keybindFilter != KeybindFilter.ALL;
+    }
+
+    public void requestLoopFilterRefresh() {
+        refreshSoundListNextTick |= loopFilter != LoopFilter.ALL;
+    }
+
     private void selectTab(Tab tab) {
         if (selectedTab == tab) {
             return;
@@ -266,7 +284,81 @@ public final class SoundboardConfigScreen extends Screen {
                 draft,
                 SoundboardConfig.get(),
                 SoundManager.getAllSounds(),
-                soundSearch
+                soundSearch,
+                soundSort,
+                keybindFilter,
+                loopFilter
+        );
+    }
+
+    private int addSoundListControls(int x, int y, int width) {
+        if (width >= 300) {
+            int controlWidth = Math.max(1, (width - GAP * 2) / 3);
+            addSortButton(x, y, controlWidth);
+            addKeybindFilterButton(x + controlWidth + GAP, y, controlWidth);
+            addLoopFilterButton(x + (controlWidth + GAP) * 2, y, controlWidth);
+            return BUTTON_HEIGHT + GAP;
+        }
+
+        addSortButton(x, y, width);
+        int secondRowY = y + BUTTON_HEIGHT + GAP;
+        int controlWidth = Math.max(1, (width - GAP) / 2);
+        addKeybindFilterButton(x, secondRowY, controlWidth);
+        addLoopFilterButton(x + controlWidth + GAP, secondRowY, controlWidth);
+        return (BUTTON_HEIGHT + GAP) * 2;
+    }
+
+    private void addSortButton(int x, int y, int width) {
+        addRenderableWidget(
+                CycleButton.builder(SoundSort::getLabel, soundSort)
+                        .withValues(SoundSort.values())
+                        .create(
+                                x,
+                                y,
+                                width,
+                                BUTTON_HEIGHT,
+                                Component.translatable("gui.soundboard.config.sort"),
+                                (_, value) -> {
+                                    soundSort = value;
+                                    populateSoundList();
+                                }
+                        )
+        );
+    }
+
+    private void addKeybindFilterButton(int x, int y, int width) {
+        addRenderableWidget(
+                CycleButton.builder(KeybindFilter::getLabel, keybindFilter)
+                        .withValues(KeybindFilter.values())
+                        .create(
+                                x,
+                                y,
+                                width,
+                                BUTTON_HEIGHT,
+                                Component.translatable("gui.soundboard.config.filter.keybind"),
+                                (_, value) -> {
+                                    keybindFilter = value;
+                                    populateSoundList();
+                                }
+                        )
+        );
+    }
+
+    private void addLoopFilterButton(int x, int y, int width) {
+        addRenderableWidget(
+                CycleButton.builder(LoopFilter::getLabel, loopFilter)
+                        .withValues(LoopFilter.values())
+                        .create(
+                                x,
+                                y,
+                                width,
+                                BUTTON_HEIGHT,
+                                Component.translatable("gui.soundboard.config.filter.loop"),
+                                (_, value) -> {
+                                    loopFilter = value;
+                                    populateSoundList();
+                                }
+                        )
         );
     }
 
@@ -311,5 +403,52 @@ public final class SoundboardConfigScreen extends Screen {
     private enum Tab {
         GENERAL,
         SOUNDS
+    }
+
+    public enum SoundSort {
+        NAME_ASCENDING("gui.soundboard.config.sort.name_ascending"),
+        NAME_DESCENDING("gui.soundboard.config.sort.name_descending");
+
+        private final String translationKey;
+
+        SoundSort(String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        public Component getLabel() {
+            return Component.translatable(translationKey);
+        }
+    }
+
+    public enum KeybindFilter {
+        ALL("gui.soundboard.config.filter.all"),
+        BOUND("gui.soundboard.config.filter.keybind.bound"),
+        UNBOUND("gui.soundboard.config.filter.keybind.unbound");
+
+        private final String translationKey;
+
+        KeybindFilter(String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        public Component getLabel() {
+            return Component.translatable(translationKey);
+        }
+    }
+
+    public enum LoopFilter {
+        ALL("gui.soundboard.config.filter.all"),
+        ENABLED("gui.soundboard.config.filter.loop.enabled"),
+        DISABLED("gui.soundboard.config.filter.loop.disabled");
+
+        private final String translationKey;
+
+        LoopFilter(String translationKey) {
+            this.translationKey = translationKey;
+        }
+
+        public Component getLabel() {
+            return Component.translatable(translationKey);
+        }
     }
 }
