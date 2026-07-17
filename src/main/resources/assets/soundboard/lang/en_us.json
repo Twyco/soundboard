@@ -30,7 +30,13 @@
   "gui.soundboard.config.sound.loop": "Loop Sound",
   "gui.soundboard.config.sound.loop.short": "Loop",
   "gui.soundboard.config.sound.amplifier": "Amplifier",
+  "gui.soundboard.wheel.title": "Sound Wheel",
+  "gui.soundboard.wheel.page": "%s / %s",
+  "gui.soundboard.wheel.previous_page": "Previous page",
+  "gui.soundboard.wheel.next_page": "Next page",
+  "gui.soundboard.wheel.mouse_wheel": "Change page with mouse wheel",
   "key.category.soundboard.general": "Soundboard",
   "key.soundboard.open_config": "Open Config Menu",
+  "key.soundboard.sound_wheel": "Open Sound Wheel",
   "key.soundboard.stop_all": "Stop all currently playing Sound"
 }

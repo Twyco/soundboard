@@ -4,6 +4,7 @@ import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.enums.GlobalKeyBindings;
 import de.twyco.soundboard.enums.GlobalKeyCombos;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
+import de.twyco.soundboard.gui.soundwheel.SoundWheelScreen;
 import de.twyco.soundboard.interfaces.KeyBindingCallback;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import de.twyco.soundboard.util.config.SoundboardConfig;
@@ -94,6 +95,7 @@ public class GlobalKeybinds {
 
     private static KeyComboCallback getKeyComboAction(@NotNull GlobalKeyCombos keybind) {
         return switch (keybind) {
+            case GlobalKeyCombos.SOUND_WHEEL -> SoundWheelScreen::open;
             case GlobalKeyCombos.SOUND_STOP_ALL -> combo -> SoundManager.stopAllSounds();
         };
     }

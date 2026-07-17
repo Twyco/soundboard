@@ -60,6 +60,13 @@ SLF4J-Logger werden ebenfalls hier definiert.
 - `widget.AmplifierSlider` bildet den Wertebereich von 0 bis 300 Prozent auf
   einen Minecraft-Slider ab.
 
+### `gui.soundwheel`
+
+`SoundWheelScreen` zeigt bis zu sechs alphabetisch sortierte Sounds radial an.
+Er verwaltet Mausauswahl, Seitenwechsel und Wiedergabe per primaerem Mausklick.
+Laufende Sounds und Loop-Eigenschaften werden direkt in den Sektoren angezeigt;
+das Loslassen der konfigurierten Oeffnen-Combo schliesst nur den Screen.
+
 ### `interfaces`
 
 Die funktionalen Interfaces `KeyBindingCallback`, `KeyComboCallback` und
