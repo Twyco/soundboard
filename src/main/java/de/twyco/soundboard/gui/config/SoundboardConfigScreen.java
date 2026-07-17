@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -149,8 +149,8 @@ public final class SoundboardConfigScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(
-            GuiGraphicsExtractor graphics,
+    public void render(
+            GuiGraphics graphics,
             int mouseX,
             int mouseY,
             float delta
@@ -163,8 +163,8 @@ public final class SoundboardConfigScreen extends Screen {
                 height - 8,
                 SoundboardUi.SURFACE
         );
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.centeredText(font, title, width / 2, 10, SoundboardUi.TEXT_PRIMARY);
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(font, title, width / 2, 10, SoundboardUi.TEXT_PRIMARY);
     }
 
     @Override
@@ -412,7 +412,7 @@ public final class SoundboardConfigScreen extends Screen {
     }
 
     private void closeToParent() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
     private enum Tab {

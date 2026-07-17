@@ -1,7 +1,7 @@
 package de.twyco.soundboard.gui.component;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
@@ -37,7 +37,7 @@ public final class SoundboardUi {
     }
 
     public static void drawRaisedPanel(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             int width,
@@ -48,11 +48,11 @@ public final class SoundboardUi {
             return;
         }
         graphics.fill(x, y, x + width, y + height, color);
-        graphics.outline(x, y, width, height, BORDER_LIGHT);
+        graphics.renderOutline(x, y, width, height, BORDER_LIGHT);
     }
 
     public static void drawInsetPanel(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             int width,
@@ -63,11 +63,11 @@ public final class SoundboardUi {
             return;
         }
         graphics.fill(x, y, x + width, y + height, color);
-        graphics.outline(x, y, width, height, BORDER_LIGHT);
+        graphics.renderOutline(x, y, width, height, BORDER_LIGHT);
     }
 
     public static void drawListRow(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             int width,
@@ -85,7 +85,7 @@ public final class SoundboardUi {
     }
 
     public static void drawCircle(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int centerX,
             int centerY,
             int radius,
@@ -105,7 +105,7 @@ public final class SoundboardUi {
     }
 
     public static void drawPageButton(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             boolean forward,
@@ -128,7 +128,7 @@ public final class SoundboardUi {
     }
 
     public static void drawMouseWheelIcon(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int centerX,
             int y
     ) {

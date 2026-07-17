@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -53,14 +53,14 @@ public final class SoundWheelScreen extends Screen {
 
     public static void open(KeyCombo activationCombo) {
         Minecraft client = Minecraft.getInstance();
-        if (client.gui.screen() != null) {
+        if (client.screen != null) {
             return;
         }
 
         List<Sound> sortedSounds = SoundManager.getAllSounds().stream()
                 .sorted(Comparator.comparing(Sound::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
-        client.gui.setScreen(new SoundWheelScreen(client.gui.screen(), activationCombo, sortedSounds));
+        client.setScreen(new SoundWheelScreen(client.screen, activationCombo, sortedSounds));
     }
 
     @Override
@@ -76,8 +76,8 @@ public final class SoundWheelScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(
-            GuiGraphicsExtractor graphics,
+    public void render(
+            GuiGraphics graphics,
             int mouseX,
             int mouseY,
             float delta
@@ -164,14 +164,14 @@ public final class SoundWheelScreen extends Screen {
                 18,
                 SoundboardUi.SURFACE
         );
-        graphics.centeredText(
+        graphics.drawCenteredString(
                 font,
                 title,
                 centerX,
                 titleY + 5,
                 SoundboardUi.TEXT_PRIMARY
         );
-        graphics.centeredText(
+        graphics.drawCenteredString(
                 font,
                 Component.translatable("gui.soundboard.wheel.page", page + 1, getPageCount()),
                 centerX,
@@ -271,7 +271,7 @@ public final class SoundWheelScreen extends Screen {
             return;
         }
         closed = true;
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
     @Override
@@ -458,7 +458,7 @@ public final class SoundWheelScreen extends Screen {
         return (int) (angle / SECTOR_ANGLE) % SOUNDS_PER_PAGE;
     }
 
-    private void drawPlayingSectors(GuiGraphicsExtractor graphics, Set<String> playingSoundIds) {
+    private void drawPlayingSectors(GuiGraphics graphics, Set<String> playingSoundIds) {
         List<Sound> pageSounds = getSoundsOnCurrentPage();
         for (int i = 0; i < pageSounds.size(); i++) {
             if (playingSoundIds.contains(pageSounds.get(i).getId())) {
@@ -467,7 +467,7 @@ public final class SoundWheelScreen extends Screen {
         }
     }
 
-    private void drawSector(GuiGraphicsExtractor graphics, int sector, int color) {
+    private void drawSector(GuiGraphics graphics, int sector, int color) {
         for (Span span : sectorSpans.get(sector)) {
             graphics.fill(
                     centerX + span.startX(),
@@ -479,7 +479,7 @@ public final class SoundWheelScreen extends Screen {
         }
     }
 
-    private void drawDividers(GuiGraphicsExtractor graphics) {
+    private void drawDividers(GuiGraphics graphics) {
         for (int i = 0; i < SOUNDS_PER_PAGE; i++) {
             float angle = (float) (-Math.PI * 2.0D / 3.0D + i * SECTOR_ANGLE);
             graphics.pose().pushMatrix();
@@ -503,7 +503,7 @@ public final class SoundWheelScreen extends Screen {
         }
     }
 
-    private void drawPageControls(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    private void drawPageControls(GuiGraphics graphics, int mouseX, int mouseY) {
         int buttonY = getPageButtonY();
         if (hasPreviousPage()) {
             SoundboardUi.drawPageButton(
@@ -550,7 +550,7 @@ public final class SoundWheelScreen extends Screen {
         }
     }
 
-    private void drawLabels(GuiGraphicsExtractor graphics, Set<String> playingSoundIds) {
+    private void drawLabels(GuiGraphics graphics, Set<String> playingSoundIds) {
         List<Sound> pageSounds = getSoundsOnCurrentPage();
         int labelRadius = (innerRadius + outerRadius) / 2 - 2;
         int maxTextWidth = Math.max(30, (int) (outerRadius * 0.5D));
@@ -564,7 +564,7 @@ public final class SoundWheelScreen extends Screen {
             String prefix = (playing ? "\u25b6 " : "") + (sound.isLoop() ? "\u27f3 " : "");
             int nameWidth = Math.max(0, maxTextWidth - font.width(prefix));
             String name = prefix + SoundboardUi.fitText(font, sound.getName(), nameWidth);
-            graphics.centeredText(
+            graphics.drawCenteredString(
                     font,
                     name,
                     x,

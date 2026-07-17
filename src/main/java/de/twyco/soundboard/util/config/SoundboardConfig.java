@@ -3,7 +3,6 @@ package de.twyco.soundboard.util.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.twyco.soundboard.Soundboard;
-import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -12,6 +11,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import net.minecraft.client.Minecraft;
 
 public class SoundboardConfig {
     private static final Logger LOG = Soundboard.LOGGER;
@@ -29,12 +29,9 @@ public class SoundboardConfig {
 
     public static void init() {
         LOG.info("[SoundboardConfig/init] Initializing Config");
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null) {
-            return;
-        }
+        Minecraft client = Minecraft.getInstance();
 
-        Path configDir = client.runDirectory.toPath().resolve("config");
+        Path configDir = client.gameDirectory.toPath().resolve("config");
         Path configFile = configDir.resolve(CONFIG_FILE_NAME);
 
         if(!Files.exists(configFile)) {
@@ -59,12 +56,12 @@ public class SoundboardConfig {
 
     public static void load() {
         LOG.info("[SoundboardConfig/load] Loading Config");
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client == null) {
             return;
         }
 
-        Path configDir = client.runDirectory.toPath().resolve("config");
+        Path configDir = client.gameDirectory.toPath().resolve("config");
         Path configFile = configDir.resolve(CONFIG_FILE_NAME);
         if(!Files.exists(configFile)) {
             LOG.error("[SoundboardConfig/load] Unable to find config file: {}", configFile);
@@ -83,12 +80,9 @@ public class SoundboardConfig {
 
     public static void save() {
         LOG.info("[SoundboardConfig/save] Saving Config");
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null) {
-            return;
-        }
+        Minecraft client = Minecraft.getInstance();
 
-        Path configDir = client.runDirectory.toPath().resolve("config");
+        Path configDir = client.gameDirectory.toPath().resolve("config");
         Path configFile = configDir.resolve(CONFIG_FILE_NAME);
 
         if(!Files.exists(configDir)) {

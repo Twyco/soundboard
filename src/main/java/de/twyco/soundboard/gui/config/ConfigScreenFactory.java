@@ -1,7 +1,7 @@
 package de.twyco.soundboard.gui.config;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ConfigScreenFactory {
 
@@ -13,8 +13,8 @@ public class ConfigScreenFactory {
     }
 
     public static void reloadConfigScreen() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.currentScreen instanceof SoundboardConfigScreen screen) {
+        Minecraft client = Minecraft.getInstance();
+        if (client.screen instanceof SoundboardConfigScreen screen) {
             screen.reloadFromConfig();
         }
     }

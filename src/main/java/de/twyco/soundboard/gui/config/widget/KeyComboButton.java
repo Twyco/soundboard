@@ -3,7 +3,7 @@ package de.twyco.soundboard.gui.config.widget;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.InputWithModifiers;
@@ -43,16 +43,16 @@ final class KeyComboButton extends Button {
     }
 
     @Override
-    protected void extractContents(
-            GuiGraphicsExtractor graphics,
+    protected void renderContents(
+            GuiGraphics graphics,
             int mouseX,
             int mouseY,
             float delta
     ) {
-        extractDefaultSprite(graphics);
-        extractDefaultLabel(graphics.textRendererForWidget(
+        renderDefaultSprite(graphics);
+        renderDefaultLabel(graphics.textRendererForWidget(
                 this,
-                GuiGraphicsExtractor.HoveredTextEffects.NONE
+                GuiGraphics.HoveredTextEffects.NONE
         ));
     }
 
