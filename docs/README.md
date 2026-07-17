@@ -15,8 +15,8 @@ spielt benutzerdefinierte Sounds ueber die API von Simple Voice Chat ab.
 
 - **Plattform:** Fabric, clientseitig
 - **Voice-Chat-Integration:** Simple Voice Chat ist eine feste Voraussetzung.
-- **Aktive Minecraft-Versionen:** 26.2 und 26.1.x werden in getrennten Branches
-  gepflegt.
+- **Aktive Minecraft-Versionen:** 26.2, 26.1.x und 1.21.11 werden in getrennten
+  Branches gepflegt.
 - **Primaerer Entwicklungsbranch:** `26.2` (gleichzeitig der Default-Branch des
   Repositorys)
 - **Audioformate:** Derzeit wird ausschliesslich MP3 geladen. Weitere Formate sind
