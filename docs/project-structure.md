@@ -122,4 +122,5 @@ Dateiliste und Config-Screen neu zu laden.
 | `fabric.mod.json` | Mod-Metadaten, Entrypoints und zwingende Abhaengigkeiten |
 | `soundboard.mixins.json` | Registrierung von `KeyboardMixin`, Java-Level 25 |
 | `assets/soundboard/lang/en_us.json` | Englische Texte und Translation Keys |
+| `assets/soundboard/lang/de_de.json` | Deutsche Uebersetzung derselben Keys |
 | `assets/soundboard/icon.png` | Mod-Icon |
