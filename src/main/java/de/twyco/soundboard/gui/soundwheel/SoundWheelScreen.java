@@ -60,7 +60,7 @@ public final class SoundWheelScreen extends Screen {
         this.activationCombo = activationCombo;
         this.sounds = sounds;
         this.toggleMode = toggleMode;
-        this.closeOnPlay = closeOnPlay;
+        this.closeOnPlay = toggleMode && closeOnPlay;
     }
 
     public static void open(KeyCombo activationCombo) {
