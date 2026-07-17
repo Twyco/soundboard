@@ -61,7 +61,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                             draft::setGlobalKeyCombo,
                             screen
                     ),
-                    contentWidth < 380 ? 54 : DEFAULT_ROW_HEIGHT
+                    contentWidth < 380 ? 56 : DEFAULT_ROW_HEIGHT
             );
         }
         CheckboxRow playWhileMuted = new CheckboxRow(
@@ -85,7 +85,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         addConfigRow(showPlayingSoundsHud, showPlayingSoundsHud.getPreferredHeight());
         addConfigRow(
                 new ActionRow(screen),
-                contentWidth < 280 ? 54 : DEFAULT_ROW_HEIGHT
+                contentWidth < 280 ? 56 : DEFAULT_ROW_HEIGHT
         );
     }
 
@@ -168,12 +168,11 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
     @Override
     protected void extractListBackground(GuiGraphicsExtractor graphics) {
-        SoundboardUi.drawInsetPanel(
-                graphics,
+        graphics.fill(
                 getX(),
                 getY(),
-                getWidth(),
-                getHeight(),
+                getX() + getWidth(),
+                getY() + getHeight(),
                 SoundboardUi.SURFACE_DARK
         );
     }
@@ -187,6 +186,9 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
     public abstract static class ConfigRow extends ContainerObjectSelectionList.Entry<ConfigRow> {
 
+        private static final int HORIZONTAL_PADDING = 8;
+        protected static final int VERTICAL_PADDING = 6;
+
         protected final List<AbstractWidget> widgets = new ArrayList<>();
 
         @Override
@@ -197,15 +199,21 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 boolean hovered,
                 float delta
         ) {
-            SoundboardUi.drawListRow(
-                    graphics,
-                    getX() + 2,
-                    getY() + 2,
-                    Math.max(1, getWidth() - 4),
-                    Math.max(1, getHeight() - 4),
-                    hovered
-            );
+            if (shouldDrawRowBackground()) {
+                SoundboardUi.drawListRow(
+                        graphics,
+                        getX() + 2,
+                        getY() + 2,
+                        Math.max(1, getWidth() - 4),
+                        Math.max(1, getHeight() - 4),
+                        hovered
+                );
+            }
             extractRowContent(graphics, mouseX, mouseY, hovered, delta);
+        }
+
+        protected boolean shouldDrawRowBackground() {
+            return true;
         }
 
         protected abstract void extractRowContent(
@@ -239,6 +247,30 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             widget.setHeight(Math.max(1, height));
         }
 
+        protected int getPaddedX() {
+            return getX() + HORIZONTAL_PADDING;
+        }
+
+        protected int getPaddedY() {
+            return getY() + VERTICAL_PADDING;
+        }
+
+        protected int getPaddedWidth() {
+            return Math.max(1, getWidth() - HORIZONTAL_PADDING * 2);
+        }
+
+        protected int getPaddedHeight() {
+            return Math.max(1, getHeight() - VERTICAL_PADDING * 2);
+        }
+
+        protected int getPaddedXMiddle() {
+            return getPaddedX() + getPaddedWidth() / 2;
+        }
+
+        protected int getPaddedYMiddle() {
+            return getPaddedY() + getPaddedHeight() / 2;
+        }
+
     }
 
     private static final class KeyComboRow extends ConfigRow {
@@ -268,9 +300,9 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 boolean hovered,
                 float delta
         ) {
-            int x = getContentX();
-            int y = getContentY();
-            int width = getContentWidth();
+            int x = getPaddedX();
+            int y = getPaddedY();
+            int width = getPaddedWidth();
 
             if (width >= 380) {
                 int buttonWidth = Math.min(180, Math.max(110, width / 3));
@@ -279,7 +311,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                         font,
                         label,
                         x,
-                        getContentYMiddle() - font.lineHeight / 2,
+                        getPaddedYMiddle() - font.lineHeight / 2,
                         SoundboardUi.TEXT_PRIMARY
                 );
             } else {
@@ -314,7 +346,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private int getPreferredHeight() {
-            return Math.max(DEFAULT_ROW_HEIGHT, checkbox.getHeight() + 4);
+            return Math.max(DEFAULT_ROW_HEIGHT, checkbox.getHeight() + VERTICAL_PADDING * 2);
         }
 
         @Override
@@ -325,8 +357,8 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 boolean hovered,
                 float delta
         ) {
-            checkbox.setX(getContentX());
-            checkbox.setY(getContentYMiddle() - checkbox.getHeight() / 2);
+            checkbox.setX(getPaddedX());
+            checkbox.setY(getPaddedYMiddle() - checkbox.getHeight() / 2);
             extractWidgets(graphics, mouseX, mouseY, delta);
         }
     }
@@ -352,6 +384,11 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         @Override
+        protected boolean shouldDrawRowBackground() {
+            return false;
+        }
+
+        @Override
         protected void extractRowContent(
                 GuiGraphicsExtractor graphics,
                 int mouseX,
@@ -359,9 +396,9 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 boolean hovered,
                 float delta
         ) {
-            int x = getContentX();
-            int y = getContentY();
-            int width = getContentWidth();
+            int x = getPaddedX();
+            int y = getPaddedY();
+            int width = getPaddedWidth();
             if (width >= 280) {
                 int buttonWidth = (width - 4) / 2;
                 setBounds(openFolder, x, y, buttonWidth, 20);
@@ -394,9 +431,9 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         ) {
             graphics.centeredText(
                     font,
-                    SoundboardUi.fitText(font, text.getString(), getContentWidth()),
-                    getContentXMiddle(),
-                    getContentYMiddle() - font.lineHeight / 2,
+                    SoundboardUi.fitText(font, text.getString(), getPaddedWidth()),
+                    getPaddedXMiddle(),
+                    getPaddedYMiddle() - font.lineHeight / 2,
                     SoundboardUi.TEXT_SECONDARY
             );
         }
@@ -462,9 +499,9 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 boolean hovered,
                 float delta
         ) {
-            int x = getContentX();
-            int y = getContentY();
-            int width = getContentWidth();
+            int x = getPaddedX();
+            int y = getPaddedY();
+            int width = getPaddedWidth();
 
             if (width >= 560) {
                 extractWide(graphics, x, y, width);
@@ -491,7 +528,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                     font,
                     SoundboardUi.fitText(font, sound.getName(), textWidth),
                     x,
-                    getContentYMiddle() - font.lineHeight / 2,
+                    getPaddedYMiddle() - font.lineHeight / 2,
                     SoundboardUi.TEXT_PRIMARY
             );
             setBounds(keyComboButton, comboX, y, comboWidth, 20);
