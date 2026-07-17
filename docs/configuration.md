@@ -34,6 +34,10 @@ nicht Teil des Repositorys und wird nicht rekursiv durchsucht.
     }
   },
   "globalKeyCombos": {
+    "soundboard.sounds.open_wheel": [
+      341,
+      82
+    ],
     "soundboard.sounds.stop_all": [
       341,
       88
@@ -82,11 +86,11 @@ ignoriert, solange die Datei fehlt.
 
 ### `globalKeyCombos`
 
-Die Map speichert Kombinationen fuer globale Aktionen. Derzeit ist genau eine ID
-definiert:
+Die Map speichert Kombinationen fuer globale Aktionen:
 
 | ID | Aktion |
 | --- | --- |
+| `soundboard.sounds.open_wheel` | Sound-Rad oeffnen und bis zum Loslassen halten |
 | `soundboard.sounds.stop_all` | Alle laufenden Sounds stoppen |
 
 ## Bedienung der Key-Combo-Eingabe

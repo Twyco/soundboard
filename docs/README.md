@@ -23,6 +23,9 @@ spielt benutzerdefinierte Sounds ueber die API von Simple Voice Chat ab.
   eine spaetere Erweiterung.
 - **Wiedergabe:** Mehrere verschiedene Sounds koennen gleichzeitig laufen. Ein
   erneuter Druck auf die Tastenkombination eines laufenden Sounds stoppt diesen.
+- **Sound-Rad:** Eine gehaltene globale Key Combo oeffnet eine radiale Auswahl
+  mit sechs alphabetisch sortierten Sounds pro Seite. Primaerklick startet oder
+  stoppt Sounds, laufende und geloopte Sounds sind direkt im Rad markiert.
 - **Eingaben:** Ausgeloeste Sound-Tastenkombinationen konsumieren das zugehoerige
   Minecraft-Tastaturereignis.
 - **Qualitaetssicherung:** Eine GitHub-Actions-Builddatei ist vorhanden. Eigene
