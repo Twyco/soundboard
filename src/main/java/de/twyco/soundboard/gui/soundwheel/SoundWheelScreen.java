@@ -3,6 +3,7 @@ package de.twyco.soundboard.gui.soundwheel;
 import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatService;
+import de.twyco.soundboard.util.config.SoundboardConfig;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.Sound;
 import de.twyco.soundboard.util.sound.SoundManager;
@@ -32,6 +33,8 @@ public final class SoundWheelScreen extends Screen {
     private final Screen parent;
     private final KeyCombo activationCombo;
     private final List<Sound> sounds;
+    private final boolean toggleMode;
+    private final boolean closeOnPlay;
     private final List<List<Span>> sectorSpans = new ArrayList<>(SOUNDS_PER_PAGE);
     private final Set<KeyMapping> forwardedMovementKeys = new HashSet<>();
 
@@ -43,12 +46,21 @@ public final class SoundWheelScreen extends Screen {
     private int selectedSector = -1;
     private int age;
     private boolean closed;
+    private boolean toggleComboReleased;
 
-    private SoundWheelScreen(Screen parent, KeyCombo activationCombo, List<Sound> sounds) {
+    private SoundWheelScreen(
+            Screen parent,
+            KeyCombo activationCombo,
+            List<Sound> sounds,
+            boolean toggleMode,
+            boolean closeOnPlay
+    ) {
         super(Component.translatable("gui.soundboard.wheel.title"));
         this.parent = parent;
         this.activationCombo = activationCombo;
         this.sounds = sounds;
+        this.toggleMode = toggleMode;
+        this.closeOnPlay = closeOnPlay;
     }
 
     public static void open(KeyCombo activationCombo) {
@@ -60,7 +72,13 @@ public final class SoundWheelScreen extends Screen {
         List<Sound> sortedSounds = SoundManager.getAllSounds().stream()
                 .sorted(Comparator.comparing(Sound::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
-        client.gui.setScreen(new SoundWheelScreen(client.gui.screen(), activationCombo, sortedSounds));
+        client.gui.setScreen(new SoundWheelScreen(
+                client.gui.screen(),
+                activationCombo,
+                sortedSounds,
+                SoundboardConfig.get().globalState.toggleSoundWheel,
+                SoundboardConfig.get().globalState.closeSoundWheelOnPlay
+        ));
     }
 
     @Override
@@ -186,7 +204,7 @@ public final class SoundWheelScreen extends Screen {
         super.tick();
         age++;
         updateMovementKeyStates();
-        if (age > 1 && !activationCombo.allKeysPressed()) {
+        if (!toggleMode && age > 1 && !activationCombo.allKeysPressed()) {
             onClose();
         }
     }
@@ -194,6 +212,9 @@ public final class SoundWheelScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (activationCombo.getKeyCodes().contains(event.key())) {
+            if (toggleMode && toggleComboReleased && activationCombo.allKeysPressed()) {
+                onClose();
+            }
             return true;
         }
         if (event.isEscape()) {
@@ -217,7 +238,11 @@ public final class SoundWheelScreen extends Screen {
     @Override
     public boolean keyReleased(KeyEvent event) {
         if (activationCombo.getKeyCodes().contains(event.key())) {
-            onClose();
+            if (toggleMode) {
+                toggleComboReleased = true;
+            } else {
+                onClose();
+            }
             return true;
         }
         if (forwardMovementKeyEvent(event, false)) {
@@ -248,6 +273,9 @@ public final class SoundWheelScreen extends Screen {
         }
 
         selectedSound.play();
+        if (closeOnPlay) {
+            onClose();
+        }
         return true;
     }
 
