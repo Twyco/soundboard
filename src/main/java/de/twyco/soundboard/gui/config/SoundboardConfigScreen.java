@@ -44,6 +44,7 @@ public final class SoundboardConfigScreen extends Screen {
     private int listY;
     private boolean clearFocusNextTick;
     private boolean refreshSoundListNextTick;
+    private boolean refreshGeneralListNextTick;
 
     private Button capturingButton;
     private KeyCombo capturingCombo;
@@ -178,6 +179,10 @@ public final class SoundboardConfigScreen extends Screen {
             populateSoundList();
             refreshSoundListNextTick = false;
         }
+        if (refreshGeneralListNextTick) {
+            configList.populateGeneral(draft);
+            refreshGeneralListNextTick = false;
+        }
     }
 
     @Override
@@ -259,6 +264,10 @@ public final class SoundboardConfigScreen extends Screen {
 
     public void requestLoopFilterRefresh() {
         refreshSoundListNextTick |= loopFilter != LoopFilter.ALL;
+    }
+
+    public void requestGeneralListRefresh() {
+        refreshGeneralListNextTick = true;
     }
 
     private void selectTab(Tab tab) {

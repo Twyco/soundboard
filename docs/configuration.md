@@ -20,7 +20,9 @@ not part of the repository and is not scanned recursively.
     "playWhileMuted": false,
     "showPlayingSoundsHud": true,
     "toggleSoundWheel": false,
-    "closeSoundWheelOnPlay": false
+    "closeSoundWheelOnPlay": false,
+    "generalCategoryExpanded": true,
+    "soundWheelCategoryExpanded": true
   },
   "defaultLoop": false,
   "defaultAmplifier": 100,
@@ -51,6 +53,11 @@ semantic meaning because they are loaded as a set.
 | `showPlayingSoundsHud` | `true` | Display active sounds in the HUD |
 | `toggleSoundWheel` | `false` | Open and close the sound wheel by pressing its combo instead of holding it |
 | `closeSoundWheelOnPlay` | `false` | Close the sound wheel after starting or stopping a sound |
+| `generalCategoryExpanded` | `true` | Keep the General section expanded in the config screen |
+| `soundWheelCategoryExpanded` | `true` | Keep the Sound Wheel Settings section expanded in the config screen |
+
+Older configuration files do not contain the two expansion fields. Missing
+values are treated as `true` so updating the mod preserves the previous layout.
 
 ### Global sound defaults
 

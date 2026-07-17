@@ -15,6 +15,8 @@ public final class ConfigDraft {
     private boolean showPlayingSoundsHud;
     private boolean toggleSoundWheel;
     private boolean closeSoundWheelOnPlay;
+    private boolean generalCategoryExpanded;
+    private boolean soundWheelCategoryExpanded;
     private final Map<String, Set<Integer>> globalKeyCombos = new LinkedHashMap<>();
     private final Map<String, SoundDraft> sounds = new LinkedHashMap<>();
 
@@ -27,6 +29,10 @@ public final class ConfigDraft {
         draft.showPlayingSoundsHud = config.globalState.showPlayingSoundsHud;
         draft.toggleSoundWheel = config.globalState.toggleSoundWheel;
         draft.closeSoundWheelOnPlay = config.globalState.closeSoundWheelOnPlay;
+        draft.generalCategoryExpanded = config.globalState.generalCategoryExpanded == null
+                || config.globalState.generalCategoryExpanded;
+        draft.soundWheelCategoryExpanded = config.globalState.soundWheelCategoryExpanded == null
+                || config.globalState.soundWheelCategoryExpanded;
 
         config.globalKeyCombos.forEach((id, keyCodes) ->
                 draft.globalKeyCombos.put(id, copyKeyCodes(keyCodes))
@@ -42,6 +48,8 @@ public final class ConfigDraft {
         config.globalState.showPlayingSoundsHud = showPlayingSoundsHud;
         config.globalState.toggleSoundWheel = toggleSoundWheel;
         config.globalState.closeSoundWheelOnPlay = closeSoundWheelOnPlay;
+        config.globalState.generalCategoryExpanded = generalCategoryExpanded;
+        config.globalState.soundWheelCategoryExpanded = soundWheelCategoryExpanded;
 
         config.globalKeyCombos.clear();
         globalKeyCombos.forEach((id, keyCodes) ->
@@ -84,6 +92,22 @@ public final class ConfigDraft {
 
     public void setCloseSoundWheelOnPlay(boolean closeSoundWheelOnPlay) {
         this.closeSoundWheelOnPlay = closeSoundWheelOnPlay;
+    }
+
+    public boolean isGeneralCategoryExpanded() {
+        return generalCategoryExpanded;
+    }
+
+    public void setGeneralCategoryExpanded(boolean generalCategoryExpanded) {
+        this.generalCategoryExpanded = generalCategoryExpanded;
+    }
+
+    public boolean isSoundWheelCategoryExpanded() {
+        return soundWheelCategoryExpanded;
+    }
+
+    public void setSoundWheelCategoryExpanded(boolean soundWheelCategoryExpanded) {
+        this.soundWheelCategoryExpanded = soundWheelCategoryExpanded;
     }
 
     public KeyCombo getGlobalKeyCombo(String id) {
