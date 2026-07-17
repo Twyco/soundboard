@@ -53,14 +53,14 @@ public final class SoundWheelScreen extends Screen {
 
     public static void open(KeyCombo activationCombo) {
         Minecraft client = Minecraft.getInstance();
-        if (client.gui.screen() != null) {
+        if (client.screen != null) {
             return;
         }
 
         List<Sound> sortedSounds = SoundManager.getAllSounds().stream()
                 .sorted(Comparator.comparing(Sound::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
-        client.gui.setScreen(new SoundWheelScreen(client.gui.screen(), activationCombo, sortedSounds));
+        client.setScreen(new SoundWheelScreen(client.screen, activationCombo, sortedSounds));
     }
 
     @Override
@@ -271,7 +271,7 @@ public final class SoundWheelScreen extends Screen {
             return;
         }
         closed = true;
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
     @Override

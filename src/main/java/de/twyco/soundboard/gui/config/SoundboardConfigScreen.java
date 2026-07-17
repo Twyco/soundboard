@@ -412,7 +412,7 @@ public final class SoundboardConfigScreen extends Screen {
     }
 
     private void closeToParent() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
     private enum Tab {
