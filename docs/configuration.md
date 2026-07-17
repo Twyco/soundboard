@@ -96,16 +96,17 @@ definiert:
 3. Beim Loslassen einer Taste wird die bis dahin erfasste Kombination gespeichert.
 
 Backspace, Delete oder Escape waehrend der Aufnahme loeschen die Belegung. Es
-kann immer nur ein `KeyComboEntry` gleichzeitig aufnehmen.
+kann immer nur eine Kombination gleichzeitig aufgenommen werden.
 
 ## Laden und Speichern
 
 - Beim ersten Start wird eine Standardkonfiguration erzeugt.
 - Bei jedem Start wird die vorhandene JSON-Datei mit Gson geladen.
 - Neu gefundene Sounddateien erhalten automatisch einen Eintrag.
-- Der Save-Button des Config-Screens speichert globale Schalter und
-  Sound-Einstellungen.
-- Key-Combo-Aenderungen werden unmittelbar gespeichert.
+- `Apply` speichert, ohne den Config-Screen zu schliessen.
+- `Done` speichert und kehrt zum vorherigen Screen zurueck.
+- `Cancel` und Escape verwerfen alle noch nicht angewendeten Aenderungen.
+- Key-Combo-Aenderungen bleiben bis `Apply` oder `Done` im lokalen Entwurf.
 - "Reload sound files" liest Config und Sound-Ordner erneut ein.
 
 Es gibt derzeit keine explizite Schema-Version oder Migrationsschicht. Neue

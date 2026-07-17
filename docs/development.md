@@ -39,7 +39,6 @@ Die zentralen Versionswerte stehen in `gradle.properties`:
 - `loom_version`
 - `fabric_version`
 - `modmenu_version`
-- `cloth_config_version`
 - `voicechat_api_version`
 - `voicechat_version`
 - `mod_version`
@@ -55,7 +54,6 @@ und gegebenenfalls das Java-Level in `soundboard.mixins.json` geprueft werden.
 | Fabric API | Client-Ticks, Key Mappings und HUD-Registrierung |
 | Simple Voice Chat API | MP3-Dekoder, Events und Audiokanaele |
 | Simple Voice Chat | Laufzeit-Mod, fuer die lokale Entwicklungsinstanz |
-| Cloth Config | Config-Screen und Eintraege |
 | Mod Menu | Optionaler Einstieg in den Config-Screen |
 | Gson | JSON-Persistenz, ueber die vorhandene Laufzeit bereitgestellt |
 
@@ -84,7 +82,10 @@ Minecraft-Key-Binding geoeffnet werden.
   `modImplementations`-Paketen.
 - Persistenzlogik bleibt in `util.config`, Dateierkennung und Sound-Laufzeitmodell
   in `util.sound`.
-- GUI-Factorys bauen Eintraege, enthalten aber moeglichst keine Audioverarbeitung.
+- Der eigene Config-Screen arbeitet auf `ConfigDraft`; Widgets veraendern nicht
+  direkt die persistierte Laufzeitkonfiguration.
+- GUI-Widgets enthalten keine Audioverarbeitung und delegieren Aktionen an Screen
+  oder Manager.
 - Neue globale Standardaktionen werden im passenden Enum deklariert und zentral
   in `GlobalKeybinds` auf einen Callback abgebildet.
 - Nicht instanziierbare Service- und Utility-Klassen erhalten einen privaten
@@ -120,7 +121,7 @@ Minecraft-Key-Binding geoeffnet werden.
 
 1. Wert mit stabiler ID und Translation Key zu `GlobalKeyCombos` hinzufuegen.
 2. Aktion im Switch von `GlobalKeybinds.getKeyComboAction()` implementieren.
-3. `KeyComboEntry` in der passenden Config-Kategorie anzeigen.
+3. Einen passenden Eintrag in `SoundboardConfigList` anzeigen.
 4. Englischen Translation Key in `en_us.json` ergaenzen.
 
 ### Neues Minecraft-Key-Binding
