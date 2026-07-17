@@ -83,6 +83,16 @@ public class SimpleVoicechatService {
         }
     }
 
+    public static Set<String> getCurrentlyPlayingSoundIds() {
+        synchronized (activeSounds) {
+            Set<String> soundIds = new HashSet<>();
+            for (PlayingSound sound : activeSounds) {
+                soundIds.add(sound.soundId);
+            }
+            return soundIds;
+        }
+    }
+
     //-------------------- helper --------------------
 
     public static void mixInto(MergeClientSoundEvent event) {
