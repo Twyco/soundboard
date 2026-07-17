@@ -6,8 +6,9 @@
 - Git
 - Keine globale Gradle-Installation erforderlich; der Wrapper ist enthalten
 
-Der Gradle-Wrapper verwendet Gradle 9.6.1. `build.gradle` setzt Java-Toolchain,
-`sourceCompatibility`, `targetCompatibility` und Compiler-Release auf 25.
+Die Gradle-Wrapper-Version ist versionsabhaengig und wird pro Minecraft-Branch
+gepflegt. `build.gradle` setzt Java-Toolchain, `sourceCompatibility`,
+`targetCompatibility` und Compiler-Release auf 25.
 
 ## Wichtige Befehle
 
@@ -26,11 +27,50 @@ Die Minecraft-Versionen werden getrennt gepflegt:
 
 - `26.2` ist der aktuelle Default- und primaere Entwicklungsbranch.
 - `26.1.x` wird parallel fuer Minecraft 26.1 gepflegt.
-- Aeltere Branches bleiben versionsbezogen getrennt.
+- `1.21.11` wird als aelterer, bereits unobfuskierter Branch gepflegt.
+- Weitere aeltere Branches bleiben versionsbezogen getrennt.
 
 Neue Aufgaben werden zuerst auf dem aktuellen 26.2-Branch umgesetzt. Eine
 Uebertragung auf 26.1.x ist ein eigener Arbeitsschritt und soll nicht unbemerkt
 zusammen mit der 26.2-Aenderung erfolgen.
+
+### Backport-Strategie
+
+Features werden grundsaetzlich per Cherry-pick rueckportiert. Dateien manuell zu
+kopieren ist nur ein Ausweg, wenn sich ein Commit auch nach sinnvoller Aufteilung
+nicht uebertragen laesst. Cherry-picks erhalten die Herkunft einzelner Features,
+vermeiden versehentlich ausgelassene Dateien und machen spaetere Backports
+nachvollziehbar.
+
+Fuer einen Backport gilt:
+
+1. Der Zielbranch wird von seinem dauerhaften Minecraft-Versionsbranch erstellt,
+   beispielsweise `26.1.x-ui-rework` von `26.1.x`.
+2. Auf dem Quellbranch werden nur die Feature-Commits nach dessen fertiger
+   Versionsbasis ermittelt, beispielsweise mit
+   `git log --first-parent --reverse 26.2..26.2-ui-rework`.
+3. Diese Commits werden in derselben Reihenfolge cherry-gepickt. Ein Merge-Commit,
+   der selbst Teil des Feature-Stacks ist, wird mit seiner First-Parent-Seite als
+   Basis uebernommen, beispielsweise `git cherry-pick -m 1 <commit>`.
+4. Minecraft-Port-Commits vor der Quellbasis werden nicht uebernommen. Der
+   Release-Commit fuer `mod_version` wird dagegen uebernommen, wenn der Backport
+   denselben Mod-Release bereitstellt.
+5. Bei Konflikten bleiben `minecraft_version`, Loader, Loom, Fabric API, Mod Menu,
+   Simple Voice Chat und die Minecraft-Constraints des Zielbranches erhalten.
+   Nur fachlich beabsichtigte Abhaengigkeitsaenderungen wie das Entfernen von
+   Cloth Config werden uebertragen.
+6. Unterschiede in Minecraft-, Fabric- oder GUI-APIs werden zielversionsspezifisch
+   angepasst. Unobfuskierte Namen bedeuten nicht, dass Signaturen und
+   Render-Lebenszyklus zwischen 1.21.11, 26.1 und 26.2 identisch sind.
+7. Zielversionsspezifische Anpassungen und Dokumentation kommen in einen eigenen
+   Commit oberhalb des gemeinsamen Feature-Stacks. Der PR zielt immer auf den
+   zugehoerigen dauerhaften Versionsbranch.
+8. Vor dem Push werden mindestens `./gradlew build`, die Werte in
+   `gradle.properties` und die Constraints in `fabric.mod.json` geprueft.
+
+Neue Features werden weiterhin zuerst auf dem aktuellen Hauptversionsbranch
+entwickelt. Fuer jede noch unterstuetzte Minecraft-Version entsteht danach ein
+eigener Backport-Branch nach demselben Ablauf.
 
 Die zentralen Versionswerte stehen in `gradle.properties`:
 
@@ -172,4 +212,5 @@ Sampleraten, Mute an/aus, Loop sowie paralleler Wiedergabe geprueft werden.
 4. Bei Audiocode Mute, Loop, parallele Sounds und Stop-Verhalten pruefen.
 5. `./gradlew build` ausfuehren.
 6. Betroffene Dokumentation aktualisieren.
-7. Portierung auf 26.1.x bei Bedarf separat vornehmen.
+7. Portierung auf 26.1.x und 1.21.11 bei Bedarf nach der dokumentierten
+   Backport-Strategie separat vornehmen.
