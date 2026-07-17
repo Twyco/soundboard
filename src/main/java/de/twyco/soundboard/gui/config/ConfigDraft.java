@@ -13,6 +13,8 @@ public final class ConfigDraft {
 
     private boolean playWhileMuted;
     private boolean showPlayingSoundsHud;
+    private boolean toggleSoundWheel;
+    private boolean closeSoundWheelOnPlay;
     private final Map<String, Set<Integer>> globalKeyCombos = new LinkedHashMap<>();
     private final Map<String, SoundDraft> sounds = new LinkedHashMap<>();
 
@@ -23,6 +25,8 @@ public final class ConfigDraft {
         ConfigDraft draft = new ConfigDraft();
         draft.playWhileMuted = config.globalState.playWhileMuted;
         draft.showPlayingSoundsHud = config.globalState.showPlayingSoundsHud;
+        draft.toggleSoundWheel = config.globalState.toggleSoundWheel;
+        draft.closeSoundWheelOnPlay = config.globalState.closeSoundWheelOnPlay;
 
         config.globalKeyCombos.forEach((id, keyCodes) ->
                 draft.globalKeyCombos.put(id, copyKeyCodes(keyCodes))
@@ -36,6 +40,8 @@ public final class ConfigDraft {
     public void applyTo(SoundboardConfigData config) {
         config.globalState.playWhileMuted = playWhileMuted;
         config.globalState.showPlayingSoundsHud = showPlayingSoundsHud;
+        config.globalState.toggleSoundWheel = toggleSoundWheel;
+        config.globalState.closeSoundWheelOnPlay = closeSoundWheelOnPlay;
 
         config.globalKeyCombos.clear();
         globalKeyCombos.forEach((id, keyCodes) ->
@@ -62,6 +68,22 @@ public final class ConfigDraft {
 
     public void setShowPlayingSoundsHud(boolean showPlayingSoundsHud) {
         this.showPlayingSoundsHud = showPlayingSoundsHud;
+    }
+
+    public boolean isToggleSoundWheel() {
+        return toggleSoundWheel;
+    }
+
+    public void setToggleSoundWheel(boolean toggleSoundWheel) {
+        this.toggleSoundWheel = toggleSoundWheel;
+    }
+
+    public boolean isCloseSoundWheelOnPlay() {
+        return closeSoundWheelOnPlay;
+    }
+
+    public void setCloseSoundWheelOnPlay(boolean closeSoundWheelOnPlay) {
+        this.closeSoundWheelOnPlay = closeSoundWheelOnPlay;
     }
 
     public KeyCombo getGlobalKeyCombo(String id) {

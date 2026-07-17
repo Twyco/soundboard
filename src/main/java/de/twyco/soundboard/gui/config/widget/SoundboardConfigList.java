@@ -83,6 +83,26 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 contentWidth
         );
         addConfigRow(showPlayingSoundsHud, showPlayingSoundsHud.getPreferredHeight());
+
+        CheckboxRow toggleSoundWheel = new CheckboxRow(
+                font,
+                Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel"),
+                Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel.description"),
+                draft.isToggleSoundWheel(),
+                draft::setToggleSoundWheel,
+                contentWidth
+        );
+        addConfigRow(toggleSoundWheel, toggleSoundWheel.getPreferredHeight());
+
+        CheckboxRow closeSoundWheelOnPlay = new CheckboxRow(
+                font,
+                Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play"),
+                Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play.description"),
+                draft.isCloseSoundWheelOnPlay(),
+                draft::setCloseSoundWheelOnPlay,
+                contentWidth
+        );
+        addConfigRow(closeSoundWheelOnPlay, closeSoundWheelOnPlay.getPreferredHeight());
         addConfigRow(
                 new ActionRow(screen),
                 contentWidth < 280 ? 56 : DEFAULT_ROW_HEIGHT

@@ -125,9 +125,11 @@ use the same keys.
 
 The global combo `soundboard.sounds.open_wheel` opens a non-pausing
 `SoundWheelScreen` on `PRESS`. It only opens when no other Minecraft screen is
-active. The screen releases the mouse cursor while voice chat and game simulation
-continue. Configured movement mappings for walking, jumping, sneaking, and
-sprinting are forwarded to game controls. Other gameplay and screen shortcuts
+active. By default the combo must remain held; toggle mode instead keeps the
+wheel open until the combo is pressed again or Escape is pressed. The screen
+releases the mouse cursor while voice chat and game simulation continue.
+Configured movement mappings for walking, jumping, sneaking, and sprinting are
+forwarded to game controls in either mode. Other gameplay and screen shortcuts
 remain blocked.
 
 The wheel and config screen share the Minecraft-inspired palette and rendering
@@ -140,8 +142,9 @@ wheel when a page exists in that direction. A mouse-wheel icon indicates scroll
 navigation when multiple pages exist.
 
 The mouse angle relative to the screen center selects a sector. The inner dead
-zone has no selection. Primary click starts or stops the selected sound without
-closing the wheel, allowing several sounds to be controlled in one wheel session.
+zone has no selection. Primary click starts or stops the selected sound. By
+default the wheel stays open so several sounds can be controlled in one session;
+the close-on-play option closes it after the click instead.
 Playing sounds are green and show a play icon; looping sounds show a loop icon.
 Releasing a key from the opening combo or pressing Escape closes the wheel
 without triggering additional playback.
@@ -150,8 +153,8 @@ without triggering additional playback.
 
 The custom Vanilla-style screen has two main tabs:
 
-- **General:** wheel and stop combos, play-while-muted behavior, HUD visibility,
-  and actions to open or reload the sound folder
+- **General:** wheel and stop combos, wheel behavior, play-while-muted behavior,
+  HUD visibility, and actions to open or reload the sound folder
 - **Sound Settings:** search, ascending or descending name sorting, bound and
   loop filters, and per-file combo, loop, and amplification settings
 
