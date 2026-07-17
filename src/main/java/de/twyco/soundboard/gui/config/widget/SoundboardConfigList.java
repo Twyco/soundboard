@@ -26,7 +26,9 @@ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 public final class SoundboardConfigList extends ContainerObjectSelectionList<SoundboardConfigList.ConfigRow> {
 
@@ -106,20 +108,25 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                     Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel"),
                     Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel.description"),
                     draft.isToggleSoundWheel(),
-                    draft::setToggleSoundWheel,
+                    value -> {
+                        draft.setToggleSoundWheel(value);
+                        screen.requestGeneralListRefresh();
+                    },
                     contentWidth
             );
             addConfigRow(toggleSoundWheel, toggleSoundWheel.getPreferredHeight());
 
-            CheckboxRow closeSoundWheelOnPlay = new CheckboxRow(
-                    font,
-                    Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play"),
-                    Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play.description"),
-                    draft.isCloseSoundWheelOnPlay(),
-                    draft::setCloseSoundWheelOnPlay,
-                    contentWidth
-            );
-            addConfigRow(closeSoundWheelOnPlay, closeSoundWheelOnPlay.getPreferredHeight());
+            if (draft.isToggleSoundWheel()) {
+                CheckboxRow closeSoundWheelOnPlay = new CheckboxRow(
+                        font,
+                        Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play"),
+                        Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play.description"),
+                        draft.isCloseSoundWheelOnPlay(),
+                        draft::setCloseSoundWheelOnPlay,
+                        contentWidth
+                );
+                addConfigRow(closeSoundWheelOnPlay, closeSoundWheelOnPlay.getPreferredHeight());
+            }
         }
     }
 
@@ -327,11 +334,13 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
         private final Font font;
         private final Component title;
+        private final Runnable onToggle;
         private final Button toggleButton;
 
         private SectionHeaderRow(Font font, Component title, boolean expanded, Runnable onToggle) {
             this.font = font;
             this.title = title;
+            this.onToggle = onToggle;
             toggleButton = Button.builder(
                             Component.literal(expanded ? "-" : "+"),
                             button -> onToggle.run()
@@ -343,6 +352,22 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         @Override
         protected boolean shouldDrawRowBackground() {
             return false;
+        }
+
+        @Override
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+            if (super.mouseClicked(event, doubleClick)) {
+                return true;
+            }
+            if (event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT
+                    || event.x() < getPaddedX() + BUTTON_SIZE + LINE_GAP
+                    || event.x() >= getPaddedX() + getPaddedWidth()
+                    || event.y() < getY()
+                    || event.y() >= getY() + getHeight()) {
+                return false;
+            }
+            onToggle.run();
+            return true;
         }
 
         @Override

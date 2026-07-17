@@ -52,7 +52,7 @@ semantic meaning because they are loaded as a set.
 | `playWhileMuted` | `false` | Output sounds while the voice-chat microphone is muted |
 | `showPlayingSoundsHud` | `true` | Display active sounds in the HUD |
 | `toggleSoundWheel` | `false` | Open and close the sound wheel by pressing its combo instead of holding it |
-| `closeSoundWheelOnPlay` | `false` | Close the sound wheel after starting or stopping a sound |
+| `closeSoundWheelOnPlay` | `false` | In toggle mode, close the sound wheel after starting or stopping a sound |
 | `generalCategoryExpanded` | `true` | Keep the General section expanded in the config screen |
 | `soundWheelCategoryExpanded` | `true` | Keep the Sound Wheel Settings section expanded in the config screen |
 

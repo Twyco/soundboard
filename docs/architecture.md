@@ -144,7 +144,8 @@ navigation when multiple pages exist.
 The mouse angle relative to the screen center selects a sector. The inner dead
 zone has no selection. Primary click starts or stops the selected sound. By
 default the wheel stays open so several sounds can be controlled in one session;
-the close-on-play option closes it after the click instead.
+in toggle mode, the close-on-play option closes it after the click instead. The
+option is hidden in the config screen while toggle mode is off.
 Playing sounds are green and show a play icon; looping sounds show a loop icon.
 Releasing a key from the opening combo or pressing Escape closes the wheel
 without triggering additional playback.
