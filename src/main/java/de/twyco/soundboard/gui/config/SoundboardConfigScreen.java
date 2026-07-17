@@ -163,14 +163,6 @@ public final class SoundboardConfigScreen extends Screen {
                 height - 8,
                 SoundboardUi.SURFACE
         );
-        SoundboardUi.drawInsetPanel(
-                graphics,
-                pageX - 2,
-                listY - 3,
-                pageWidth + 4,
-                Math.max(1, height - listY - FOOTER_HEIGHT + 6),
-                SoundboardUi.SURFACE_DARK
-        );
         super.extractRenderState(graphics, mouseX, mouseY, delta);
         graphics.centeredText(font, title, width / 2, 10, SoundboardUi.TEXT_PRIMARY);
     }
@@ -341,6 +333,7 @@ public final class SoundboardConfigScreen extends Screen {
                                 (_, value) -> {
                                     soundSort = value;
                                     populateSoundList();
+                                    clearFocusNextTick = true;
                                 }
                         )
         );
@@ -359,6 +352,7 @@ public final class SoundboardConfigScreen extends Screen {
                                 (_, value) -> {
                                     keybindFilter = value;
                                     populateSoundList();
+                                    clearFocusNextTick = true;
                                 }
                         )
         );
@@ -377,6 +371,7 @@ public final class SoundboardConfigScreen extends Screen {
                                 (_, value) -> {
                                     loopFilter = value;
                                     populateSoundList();
+                                    clearFocusNextTick = true;
                                 }
                         )
         );

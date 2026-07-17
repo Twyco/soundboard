@@ -47,15 +47,8 @@ public final class SoundboardUi {
         if (width <= 0 || height <= 0) {
             return;
         }
-        graphics.fill(x + 2, y + 2, x + width + 2, y + height + 2, SHADOW);
         graphics.fill(x, y, x + width, y + height, color);
-        graphics.fill(x, y, x + width, y + 1, BORDER_LIGHT);
-        graphics.fill(x, y, x + 1, y + height, BORDER_LIGHT);
-        graphics.fill(x, y + height - 1, x + width, y + height, BORDER_DARK);
-        graphics.fill(x + width - 1, y, x + width, y + height, BORDER_DARK);
-        if (width > 3 && height > 3) {
-            graphics.outline(x + 1, y + 1, width - 2, height - 2, BORDER_MID);
-        }
+        graphics.outline(x, y, width, height, BORDER_LIGHT);
     }
 
     public static void drawInsetPanel(
@@ -70,10 +63,7 @@ public final class SoundboardUi {
             return;
         }
         graphics.fill(x, y, x + width, y + height, color);
-        graphics.fill(x, y, x + width, y + 1, BORDER_DARK);
-        graphics.fill(x, y, x + 1, y + height, BORDER_DARK);
-        graphics.fill(x, y + height - 1, x + width, y + height, BORDER_LIGHT);
-        graphics.fill(x + width - 1, y, x + width, y + height, BORDER_LIGHT);
+        graphics.outline(x, y, width, height, BORDER_LIGHT);
     }
 
     public static void drawListRow(
