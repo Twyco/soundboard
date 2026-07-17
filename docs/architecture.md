@@ -133,7 +133,10 @@ Minecraft- oder Mod-Tastenbelegungen kollidieren.
 Die globale Combo `soundboard.sounds.open_wheel` oeffnet bei `PRESS` einen nicht
 pausierenden `SoundWheelScreen`. Das Oeffnen ist nur ohne bereits aktiven
 Minecraft-Screen moeglich. Der Screen gibt den Mauszeiger frei, waehrend die
-Voicechat- und Spielsimulation weiterlaufen.
+Voicechat- und Spielsimulation weiterlaufen. Die konfigurierten KeyMappings fuer
+Vorwaerts-, Rueckwaerts- und Seitwaertsbewegung sowie Springen, Schleichen und
+Sprinten werden waehrenddessen an die Spielsteuerung weitergereicht. Andere
+Gameplay- und Screen-Shortcuts bleiben blockiert.
 
 Die Sounds werden beim Oeffnen ohne Beachtung der Gross-/Kleinschreibung nach
 Dateiname sortiert und in Seiten mit jeweils sechs Eintraegen aufgeteilt. Die

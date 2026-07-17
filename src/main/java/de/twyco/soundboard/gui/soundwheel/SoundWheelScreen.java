@@ -1,13 +1,16 @@
 package de.twyco.soundboard.gui.soundwheel;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatService;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import de.twyco.soundboard.util.sound.Sound;
 import de.twyco.soundboard.util.sound.SoundManager;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -42,6 +45,7 @@ public final class SoundWheelScreen extends Screen {
     private final KeyCombo activationCombo;
     private final List<Sound> sounds;
     private final List<List<Span>> sectorSpans = new ArrayList<>(SOUNDS_PER_PAGE);
+    private final Set<KeyMapping> forwardedMovementKeys = new HashSet<>();
 
     private int centerX;
     private int centerY;
@@ -80,6 +84,7 @@ public final class SoundWheelScreen extends Screen {
         innerRadius = Math.max(22, (int) Math.round(outerRadius * 0.38D));
         buildSectorSpans();
         page = Math.min(page, getPageCount() - 1);
+        updateMovementKeyStates();
     }
 
     @Override
@@ -133,6 +138,7 @@ public final class SoundWheelScreen extends Screen {
     public void tick() {
         super.tick();
         age++;
+        updateMovementKeyStates();
         if (age > 1 && !activationCombo.allKeysPressed()) {
             onClose();
         }
@@ -155,6 +161,9 @@ public final class SoundWheelScreen extends Screen {
             changePage(1);
             return true;
         }
+        if (forwardMovementKeyEvent(event, true)) {
+            return true;
+        }
         return super.keyPressed(event);
     }
 
@@ -162,6 +171,9 @@ public final class SoundWheelScreen extends Screen {
     public boolean keyReleased(KeyEvent event) {
         if (activationCombo.getKeyCodes().contains(event.key())) {
             onClose();
+            return true;
+        }
+        if (forwardMovementKeyEvent(event, false)) {
             return true;
         }
         return super.keyReleased(event);
@@ -229,6 +241,58 @@ public final class SoundWheelScreen extends Screen {
         int pageCount = getPageCount();
         page = Math.floorMod(page + direction, pageCount);
         selectedSector = -1;
+    }
+
+    private void updateMovementKeyStates() {
+        updateMovementKeyState(minecraft.options.keyUp);
+        updateMovementKeyState(minecraft.options.keyDown);
+        updateMovementKeyState(minecraft.options.keyLeft);
+        updateMovementKeyState(minecraft.options.keyRight);
+        updateMovementKeyState(minecraft.options.keyJump);
+        updateMovementKeyState(minecraft.options.keyShift);
+        updateMovementKeyState(minecraft.options.keySprint);
+    }
+
+    private void updateMovementKeyState(KeyMapping keyMapping) {
+        if (keyMapping.isUnbound()) {
+            return;
+        }
+        InputConstants.Key key = InputConstants.getKey(keyMapping.saveString());
+        if (key.getType() != InputConstants.Type.KEYSYM) {
+            return;
+        }
+
+        boolean pressed = InputConstants.isKeyDown(minecraft.getWindow(), key.getValue());
+        setForwardedMovementKey(keyMapping, pressed);
+    }
+
+    private boolean forwardMovementKeyEvent(KeyEvent event, boolean pressed) {
+        boolean handled = false;
+        handled |= forwardMovementKeyEvent(minecraft.options.keyUp, event, pressed);
+        handled |= forwardMovementKeyEvent(minecraft.options.keyDown, event, pressed);
+        handled |= forwardMovementKeyEvent(minecraft.options.keyLeft, event, pressed);
+        handled |= forwardMovementKeyEvent(minecraft.options.keyRight, event, pressed);
+        handled |= forwardMovementKeyEvent(minecraft.options.keyJump, event, pressed);
+        handled |= forwardMovementKeyEvent(minecraft.options.keyShift, event, pressed);
+        handled |= forwardMovementKeyEvent(minecraft.options.keySprint, event, pressed);
+        return handled;
+    }
+
+    private boolean forwardMovementKeyEvent(KeyMapping keyMapping, KeyEvent event, boolean pressed) {
+        if (!keyMapping.matches(event)) {
+            return false;
+        }
+        setForwardedMovementKey(keyMapping, pressed);
+        return true;
+    }
+
+    private void setForwardedMovementKey(KeyMapping keyMapping, boolean pressed) {
+        boolean stateChanged = pressed
+                ? forwardedMovementKeys.add(keyMapping)
+                : forwardedMovementKeys.remove(keyMapping);
+        if (stateChanged) {
+            keyMapping.setDown(pressed);
+        }
     }
 
     private void updateSelection(int mouseX, int mouseY) {
