@@ -32,7 +32,7 @@
   "gui.soundboard.config.state.global.toggle_sound_wheel": "Sound-Rad umschalten",
   "gui.soundboard.config.state.global.toggle_sound_wheel.description": "Öffnet oder schließt das Rad per Tastendruck, statt die Tastenkombination halten zu müssen.",
   "gui.soundboard.config.state.global.close_sound_wheel_on_play": "Sound-Rad nach Wiedergabe schließen",
-  "gui.soundboard.config.state.global.close_sound_wheel_on_play.description": "Schließt das Rad, nachdem ein Sound gestartet oder gestoppt wurde.",
+  "gui.soundboard.config.state.global.close_sound_wheel_on_play.description": "Schließt das Rad nach dem Starten oder Stoppen eines Sounds, wenn „Sound-Rad umschalten“ aktiviert ist.",
   "gui.soundboard.config.sound.loop": "Sound wiederholen",
   "gui.soundboard.config.sound.loop.short": "Schleife",
   "gui.soundboard.config.sound.amplifier": "Verstärkung",
