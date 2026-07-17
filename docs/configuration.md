@@ -18,7 +18,9 @@ not part of the repository and is not scanned recursively.
 {
   "globalState": {
     "playWhileMuted": false,
-    "showPlayingSoundsHud": true
+    "showPlayingSoundsHud": true,
+    "toggleSoundWheel": false,
+    "closeSoundWheelOnPlay": false
   },
   "defaultLoop": false,
   "defaultAmplifier": 100,
@@ -47,6 +49,8 @@ semantic meaning because they are loaded as a set.
 | --- | --- | --- |
 | `playWhileMuted` | `false` | Output sounds while the voice-chat microphone is muted |
 | `showPlayingSoundsHud` | `true` | Display active sounds in the HUD |
+| `toggleSoundWheel` | `false` | Open and close the sound wheel by pressing its combo instead of holding it |
+| `closeSoundWheelOnPlay` | `false` | Close the sound wheel after starting or stopping a sound |
 
 ### Global sound defaults
 
