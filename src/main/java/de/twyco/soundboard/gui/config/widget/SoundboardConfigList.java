@@ -51,17 +51,18 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         clearEntries();
         int contentWidth = getRowWidth() - 8;
 
-        GlobalKeyCombos stopAll = GlobalKeyCombos.SOUND_STOP_ALL;
-        addConfigRow(
-                new KeyComboRow(
-                        font,
-                        Component.translatable(stopAll.getTranslationKey()),
-                        draft.getGlobalKeyCombo(stopAll.getId()),
-                        draft::setGlobalKeyCombo,
-                        screen
-                ),
-                contentWidth < 380 ? 50 : DEFAULT_ROW_HEIGHT
-        );
+        for (GlobalKeyCombos keybind : GlobalKeyCombos.values()) {
+            addConfigRow(
+                    new KeyComboRow(
+                            font,
+                            Component.translatable(keybind.getTranslationKey()),
+                            draft.getGlobalKeyCombo(keybind.getId()),
+                            draft::setGlobalKeyCombo,
+                            screen
+                    ),
+                    contentWidth < 380 ? 50 : DEFAULT_ROW_HEIGHT
+            );
+        }
         CheckboxRow playWhileMuted = new CheckboxRow(
                 font,
                 Component.translatable("gui.soundboard.config.state.global.play_while_muted"),

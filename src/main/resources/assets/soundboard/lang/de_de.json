@@ -30,7 +30,13 @@
   "gui.soundboard.config.sound.loop": "Sound wiederholen",
   "gui.soundboard.config.sound.loop.short": "Schleife",
   "gui.soundboard.config.sound.amplifier": "Verstärkung",
+  "gui.soundboard.wheel.title": "Sound-Rad",
+  "gui.soundboard.wheel.page": "%s / %s",
+  "gui.soundboard.wheel.previous_page": "Vorherige Seite",
+  "gui.soundboard.wheel.next_page": "Nächste Seite",
+  "gui.soundboard.wheel.mouse_wheel": "Seite mit dem Mausrad wechseln",
   "key.category.soundboard.general": "Soundboard",
   "key.soundboard.open_config": "Einstellungsmenü öffnen",
+  "key.soundboard.sound_wheel": "Sound-Rad öffnen",
   "key.soundboard.stop_all": "Alle laufenden Sounds stoppen"
 }

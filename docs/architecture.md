@@ -113,7 +113,7 @@ Das Projekt unterscheidet zwei Mechanismen:
 | Mechanismus | Verwendung | Verarbeitung |
 | --- | --- | --- |
 | Minecraft `KeyMapping` | Config-Menue oeffnen | `consumeClick()` am Tick-Ende |
-| Eigene `KeyCombo` | Sounds starten/stoppen, alle stoppen | rohes Ereignis im Mixin |
+| Eigene `KeyCombo` | Sounds, Sound-Rad und globaler Stopp | rohes Ereignis im Mixin |
 
 Eine `KeyCombo` besteht aus einer ID und einer ungeordneten Menge von GLFW-
 Keycodes. Sie gilt als gedrueckt, wenn alle enthaltenen Tasten aktuell gedrueckt
@@ -128,12 +128,35 @@ Sobald ein Combo-Ereignis ausgeloest wurde, konsumiert `KeyboardMixin` das rohe
 Tastaturereignis. Dieses Verhalten ist beabsichtigt, kann aber mit anderen
 Minecraft- oder Mod-Tastenbelegungen kollidieren.
 
+## Sound-Rad
+
+Die globale Combo `soundboard.sounds.open_wheel` oeffnet bei `PRESS` einen nicht
+pausierenden `SoundWheelScreen`. Das Oeffnen ist nur ohne bereits aktiven
+Minecraft-Screen moeglich. Der Screen gibt den Mauszeiger frei, waehrend die
+Voicechat- und Spielsimulation weiterlaufen.
+
+Die Sounds werden beim Oeffnen ohne Beachtung der Gross-/Kleinschreibung nach
+Dateiname sortiert und in Seiten mit jeweils sechs Eintraegen aufgeteilt. Die
+Sektoren beginnen oben und laufen im Uhrzeigersinn. Mausrad sowie linke und rechte
+Pfeiltaste wechseln zyklisch zwischen den Seiten. Zusaetzlich erscheinen an den
+oberen Aussenseiten des Rads klickbare Pfeile, sofern in der jeweiligen Richtung
+eine Seite vorhanden ist. Ein Mausrad-Icon in der Mitte weist bei mehreren Seiten
+auf die Scroll-Navigation hin.
+
+Die Mausposition bestimmt ueber ihren Winkel zum Bildschirmzentrum den aktiven
+Sektor. Innerhalb der mittleren toten Zone bleibt die Auswahl leer. Ein primaerer
+Mausklick startet oder stoppt den markierten Sound, ohne das Rad zu schliessen.
+Dadurch koennen waehrend einer Rad-Sitzung mehrere Sounds gestartet werden.
+Laufende Sounds sind gruen markiert und tragen ein Wiedergabe-Icon; Loop-Sounds
+tragen ein Wiederholen-Icon. Das Loslassen einer Taste der Oeffnen-Combo oder
+Escape schliesst das Rad ohne eine weitere Wiedergabe auszuloesen.
+
 ## Config-Screen und Nachladen
 
 Der eigene Vanilla-Minecraft-Screen stellt zwei Hauptbereiche bereit:
 
-- **General:** globale Stop-Combo, Wiedergabe bei stummem Mikrofon, HUD sowie
-  Aktionen zum Oeffnen und Nachladen des Sound-Ordners
+- **General:** Sound-Rad- und Stop-Combo, Wiedergabe bei stummem Mikrofon, HUD
+  sowie Aktionen zum Oeffnen und Nachladen des Sound-Ordners
 - **Sound Settings:** Suche, auf- oder absteigende Namenssortierung, Filter fuer
   Keybind- und Loop-Zustand sowie je Datei Key Combo, Loop und Verstaerkung
 
