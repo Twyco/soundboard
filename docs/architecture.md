@@ -138,6 +138,11 @@ Vorwaerts-, Rueckwaerts- und Seitwaertsbewegung sowie Springen, Schleichen und
 Sprinten werden waehrenddessen an die Spielsteuerung weitergereicht. Andere
 Gameplay- und Screen-Shortcuts bleiben blockiert.
 
+Sound-Rad und Config-Screen verwenden dieselbe Minecraft-nahe UI-Palette aus
+`SoundboardUi`: graue pixelige Bevel- und Inset-Flaechen, helle und dunkle
+Rahmenkanten sowie Gruen fuer aktive Wiedergabe. Die Seitennavigation des Rads
+nutzt Vanilla-Minecraft-Sprites.
+
 Die Sounds werden beim Oeffnen ohne Beachtung der Gross-/Kleinschreibung nach
 Dateiname sortiert und in Seiten mit jeweils sechs Eintraegen aufgeteilt. Die
 Sektoren beginnen oben und laufen im Uhrzeigersinn. Mausrad sowie linke und rechte

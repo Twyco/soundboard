@@ -1,6 +1,7 @@
 package de.twyco.soundboard.gui.config.widget;
 
 import de.twyco.soundboard.enums.GlobalKeyCombos;
+import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.gui.config.ConfigDraft;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen.KeybindFilter;
@@ -29,7 +30,7 @@ import net.minecraft.network.chat.Component;
 
 public final class SoundboardConfigList extends ContainerObjectSelectionList<SoundboardConfigList.ConfigRow> {
 
-    private static final int DEFAULT_ROW_HEIGHT = 28;
+    private static final int DEFAULT_ROW_HEIGHT = 32;
     private static final int MAX_ROW_WIDTH = 680;
 
     private final SoundboardConfigScreen screen;
@@ -60,7 +61,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                             draft::setGlobalKeyCombo,
                             screen
                     ),
-                    contentWidth < 380 ? 50 : DEFAULT_ROW_HEIGHT
+                    contentWidth < 380 ? 54 : DEFAULT_ROW_HEIGHT
             );
         }
         CheckboxRow playWhileMuted = new CheckboxRow(
@@ -84,7 +85,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         addConfigRow(showPlayingSoundsHud, showPlayingSoundsHud.getPreferredHeight());
         addConfigRow(
                 new ActionRow(screen),
-                contentWidth < 280 ? 50 : DEFAULT_ROW_HEIGHT
+                contentWidth < 280 ? 54 : DEFAULT_ROW_HEIGHT
         );
     }
 
@@ -134,7 +135,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
         int rowHeight = contentWidth >= 560
                 ? DEFAULT_ROW_HEIGHT
-                : contentWidth >= 320 ? 52 : contentWidth >= 140 ? 76 : 100;
+                : contentWidth >= 320 ? 56 : contentWidth >= 140 ? 80 : 104;
         for (SoundRowData data : sortedSounds) {
             addConfigRow(
                     new SoundRow(font, data.sound(), data.draft(), screen),
@@ -165,6 +166,18 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         return Math.max(1, Math.min(getWidth() - 20, MAX_ROW_WIDTH));
     }
 
+    @Override
+    protected void extractListBackground(GuiGraphicsExtractor graphics) {
+        SoundboardUi.drawInsetPanel(
+                graphics,
+                getX(),
+                getY(),
+                getWidth(),
+                getHeight(),
+                SoundboardUi.SURFACE_DARK
+        );
+    }
+
     private void addConfigRow(ConfigRow row, int height) {
         addEntry(row, height);
     }
@@ -175,6 +188,33 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
     public abstract static class ConfigRow extends ContainerObjectSelectionList.Entry<ConfigRow> {
 
         protected final List<AbstractWidget> widgets = new ArrayList<>();
+
+        @Override
+        public final void extractContent(
+                GuiGraphicsExtractor graphics,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta
+        ) {
+            SoundboardUi.drawListRow(
+                    graphics,
+                    getX() + 2,
+                    getY() + 2,
+                    Math.max(1, getWidth() - 4),
+                    Math.max(1, getHeight() - 4),
+                    hovered
+            );
+            extractRowContent(graphics, mouseX, mouseY, hovered, delta);
+        }
+
+        protected abstract void extractRowContent(
+                GuiGraphicsExtractor graphics,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta
+        );
 
         @Override
         public List<? extends GuiEventListener> children() {
@@ -199,18 +239,6 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             widget.setHeight(Math.max(1, height));
         }
 
-        protected static String fitText(Font font, String text, int maxWidth) {
-            if (maxWidth <= 0) {
-                return "";
-            }
-            if (font.width(text) <= maxWidth) {
-                return text;
-            }
-
-            String suffix = "...";
-            int textWidth = Math.max(0, maxWidth - font.width(suffix));
-            return font.plainSubstrByWidth(text, textWidth) + suffix;
-        }
     }
 
     private static final class KeyComboRow extends ConfigRow {
@@ -233,7 +261,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         @Override
-        public void extractContent(
+        protected void extractRowContent(
                 GuiGraphicsExtractor graphics,
                 int mouseX,
                 int mouseY,
@@ -246,10 +274,16 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
             if (width >= 380) {
                 int buttonWidth = Math.min(180, Math.max(110, width / 3));
-                setBounds(button, x + width - buttonWidth, y - 2, buttonWidth, 20);
-                graphics.text(font, label, x, getContentYMiddle() - font.lineHeight / 2, 0xFFFFFFFF);
+                setBounds(button, x + width - buttonWidth, y, buttonWidth, 20);
+                graphics.text(
+                        font,
+                        label,
+                        x,
+                        getContentYMiddle() - font.lineHeight / 2,
+                        SoundboardUi.TEXT_PRIMARY
+                );
             } else {
-                graphics.text(font, label, x, y, 0xFFFFFFFF);
+                graphics.text(font, label, x, y, SoundboardUi.TEXT_PRIMARY);
                 setBounds(button, x, y + 18, width, 20);
             }
             extractWidgets(graphics, mouseX, mouseY, delta);
@@ -284,7 +318,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         @Override
-        public void extractContent(
+        protected void extractRowContent(
                 GuiGraphicsExtractor graphics,
                 int mouseX,
                 int mouseY,
@@ -318,7 +352,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         @Override
-        public void extractContent(
+        protected void extractRowContent(
                 GuiGraphicsExtractor graphics,
                 int mouseX,
                 int mouseY,
@@ -330,8 +364,8 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             int width = getContentWidth();
             if (width >= 280) {
                 int buttonWidth = (width - 4) / 2;
-                setBounds(openFolder, x, y - 2, buttonWidth, 20);
-                setBounds(reload, x + buttonWidth + 4, y - 2, buttonWidth, 20);
+                setBounds(openFolder, x, y, buttonWidth, 20);
+                setBounds(reload, x + buttonWidth + 4, y, buttonWidth, 20);
             } else {
                 setBounds(openFolder, x, y, width, 20);
                 setBounds(reload, x, y + 24, width, 20);
@@ -351,7 +385,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         @Override
-        public void extractContent(
+        protected void extractRowContent(
                 GuiGraphicsExtractor graphics,
                 int mouseX,
                 int mouseY,
@@ -360,10 +394,10 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         ) {
             graphics.centeredText(
                     font,
-                    fitText(font, text.getString(), getContentWidth()),
+                    SoundboardUi.fitText(font, text.getString(), getContentWidth()),
                     getContentXMiddle(),
                     getContentYMiddle() - font.lineHeight / 2,
-                    0xFFAAAAAA
+                    SoundboardUi.TEXT_SECONDARY
             );
         }
     }
@@ -421,7 +455,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         @Override
-        public void extractContent(
+        protected void extractRowContent(
                 GuiGraphicsExtractor graphics,
                 int mouseX,
                 int mouseY,
@@ -455,19 +489,25 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
 
             graphics.text(
                     font,
-                    fitText(font, sound.getName(), textWidth),
+                    SoundboardUi.fitText(font, sound.getName(), textWidth),
                     x,
                     getContentYMiddle() - font.lineHeight / 2,
-                    0xFFFFFFFF
+                    SoundboardUi.TEXT_PRIMARY
             );
-            setBounds(keyComboButton, comboX, y - 2, comboWidth, 20);
+            setBounds(keyComboButton, comboX, y, comboWidth, 20);
             loopCheckbox.setX(checkboxX);
-            loopCheckbox.setY(y - 1);
-            setBounds(amplifierSlider, sliderX, y - 2, sliderWidth, 20);
+            loopCheckbox.setY(y + 1);
+            setBounds(amplifierSlider, sliderX, y, sliderWidth, 20);
         }
 
         private void extractCompact(GuiGraphicsExtractor graphics, int x, int y, int width) {
-            graphics.text(font, fitText(font, sound.getName(), width), x, y, 0xFFFFFFFF);
+            graphics.text(
+                    font,
+                    SoundboardUi.fitText(font, sound.getName(), width),
+                    x,
+                    y,
+                    SoundboardUi.TEXT_PRIMARY
+            );
 
             int controlsY = y + 20;
             int sliderWidth = Math.max(82, width / 4);
@@ -483,7 +523,13 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private void extractNarrow(GuiGraphicsExtractor graphics, int x, int y, int width) {
-            graphics.text(font, fitText(font, sound.getName(), width), x, y, 0xFFFFFFFF);
+            graphics.text(
+                    font,
+                    SoundboardUi.fitText(font, sound.getName(), width),
+                    x,
+                    y,
+                    SoundboardUi.TEXT_PRIMARY
+            );
             setBounds(keyComboButton, x, y + 18, width, 20);
 
             int controlsY = y + 44;
@@ -500,7 +546,13 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private void extractUltraNarrow(GuiGraphicsExtractor graphics, int x, int y, int width) {
-            graphics.text(font, fitText(font, sound.getName(), width), x, y, 0xFFFFFFFF);
+            graphics.text(
+                    font,
+                    SoundboardUi.fitText(font, sound.getName(), width),
+                    x,
+                    y,
+                    SoundboardUi.TEXT_PRIMARY
+            );
             setBounds(keyComboButton, x, y + 18, width, 20);
             loopCheckbox.setX(x);
             loopCheckbox.setY(y + 44);

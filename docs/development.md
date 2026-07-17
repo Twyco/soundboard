@@ -86,6 +86,9 @@ Minecraft-Key-Binding geoeffnet werden.
   direkt die persistierte Laufzeitkonfiguration.
 - GUI-Widgets enthalten keine Audioverarbeitung und delegieren Aktionen an Screen
   oder Manager.
+- Gemeinsam verwendete UI-Farben und Zeichenprimitive liegen in
+  `gui.component.SoundboardUi`. Fachliche Rad-Geometrie und Screen-Interaktion
+  bleiben im jeweiligen Screen.
 - Neue globale Standardaktionen werden im passenden Enum deklariert und zentral
   in `GlobalKeybinds` auf einen Callback abgebildet.
 - Nicht instanziierbare Service- und Utility-Klassen erhalten einen privaten
