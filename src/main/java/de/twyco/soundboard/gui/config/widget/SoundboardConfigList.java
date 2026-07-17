@@ -337,7 +337,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             Checkbox.Builder builder = Checkbox.builder(label, font)
                     .selected(selected)
                     .maxWidth(Math.max(1, maxWidth))
-                    .onValueChange((_, value) -> onChange.accept(value));
+                    .onValueChange((checkbox, value) -> onChange.accept(value));
             if (tooltip != null) {
                 builder.tooltip(Tooltip.create(tooltip));
             }
@@ -371,12 +371,12 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         private ActionRow(SoundboardConfigScreen screen) {
             openFolder = Button.builder(
                             Component.translatable("gui.soundboard.config.action.open_sounds_folder"),
-                            _ -> screen.openSoundsFolder()
+                            button -> screen.openSoundsFolder()
                     )
                     .build();
             reload = Button.builder(
                             Component.translatable("gui.soundboard.config.action.reload"),
-                            _ -> screen.reloadSoundFiles()
+                            button -> screen.reloadSoundFiles()
                     )
                     .build();
             widgets.add(openFolder);
@@ -476,7 +476,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                             font
                     )
                     .selected(draft.isLoop())
-                    .onValueChange((_, value) -> {
+                    .onValueChange((checkbox, value) -> {
                         draft.setLoop(value);
                         screen.requestLoopFilterRefresh();
                     })

@@ -67,7 +67,7 @@ public final class SoundboardConfigScreen extends Screen {
         generalTabButton = addRenderableWidget(
                 Button.builder(
                                 Component.translatable("gui.soundboard.config.categories.general.title"),
-                                _ -> selectTab(Tab.GENERAL)
+                                button -> selectTab(Tab.GENERAL)
                         )
                         .bounds(pageX, 28, tabWidth, BUTTON_HEIGHT)
                         .build()
@@ -75,7 +75,7 @@ public final class SoundboardConfigScreen extends Screen {
         soundsTabButton = addRenderableWidget(
                 Button.builder(
                                 Component.translatable("gui.soundboard.config.categories.sounds.title"),
-                                _ -> selectTab(Tab.SOUNDS)
+                                button -> selectTab(Tab.SOUNDS)
                         )
                         .bounds(pageX + tabWidth + GAP, 28, tabWidth, BUTTON_HEIGHT)
                         .build()
@@ -119,12 +119,12 @@ public final class SoundboardConfigScreen extends Screen {
         int footerY = height - 28;
         int footerButtonWidth = Math.max(1, (pageWidth - GAP * 2) / 3);
         addRenderableWidget(
-                Button.builder(Component.translatable("gui.cancel"), _ -> onClose())
+                Button.builder(Component.translatable("gui.cancel"), button -> onClose())
                         .bounds(pageX, footerY, footerButtonWidth, BUTTON_HEIGHT)
                         .build()
         );
         addRenderableWidget(
-                Button.builder(Component.translatable("gui.soundboard.config.action.apply"), _ -> applyDraft())
+                Button.builder(Component.translatable("gui.soundboard.config.action.apply"), button -> applyDraft())
                         .bounds(
                                 pageX + footerButtonWidth + GAP,
                                 footerY,
@@ -134,7 +134,7 @@ public final class SoundboardConfigScreen extends Screen {
                         .build()
         );
         addRenderableWidget(
-                Button.builder(Component.translatable("gui.done"), _ -> {
+                Button.builder(Component.translatable("gui.done"), button -> {
                             applyDraft();
                             closeToParent();
                         })
@@ -330,7 +330,7 @@ public final class SoundboardConfigScreen extends Screen {
                                 width,
                                 BUTTON_HEIGHT,
                                 Component.translatable("gui.soundboard.config.sort"),
-                                (_, value) -> {
+                                (button, value) -> {
                                     soundSort = value;
                                     populateSoundList();
                                     clearFocusNextTick = true;
@@ -349,7 +349,7 @@ public final class SoundboardConfigScreen extends Screen {
                                 width,
                                 BUTTON_HEIGHT,
                                 Component.translatable("gui.soundboard.config.filter.keybind"),
-                                (_, value) -> {
+                                (button, value) -> {
                                     keybindFilter = value;
                                     populateSoundList();
                                     clearFocusNextTick = true;
@@ -368,7 +368,7 @@ public final class SoundboardConfigScreen extends Screen {
                                 width,
                                 BUTTON_HEIGHT,
                                 Component.translatable("gui.soundboard.config.filter.loop"),
-                                (_, value) -> {
+                                (button, value) -> {
                                     loopFilter = value;
                                     populateSoundList();
                                     clearFocusNextTick = true;

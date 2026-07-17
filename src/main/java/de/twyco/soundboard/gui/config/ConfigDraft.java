@@ -43,7 +43,7 @@ public final class ConfigDraft {
         );
 
         sounds.forEach((id, draft) -> {
-            SoundEntry entry = config.sounds.computeIfAbsent(id, _ -> SoundEntry.fromDefaults(config));
+            SoundEntry entry = config.sounds.computeIfAbsent(id, ignored -> SoundEntry.fromDefaults(config));
             draft.applyTo(entry);
         });
     }
@@ -75,7 +75,7 @@ public final class ConfigDraft {
     public SoundDraft getSound(Sound sound, SoundboardConfigData config) {
         return sounds.computeIfAbsent(
                 sound.getId(),
-                _ -> SoundDraft.from(SoundEntry.fromDefaults(config))
+                ignored -> SoundDraft.from(SoundEntry.fromDefaults(config))
         );
     }
 

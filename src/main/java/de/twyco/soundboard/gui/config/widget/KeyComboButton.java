@@ -27,7 +27,7 @@ final class KeyComboButton extends Button {
                 150,
                 DEFAULT_HEIGHT,
                 Component.literal(combo.toString()),
-                _ -> {
+                button -> {
                 },
                 DEFAULT_NARRATION
         );
