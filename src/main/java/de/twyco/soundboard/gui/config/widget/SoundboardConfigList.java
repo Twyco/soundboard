@@ -52,60 +52,87 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         clearEntries();
         int contentWidth = getRowWidth() - 8;
 
-        for (GlobalKeyCombos keybind : GlobalKeyCombos.values()) {
+        addConfigRow(new SectionHeaderRow(
+                font,
+                Component.translatable("gui.soundboard.config.sections.general"),
+                draft.isGeneralCategoryExpanded(),
+                () -> {
+                    draft.setGeneralCategoryExpanded(!draft.isGeneralCategoryExpanded());
+                    screen.requestGeneralListRefresh();
+                }
+        ), DEFAULT_ROW_HEIGHT);
+        if (draft.isGeneralCategoryExpanded()) {
+            addKeyComboRow(draft, GlobalKeyCombos.SOUND_STOP_ALL, contentWidth);
+
+            CheckboxRow playWhileMuted = new CheckboxRow(
+                    font,
+                    Component.translatable("gui.soundboard.config.state.global.play_while_muted"),
+                    Component.translatable("gui.soundboard.config.state.global.play_while_muted.description"),
+                    draft.isPlayWhileMuted(),
+                    draft::setPlayWhileMuted,
+                    contentWidth
+            );
+            addConfigRow(playWhileMuted, playWhileMuted.getPreferredHeight());
+
+            CheckboxRow showPlayingSoundsHud = new CheckboxRow(
+                    font,
+                    Component.translatable("gui.soundboard.config.state.global.show_sounds_in_hud"),
+                    null,
+                    draft.isShowPlayingSoundsHud(),
+                    draft::setShowPlayingSoundsHud,
+                    contentWidth
+            );
+            addConfigRow(showPlayingSoundsHud, showPlayingSoundsHud.getPreferredHeight());
             addConfigRow(
-                    new KeyComboRow(
-                            font,
-                            Component.translatable(keybind.getTranslationKey()),
-                            draft.getGlobalKeyCombo(keybind.getId()),
-                            draft::setGlobalKeyCombo,
-                            screen
-                    ),
-                    contentWidth < 380 ? 56 : DEFAULT_ROW_HEIGHT
+                    new ActionRow(screen),
+                    contentWidth < 280 ? 56 : DEFAULT_ROW_HEIGHT
             );
         }
-        CheckboxRow playWhileMuted = new CheckboxRow(
-                font,
-                Component.translatable("gui.soundboard.config.state.global.play_while_muted"),
-                Component.translatable("gui.soundboard.config.state.global.play_while_muted.description"),
-                draft.isPlayWhileMuted(),
-                draft::setPlayWhileMuted,
-                contentWidth
-        );
-        addConfigRow(playWhileMuted, playWhileMuted.getPreferredHeight());
 
-        CheckboxRow showPlayingSoundsHud = new CheckboxRow(
+        addConfigRow(new SectionHeaderRow(
                 font,
-                Component.translatable("gui.soundboard.config.state.global.show_sounds_in_hud"),
-                null,
-                draft.isShowPlayingSoundsHud(),
-                draft::setShowPlayingSoundsHud,
-                contentWidth
-        );
-        addConfigRow(showPlayingSoundsHud, showPlayingSoundsHud.getPreferredHeight());
+                Component.translatable("gui.soundboard.config.sections.sound_wheel"),
+                draft.isSoundWheelCategoryExpanded(),
+                () -> {
+                    draft.setSoundWheelCategoryExpanded(!draft.isSoundWheelCategoryExpanded());
+                    screen.requestGeneralListRefresh();
+                }
+        ), DEFAULT_ROW_HEIGHT);
+        if (draft.isSoundWheelCategoryExpanded()) {
+            addKeyComboRow(draft, GlobalKeyCombos.SOUND_WHEEL, contentWidth);
 
-        CheckboxRow toggleSoundWheel = new CheckboxRow(
-                font,
-                Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel"),
-                Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel.description"),
-                draft.isToggleSoundWheel(),
-                draft::setToggleSoundWheel,
-                contentWidth
-        );
-        addConfigRow(toggleSoundWheel, toggleSoundWheel.getPreferredHeight());
+            CheckboxRow toggleSoundWheel = new CheckboxRow(
+                    font,
+                    Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel"),
+                    Component.translatable("gui.soundboard.config.state.global.toggle_sound_wheel.description"),
+                    draft.isToggleSoundWheel(),
+                    draft::setToggleSoundWheel,
+                    contentWidth
+            );
+            addConfigRow(toggleSoundWheel, toggleSoundWheel.getPreferredHeight());
 
-        CheckboxRow closeSoundWheelOnPlay = new CheckboxRow(
-                font,
-                Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play"),
-                Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play.description"),
-                draft.isCloseSoundWheelOnPlay(),
-                draft::setCloseSoundWheelOnPlay,
-                contentWidth
-        );
-        addConfigRow(closeSoundWheelOnPlay, closeSoundWheelOnPlay.getPreferredHeight());
+            CheckboxRow closeSoundWheelOnPlay = new CheckboxRow(
+                    font,
+                    Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play"),
+                    Component.translatable("gui.soundboard.config.state.global.close_sound_wheel_on_play.description"),
+                    draft.isCloseSoundWheelOnPlay(),
+                    draft::setCloseSoundWheelOnPlay,
+                    contentWidth
+            );
+            addConfigRow(closeSoundWheelOnPlay, closeSoundWheelOnPlay.getPreferredHeight());
+        }
+    }
+
+    private void addKeyComboRow(ConfigDraft draft, GlobalKeyCombos keybind, int contentWidth) {
         addConfigRow(
-                new ActionRow(screen),
-                contentWidth < 280 ? 56 : DEFAULT_ROW_HEIGHT
+                new KeyComboRow(
+                        font,
+                        Component.translatable(keybind.getTranslationKey()),
+                        draft.getGlobalKeyCombo(keybind.getId()),
+                        draft::setGlobalKeyCombo,
+                        screen
+                ),
+                contentWidth < 380 ? 56 : DEFAULT_ROW_HEIGHT
         );
     }
 
@@ -291,6 +318,76 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             return getPaddedY() + getPaddedHeight() / 2;
         }
 
+    }
+
+    private static final class SectionHeaderRow extends ConfigRow {
+
+        private static final int BUTTON_SIZE = 20;
+        private static final int LINE_GAP = 6;
+
+        private final Font font;
+        private final Component title;
+        private final Button toggleButton;
+
+        private SectionHeaderRow(Font font, Component title, boolean expanded, Runnable onToggle) {
+            this.font = font;
+            this.title = title;
+            toggleButton = Button.builder(
+                            Component.literal(expanded ? "-" : "+"),
+                            button -> onToggle.run()
+                    )
+                    .build();
+            widgets.add(toggleButton);
+        }
+
+        @Override
+        protected boolean shouldDrawRowBackground() {
+            return false;
+        }
+
+        @Override
+        protected void extractRowContent(
+                GuiGraphicsExtractor graphics,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta
+        ) {
+            int x = getPaddedX();
+            int y = getPaddedYMiddle();
+            int width = getPaddedWidth();
+            int centerX = x + width / 2;
+            String visibleTitle = SoundboardUi.fitText(
+                    font,
+                    title.getString(),
+                    Math.max(1, width - BUTTON_SIZE * 2 - LINE_GAP * 4)
+            );
+            int halfTitleWidth = font.width(visibleTitle) / 2;
+
+            setBounds(
+                    toggleButton,
+                    x,
+                    getPaddedYMiddle() - BUTTON_SIZE / 2,
+                    BUTTON_SIZE,
+                    BUTTON_SIZE
+            );
+            drawLine(graphics, x + BUTTON_SIZE + LINE_GAP, centerX - halfTitleWidth - LINE_GAP, y);
+            drawLine(graphics, centerX + halfTitleWidth + LINE_GAP, x + width, y);
+            graphics.centeredText(
+                    font,
+                    visibleTitle,
+                    centerX,
+                    y - font.lineHeight / 2,
+                    SoundboardUi.TEXT_PRIMARY
+            );
+            extractWidgets(graphics, mouseX, mouseY, delta);
+        }
+
+        private static void drawLine(GuiGraphicsExtractor graphics, int startX, int endX, int y) {
+            if (endX > startX) {
+                graphics.fill(startX, y, endX, y + 1, SoundboardUi.BORDER_MID);
+            }
+        }
     }
 
     private static final class KeyComboRow extends ConfigRow {
