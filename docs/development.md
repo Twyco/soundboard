@@ -78,6 +78,7 @@ The central version values are in `gradle.properties`:
 - `voicechat_api_version`
 - `voicechat_version`
 - `mod_version`
+- `mod_release_type` (`alpha`, `beta`, or empty for a stable release)
 
 Also verify `fabric.mod.json`, the Gradle wrapper, Java settings, and the
 compatibility level in `soundboard.mixins.json` during a version update.

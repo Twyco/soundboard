@@ -6,8 +6,18 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
+def modReleaseType = providers.gradleProperty("mod_release_type").getOrElse("").trim()
+if (!(modReleaseType in ["", "alpha", "beta"])) {
+	throw new GradleException("mod_release_type must be empty, alpha, or beta")
+}
+def modReleaseSuffix = modReleaseType ? "-${modReleaseType}" : ""
+
 base {
-	archivesName = "${project.archives_base_name}-fabric-${project.minecraft_version}"
+	archivesName = "fabric-${project.mod_version}+${project.minecraft_version}${modReleaseSuffix}"
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+	archiveVersion = ""
 }
 
 repositories {
