@@ -1,56 +1,84 @@
 # Simple Voice Chat Soundboard
-A soundboard mod for the [Simple Voicechat Mod](https://modrinth.com/plugin/simple-voice-chat). It lets you play sounds through your microphone, so anyone using Simple Voice Chat can hear them.
 
-> This is not an official addon. Please don't go to the Simple Voice Chat discord server for support! Instead, please use [GitHub issues](https://github.com/Twyco/soundboard/issues) for support. I'll try to provide support as soon as possible.
+A client-side soundboard mod for [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat). Play your own sounds through voice chat so everyone using Simple Voice Chat can hear them.
+
+> This is not an official Simple Voice Chat addon. Please do not ask for support in the Simple Voice Chat Discord server. Instead, use the [GitHub issue tracker](https://github.com/Twyco/soundboard/issues); I will try to help as soon as possible.
 
 ## Features
-- Play any `.mp3` file
-- Start/stop sounds with keybinds
-- Multi-key keybinds (like ctrl + shift + 1)
-- Bind unlimited amount of sounds
-- Stop all currently playing sounds with a keybind
-- HUD element in the bottom-right corner showing all active sounds and whether they are looping
-- Per-sound settings:
-    - Loop on/off
-    - Sound amplifier (per-sound volume sent to others)
-- Play sounds others can hear while your microphone is muted
-- Adjust your local playback volume without affecting the sound amplifier or how loud others hear the sound
+
+- Play any `.mp3` file through Simple Voice Chat
+- Start and stop sounds with keybinds
+- Start and stop sounds directly from a customizable sound wheel
+- Multi-key keybinds (like `Ctrl + Shift + 1`)
+- Bind an unlimited number of sounds
+- See active playing sounds in an optional HUD element
+- Configure each sound individually:
+  - Loop on or off
+  - Amplifier (the volume sent to other players)
+- Play sounds while your microphone is muted
+- Adjust your local playback volume without changing how loud other players hear the sounds
+- Search, sort, and filter large sound collections
+- English and German interface
 
 ## Dependencies
-- [Simple Voicechat](https://modrinth.com/plugin/simple-voice-chat)
+
+- [Fabric API](https://modrinth.com/mod/fabric-api)
+- [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)
 
 ## Quick Start
-1. Put your `.mp3` files into the `sounds` folder in your Minecraft instance.
-2. Open the settings (default `O`) and bind your sounds to keys.
-3. Press your keybinds in-game (singleplayer or server) to play sounds.
 
-# GUI (full usage guide)
-### Currnetly Playing Sounds
-All currnetly playing sounds are shown in a small HUD at the bottom-right of the screen.  
-You can disable this indicator in the settings.
-![Currently Playing GUI](https://cdn.modrinth.com/data/cached_images/728858bc2a3c116844b23284c6af170a79cf3f16.png)
+1. Launch the game once so the `sounds` folder is created in your Minecraft instance.
+2. Put your `.mp3` files into that folder.
+3. Open the Soundboard Config screen with `O` by default.
+4. Assign keybinds to your sounds and, optionally, to the sound wheel.
+5. Use the keybinds in singleplayer or multiplayer to start a sound; use the same keybind again to stop it.
 
-### Local soundboard volume
-You can adjust how loud the soundboard sounds are for **you** by changing the `Soundboard` category in the [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) **Adjust volumes** menu.  
-This only affects your local volume and does **not** change how loud other players hear the sounds.
-![Adjust volume](https://cdn.modrinth.com/data/cached_images/26a8381811f056c6ce0311a0307c2ec99fa3901f_0.webp)
+## GUI and Usage Guide
 
+### Currently Playing Sounds
+
+All currently playing sounds are shown in a small HUD at the bottom-right of the screen. Looping sounds are marked accordingly. You can disable this indicator in the settings.
+
+![Currently Playing Sounds HUD](https://cdn.modrinth.com/data/cached_images/728858bc2a3c116844b23284c6af170a79cf3f16.png)
+
+### Sound Wheel
+
+Assign a keybind to **Open Sound Wheel** in the General tab. By default, the wheel stays open while you hold the keybind. You can instead enable toggle mode and optionally close the wheel after playing a sound.
+
+The wheel shows six alphabetically sorted sounds per page. Change pages with the mouse wheel, the left and right arrow keys, or the clickable page arrows. Hover over a sound and left-click it to start or stop it. Indicators show which sounds are currently playing or set to loop, and you can keep walking, jumping, sneaking, and sprinting while the wheel is open.
+
+![Sound Wheel](https://cdn.modrinth.com/data/cached_images/29fc7790d6455f699ab0c9c847b8192558280507.png)
+
+### Local Soundboard Volume
+
+Change how loud the soundboard is for **you** with the `Soundboard` category in Simple Voice Chat's **Adjust Volumes** menu. This only affects local playback and does not change the amplifier or how loud other players hear the sounds.
+
+![Adjust Soundboard Volume](https://cdn.modrinth.com/data/cached_images/26a8381811f056c6ce0311a0307c2ec99fa3901f_0.webp)
 
 ## Settings
-Open the settings menu with the default keybind `O`.
-Can be changed in the default Controls Menu.
+
+Open the custom Minecraft-style config screen with `O` by default. You can change this key in Minecraft's Controls menu. Use **Apply** to save without closing the screen, or **Done** to save and close it.
+
 ### General
-The **General** tab contains all global settings, including global keybinds (e.g. stop all sounds, toggle HUD, play while muted, open config).
-![Settings Menu](https://cdn.modrinth.com/data/cached_images/b8595a56fae5234a9891dedd2effbbb4f0feb3ef.png)
 
-### Sound
-The **Sound** tab lists all sounds detected in your `sounds` folder.
+The **General** tab contains the global options and keybinds. Its persistent, collapsible sections let you:
 
-The `sounds` folder is automatically created after the first game launch. You can open it from the GUI, or by navigating to your Minecraft instance folder and opening the `sounds` folder.
+- Bind **Stop all currently playing sounds**
+- Allow sounds to play while your microphone is muted
+- Show or hide the currently playing sounds HUD
+- Open the sound folder or reload its files
+- Bind the sound wheel and configure its toggle and close-on-play behavior
+
+![General Settings](https://cdn.modrinth.com/data/cached_images/2d73ee956c29f67aa6c347c7d100a4227e865f9d.png)
+
+### Sound Settings
+
+The **Sound Settings** tab lists all `.mp3` files detected in your `sounds` folder. Search by name, sort from A-Z or Z-A, and filter sounds by whether they have a keybind or use looping.
 
 Each sound can be customized individually:
-- Keybind (multi-key combos supported)
-- Amplifier (per-sound volume sent to others)
-- Loop on/off
 
-![Sound Settings GUI](https://cdn.modrinth.com/data/cached_images/f5c4acab46c0309fec10be58484884875353d2a1.png)
+- Keybind (multiple keys supported)
+- Loop on or off
+- Amplifier (the volume sent to other players)
+
+![Sound Settings](https://cdn.modrinth.com/data/cached_images/05178304cde87770a5d89998015d88d6c289d3ca.png)
