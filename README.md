@@ -15,6 +15,8 @@ A client-side soundboard mod for [Simple Voice Chat](https://modrinth.com/plugin
 - Configure each sound individually:
   - Loop on or off
   - Amplifier (the volume sent to other players)
+- Set one global amplifier that is multiplied with every sound's individual amplifier
+- Mark favorite sounds and show only those favorites in the sound wheel
 - Play sounds while your microphone is muted
 - Adjust your local playback volume without changing how loud other players hear the sounds
 - Search, sort, and filter large sound collections
@@ -30,7 +32,7 @@ A client-side soundboard mod for [Simple Voice Chat](https://modrinth.com/plugin
 1. Launch the game once so the `sounds` folder is created in your Minecraft instance.
 2. Put your `.mp3` files into that folder.
 3. Open the Soundboard Config screen with `O` by default.
-4. Assign keybinds to your sounds and, optionally, to the sound wheel.
+4. Assign keybinds to your sounds and mark the sounds you want in the sound wheel as favorites.
 5. Use the keybinds in singleplayer or multiplayer to start a sound; use the same keybind again to stop it.
 
 ## GUI and Usage Guide
@@ -45,7 +47,7 @@ All currently playing sounds are shown in a small HUD at the bottom-right of the
 
 Assign a keybind to **Open Sound Wheel** in the General tab. By default, the wheel stays open while you hold the keybind. You can instead enable toggle mode and optionally close the wheel after playing a sound.
 
-The wheel shows six alphabetically sorted sounds per page. Change pages with the mouse wheel, the left and right arrow keys, or the clickable page arrows. Hover over a sound and left-click it to start or stop it. Indicators show which sounds are currently playing or set to loop, and you can keep walking, jumping, sneaking, and sprinting while the wheel is open.
+The wheel shows up to six alphabetically sorted favorite sounds per page. Change pages with the mouse wheel, the left and right arrow keys, or the clickable page arrows. Hover over a sound and left-click it to start or stop it. Indicators show which sounds are currently playing or set to loop, and you can keep walking, jumping, sneaking, and sprinting while the wheel is open.
 
 ![Sound Wheel](https://cdn.modrinth.com/data/cached_images/29fc7790d6455f699ab0c9c847b8192558280507.png)
 
@@ -64,6 +66,7 @@ Open the custom Minecraft-style config screen with `O` by default. You can chang
 The **General** tab contains the global options and keybinds. Its persistent, collapsible sections let you:
 
 - Bind **Stop all currently playing sounds**
+- Set the global sound amplifier applied to every sound
 - Allow sounds to play while your microphone is muted
 - Show or hide the currently playing sounds HUD
 - Open the sound folder or reload its files
@@ -73,11 +76,12 @@ The **General** tab contains the global options and keybinds. Its persistent, co
 
 ### Sound Settings
 
-The **Sound Settings** tab lists all `.mp3` files detected in your `sounds` folder. Search by name, sort from A-Z or Z-A, and filter sounds by whether they have a keybind or use looping.
+The **Sound Settings** tab lists all `.mp3` files detected in your `sounds` folder. Search by name, sort from A-Z or Z-A, and filter sounds by favorite status, keybind, or looping.
 
 Each sound can be customized individually:
 
 - Keybind (multiple keys supported)
+- Favorite star for inclusion in the sound wheel
 - Loop on or off
 - Amplifier (the volume sent to other players)
 

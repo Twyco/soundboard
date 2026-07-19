@@ -70,6 +70,7 @@ public final class SoundWheelScreen extends Screen {
         }
 
         List<Sound> sortedSounds = SoundManager.getAllSounds().stream()
+                .filter(Sound::isFavorite)
                 .sorted(Comparator.comparing(Sound::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
         client.gui.setScreen(new SoundWheelScreen(
@@ -189,9 +190,12 @@ public final class SoundWheelScreen extends Screen {
                 titleY + 5,
                 SoundboardUi.TEXT_PRIMARY
         );
+        Component centerText = sounds.isEmpty()
+                ? Component.translatable("gui.soundboard.wheel.no_favorites")
+                : Component.translatable("gui.soundboard.wheel.page", page + 1, getPageCount());
         graphics.centeredText(
                 font,
-                Component.translatable("gui.soundboard.wheel.page", page + 1, getPageCount()),
+                centerText,
                 centerX,
                 centerY - font.lineHeight / 2,
                 SoundboardUi.TEXT_PRIMARY
