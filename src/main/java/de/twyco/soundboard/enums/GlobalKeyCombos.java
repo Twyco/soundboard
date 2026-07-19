@@ -2,6 +2,7 @@ package de.twyco.soundboard.enums;
 
 public enum GlobalKeyCombos {
 
+    SOUND_WHEEL("soundboard.sounds.open_wheel", "key.soundboard.sound_wheel"),
     SOUND_STOP_ALL("soundboard.sounds.stop_all", "key.soundboard.stop_all");
 
     private final String id;

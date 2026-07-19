@@ -6,16 +6,21 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
+def modReleaseType = providers.gradleProperty("mod_release_type").getOrElse("").trim()
+if (!(modReleaseType in ["", "alpha", "beta"])) {
+	throw new GradleException("mod_release_type must be empty, alpha, or beta")
+}
+def modReleaseSuffix = modReleaseType ? "-${modReleaseType}" : ""
+
 base {
-	archivesName = "fabric-${project.mod_version}+${project.minecraft_version}"
+	archivesName = "fabric-${project.mod_version}+${project.minecraft_version}${modReleaseSuffix}"
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+	archiveVersion = ""
 }
 
 repositories {
-	maven { url = "https://maven.shedaniel.me/" }
-	maven {
-		name = "Terraformers"
-		url = "https://maven.terraformersmc.com/"
-	}
 	maven { url = 'https://maven.maxhenkel.de/repository/public' }
 	maven {
 		name = "Modrinth"
@@ -31,8 +36,7 @@ dependencies {
 
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
-	implementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+	implementation("maven.modrinth:modmenu:${project.modmenu_version}")
 
 	implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 	runtimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_version}"
