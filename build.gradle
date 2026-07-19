@@ -21,10 +21,6 @@ tasks.withType(AbstractArchiveTask).configureEach {
 }
 
 repositories {
-	maven {
-		name = "Terraformers"
-		url = "https://maven.terraformersmc.com/"
-	}
 	maven { url = 'https://maven.maxhenkel.de/repository/public' }
 	maven {
 		name = "Modrinth"
@@ -41,7 +37,7 @@ dependencies {
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+	modImplementation("maven.modrinth:modmenu:${project.modmenu_version}")
 
 	implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 	modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_version}"
