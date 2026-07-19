@@ -53,6 +53,7 @@ fixed order. It also defines `MOD_ID` and the shared SLF4J logger.
 - `ConfigDraft` separates unapplied UI values from active runtime configuration.
 - `widget.SoundboardConfigList` renders global and per-sound settings as a
   scrollable responsive list.
+- `widget.FavoriteButton` renders the interactive empty or filled favorite star.
 - `widget.KeyComboButton` owns combo recording state and its change callback.
 - `widget.AmplifierSlider` maps 0 through 300 percent to a Minecraft slider.
 
@@ -64,7 +65,7 @@ circle and mouse-wheel drawing, and Vanilla page-arrow sprites.
 
 ### `gui.soundwheel`
 
-`SoundWheelScreen` renders up to six alphabetically sorted sounds per page. It
+`SoundWheelScreen` renders up to six alphabetically sorted favorite sounds per page. It
 owns mouse selection, paging, click playback, movement forwarding, and playing or
 loop indicators. Releasing the opening combo closes only the screen.
 
@@ -116,8 +117,8 @@ screen after the external sound folder closes.
 
 - `SoundManager` scans the sound folder, links files to config, and delegates
   playback to Simple Voice Chat.
-- `Sound` is the runtime model containing ID, path, amplification, loop, and key
-  combo.
+- `Sound` is the runtime model containing ID, path, amplification, favorite
+  status, loop, and key combo.
 
 ## Resources
 

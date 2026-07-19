@@ -15,6 +15,7 @@ public final class ConfigDraft {
     private boolean showPlayingSoundsHud;
     private boolean toggleSoundWheel;
     private boolean closeSoundWheelOnPlay;
+    private int soundAmplifier;
     private boolean generalCategoryExpanded;
     private boolean soundWheelCategoryExpanded;
     private final Map<String, Set<Integer>> globalKeyCombos = new LinkedHashMap<>();
@@ -29,6 +30,7 @@ public final class ConfigDraft {
         draft.showPlayingSoundsHud = config.globalState.showPlayingSoundsHud;
         draft.toggleSoundWheel = config.globalState.toggleSoundWheel;
         draft.closeSoundWheelOnPlay = config.globalState.closeSoundWheelOnPlay;
+        draft.soundAmplifier = config.globalState.getSoundAmplifier();
         draft.generalCategoryExpanded = config.globalState.generalCategoryExpanded == null
                 || config.globalState.generalCategoryExpanded;
         draft.soundWheelCategoryExpanded = config.globalState.soundWheelCategoryExpanded == null
@@ -48,6 +50,7 @@ public final class ConfigDraft {
         config.globalState.showPlayingSoundsHud = showPlayingSoundsHud;
         config.globalState.toggleSoundWheel = toggleSoundWheel;
         config.globalState.closeSoundWheelOnPlay = closeSoundWheelOnPlay;
+        config.globalState.setSoundAmplifier(soundAmplifier);
         config.globalState.generalCategoryExpanded = generalCategoryExpanded;
         config.globalState.soundWheelCategoryExpanded = soundWheelCategoryExpanded;
 
@@ -92,6 +95,14 @@ public final class ConfigDraft {
 
     public void setCloseSoundWheelOnPlay(boolean closeSoundWheelOnPlay) {
         this.closeSoundWheelOnPlay = closeSoundWheelOnPlay;
+    }
+
+    public int getSoundAmplifier() {
+        return soundAmplifier;
+    }
+
+    public void setSoundAmplifier(int soundAmplifier) {
+        this.soundAmplifier = Math.max(0, Math.min(soundAmplifier, 300));
     }
 
     public boolean isGeneralCategoryExpanded() {
@@ -140,21 +151,24 @@ public final class ConfigDraft {
 
         private int amplifier;
         private boolean loop;
+        private boolean favorite;
         private Set<Integer> keyCombo;
 
-        private SoundDraft(int amplifier, boolean loop, Set<Integer> keyCombo) {
+        private SoundDraft(int amplifier, boolean loop, boolean favorite, Set<Integer> keyCombo) {
             this.amplifier = Math.max(0, Math.min(amplifier, 300));
             this.loop = loop;
+            this.favorite = favorite;
             this.keyCombo = copyKeyCodes(keyCombo);
         }
 
         static SoundDraft from(SoundEntry entry) {
-            return new SoundDraft(entry.amplifier, entry.loop, entry.keyCombo);
+            return new SoundDraft(entry.amplifier, entry.loop, entry.favorite, entry.keyCombo);
         }
 
         void applyTo(SoundEntry entry) {
             entry.amplifier = amplifier;
             entry.loop = loop;
+            entry.favorite = favorite;
             entry.keyCombo = copyKeyCodes(keyCombo);
         }
 
@@ -172,6 +186,14 @@ public final class ConfigDraft {
 
         public void setLoop(boolean loop) {
             this.loop = loop;
+        }
+
+        public boolean isFavorite() {
+            return favorite;
+        }
+
+        public void setFavorite(boolean favorite) {
+            this.favorite = favorite;
         }
 
         public KeyCombo getKeyCombo(String soundId) {
