@@ -3,8 +3,8 @@ package de.twyco.soundboard.util.keybinding;
 import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -87,11 +87,8 @@ public class KeyComboManager {
         }
     }
 
-    public static boolean handleRawKeyEvent(int action, KeyInput input) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if(client == null) {
-            return false;
-        }
+    public static boolean handleRawKeyEvent(int action, KeyEvent input) {
+        Minecraft client = Minecraft.getInstance();
         if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE && action != GLFW.GLFW_REPEAT) {
             return false;
         }
@@ -101,7 +98,7 @@ public class KeyComboManager {
             return false;
         }
 
-        if(client.currentScreen != null) {
+        if(client.screen != null) {
             for(KeyComboState state : comboStates) {
                 state.pressed = false;
             }
