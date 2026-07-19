@@ -1,39 +1,42 @@
-# Soundboard-Dokumentation
+# Soundboard documentation
 
-Diese Dokumentation beschreibt den aktuellen Stand des Fabric-Mods **Simple Voice
-Chat Soundboard**. Der Mod ist eine reine Client-Erweiterung fuer Minecraft und
-spielt benutzerdefinierte Sounds ueber die API von Simple Voice Chat ab.
+This documentation describes the current state of **Simple Voice Chat
+Soundboard**, a client-side Fabric mod that plays custom sounds through the
+Simple Voice Chat API.
 
-## Dokumente
+## Documents
 
-- [Projektstruktur](project-structure.md): Verzeichnisse, Pakete und Zustaendigkeiten
-- [Architektur](architecture.md): Initialisierung, Audiofluss, Eingaben und GUI
-- [Konfiguration](configuration.md): Laufzeitdateien, JSON-Schema und Bedienverhalten
-- [Entwicklung](development.md): Build, Abhaengigkeiten und Projektkonventionen
+- [Project structure](project-structure.md): directories, packages, and ownership
+- [Architecture](architecture.md): initialization, audio flow, input, and GUI
+- [Configuration](configuration.md): runtime files, JSON schema, and behavior
+- [Development](development.md): builds, dependencies, and project conventions
+- [Changelog](changelog/README.md): release-note policy and published releases
 
-## Festgelegter Projektumfang
+## Project scope
 
-- **Plattform:** Fabric, clientseitig
-- **Voice-Chat-Integration:** Simple Voice Chat ist eine feste Voraussetzung.
-- **Aktive Minecraft-Versionen:** 26.2 und 26.1.x werden in getrennten Branches
-  gepflegt.
-- **Primaerer Entwicklungsbranch:** `26.2` (gleichzeitig der Default-Branch des
-  Repositorys)
-- **Audioformate:** Derzeit wird ausschliesslich MP3 geladen. Weitere Formate sind
-  eine spaetere Erweiterung.
-- **Wiedergabe:** Mehrere verschiedene Sounds koennen gleichzeitig laufen. Ein
-  erneuter Druck auf die Tastenkombination eines laufenden Sounds stoppt diesen.
-- **Eingaben:** Ausgeloeste Sound-Tastenkombinationen konsumieren das zugehoerige
-  Minecraft-Tastaturereignis.
-- **Qualitaetssicherung:** Eine GitHub-Actions-Builddatei ist vorhanden. Eigene
-  automatisierte Tests existieren derzeit nicht.
+- **Platform:** Fabric, client-side only
+- **Voice chat integration:** Simple Voice Chat is required.
+- **Maintained Minecraft versions:** 26.2, 26.1.x, and 1.21.11 are maintained
+  on separate branches.
+- **Primary development branch:** `26.2`
+- **Audio formats:** Only MP3 files are supported. More formats may follow later.
+- **Playback:** Multiple sounds may play simultaneously. Triggering a running
+  sound again stops that sound.
+- **Sound wheel:** Holding a configurable global key combo opens a radial picker
+  with six alphabetically sorted sounds per page. Primary click starts or stops
+  sounds, and playing and looping sounds are marked in the wheel. Player movement
+  remains available while the wheel is open.
+- **Input:** Triggered sound combos consume their matching Minecraft keyboard
+  event.
+- **Quality assurance:** There are no project-specific automated tests. Changes
+  are validated with Gradle builds and targeted in-game testing.
 
-## Begriffe
+## Terms
 
-| Begriff | Bedeutung |
+| Term | Meaning |
 | --- | --- |
-| Key Binding | Normale, von Minecraft verwaltete einzelne Tastenbelegung |
-| Key Combo | Mod-eigene Kombination aus einer oder mehreren GLFW-Tasten |
-| Sound Entry | Persistierte Einstellungen fuer genau eine Audiodatei |
-| Playing Sound | Dekodierte PCM-Daten mit aktueller Abspielposition |
-| Merge Event | Simple-Voice-Chat-Ereignis, in das der Mod Audiobloecke mischt |
+| Key Binding | A normal single-key binding managed by Minecraft |
+| Key Combo | A mod-defined combination of one or more GLFW keys |
+| Sound Entry | Persisted settings for one audio file |
+| Playing Sound | Decoded PCM data and its current playback position |
+| Merge Event | Simple Voice Chat event into which the mod mixes audio blocks |

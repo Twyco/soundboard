@@ -1,125 +1,130 @@
-# Projektstruktur
+# Project structure
 
-## Wurzelverzeichnis
+## Repository root
 
 ```text
 .
 |-- .github/
-|   |-- ISSUE_TEMPLATE/       Vorlagen fuer Fehler und Feature-Wuensche
-|   `-- workflows/build.yml   Build und Artefakt-Upload fuer Push und PR
-|-- docs/                     Technische Projektdokumentation
-|-- gradle/wrapper/           Festgelegte Gradle-Wrapper-Version
-|-- src/main/java/            Java-Quellcode
-|-- src/main/resources/       Fabric-Metadaten, Mixin und Assets
-|-- build.gradle              Plugins, Abhaengigkeiten und Build-Konfiguration
-|-- gradle.properties         Minecraft-, Mod- und Dependency-Versionen
-|-- settings.gradle           Gradle-Plugin-Repositories
-|-- gradlew / gradlew.bat     Plattformabhaengige Gradle-Wrapper
-`-- LICENSE                   MIT-Lizenz
+|   |-- ISSUE_TEMPLATE/       Issue and feature-request templates
+|   `-- workflows/build.yml   Build workflow for pushes and pull requests
+|-- docs/                     Technical documentation and release notes
+|   `-- changelog/            Changelog policy and one file per mod version
+|-- gradle/wrapper/           Branch-specific Gradle wrapper
+|-- src/main/java/            Java source code
+|-- src/main/resources/       Fabric metadata, mixins, and assets
+|-- build.gradle              Plugins, dependencies, and build configuration
+|-- gradle.properties         Minecraft, mod, and dependency versions
+|-- settings.gradle           Gradle plugin repositories
+|-- gradlew / gradlew.bat     Platform-specific Gradle wrappers
+`-- LICENSE                   MIT license
 ```
 
-Generierte Verzeichnisse wie `.gradle/`, `build/`, `out/` und `run/` werden nicht
-versioniert.
+Generated directories such as `.gradle/`, `build/`, `out/`, and `run/` are not
+versioned.
 
-## Java-Pakete
+## Java packages
 
-Alle Klassen liegen unter `de.twyco.soundboard`.
+All classes are below `de.twyco.soundboard`.
 
-### Einstiegspunkt
+### Entrypoint
 
-`Soundboard` implementiert Fabrics `ModInitializer` und startet alle
-clientseitigen Dienste in einer festen Reihenfolge. `MOD_ID` und der gemeinsame
-SLF4J-Logger werden ebenfalls hier definiert.
+`Soundboard` implements Fabric's `ModInitializer` and starts client services in a
+fixed order. It also defines `MOD_ID` and the shared SLF4J logger.
 
 ### `client`
 
-- `GlobalKeybinds` registriert globale Aktionen. Das Konfigurationsmenue ist ein
-  Minecraft-Key-Binding; "alle Sounds stoppen" ist eine frei konfigurierbare
-  Key Combo.
-- `client.hud.HudService` bindet den Renderer vor dem Vanilla-Chat-HUD ein.
-- `client.hud.SoundboardHudRenderer` zeigt aktive Sounds rechts unten an.
+- `GlobalKeybinds` registers global actions. Opening config is a Minecraft key
+  binding; opening the wheel and stopping sounds are configurable key combos.
+- `client.hud.HudService` registers the renderer before Vanilla chat.
+- `client.hud.SoundboardHudRenderer` displays active sounds in the bottom-right.
 
 ### `enums`
 
-- `GlobalKeyBindings` ist der Katalog normaler Minecraft-Tastenbelegungen.
-- `GlobalKeyCombos` ist der Katalog der Mod-eigenen Tastenkombinationen.
-- `KeyComboEventType` unterscheidet `PRESS`, `HOLD` und `RELEASE`.
+- `GlobalKeyBindings` lists normal Minecraft key bindings.
+- `GlobalKeyCombos` lists custom mod key combos.
+- `KeyComboEventType` distinguishes `PRESS`, `HOLD`, and `RELEASE`.
 
 ### `gui.config`
 
-- `ConfigScreenFactory` baut den Cloth-Config-Bildschirm und speichert
-  Aenderungen.
-- `categories.GeneralCategoryFactory` baut globale Optionen und Aktionen.
-- `categories.SoundsCategoryFactory` fuegt pro geladener Datei eine Unterkategorie
-  hinzu.
-- `subcategories.SoundSubCategoryFactory` baut Key Combo, Loop und Verstaerkung
-  eines Sounds.
-- `entries.ActionButtonEntry` kapselt eine einzelne Aktionsschaltflaeche.
-- `entries.ActionButtonGridEntry` ordnet mehrere Aktionsschaltflaechen in einer
-  Zeile an.
-- `entries.KeyComboEntry` zeichnet die Eingabekomponente und zeichnet neue
-  Tastenkombinationen auf.
+- `ConfigScreenFactory` creates the custom config screen and forwards reloads to
+  an open instance.
+- `SoundboardConfigScreen` owns tabs, footer actions, the local draft, and combo
+  recording.
+- `ConfigDraft` separates unapplied UI values from active runtime configuration.
+- `widget.SoundboardConfigList` renders global and per-sound settings as a
+  scrollable responsive list.
+- `widget.KeyComboButton` owns combo recording state and its change callback.
+- `widget.AmplifierSlider` maps 0 through 300 percent to a Minecraft slider.
+
+### `gui.component`
+
+`SoundboardUi` contains the shared Minecraft-inspired palette and drawing helpers
+for the config screen and wheel. It owns panel and row rendering, text clipping,
+circle and mouse-wheel drawing, and Vanilla page-arrow sprites.
+
+### `gui.soundwheel`
+
+`SoundWheelScreen` renders up to six alphabetically sorted sounds per page. It
+owns mouse selection, paging, click playback, movement forwarding, and playing or
+loop indicators. Releasing the opening combo closes only the screen.
 
 ### `interfaces`
 
-Die funktionalen Interfaces `KeyBindingCallback`, `KeyComboCallback` und
-`VoicechatListener` geben den Callback-Signaturen sprechende Typen. Die
-Simple-Voice-Chat-Unterpakete verfeinern `VoicechatListener` fuer Client- und
-Server-Events. Der Server-Typ wird aktuell nicht verwendet, da der Mod
-clientseitig ist.
+`KeyBindingCallback`, `KeyComboCallback`, and `VoicechatListener` provide named
+functional callback types. Voice-chat subpackages specialize listeners for
+client and server events. The server listener is currently unused because the
+mod is client-side.
 
 ### `mixin`
 
-`KeyboardMixin` injiziert am Anfang von `KeyboardHandler.keyPress`. Es reicht das
-rohe GLFW-Ereignis an den `KeyComboManager` weiter und bricht die weitere
-Minecraft-Verarbeitung ab, sobald eine Combo ein Ereignis ausgeloest hat.
+`KeyboardMixin` injects at the start of `KeyboardHandler.keyPress`, forwards the
+raw GLFW event to `KeyComboManager`, and cancels further Minecraft processing
+when a combo triggers.
 
 ### `modImplementations`
 
-- `modMenu.ModMenuApi` stellt Mod Menu die `ConfigScreenFactory` bereit.
-- `simpleVoicechatApi.SimpleVoicechatApi` ist das Voicechat-Plugin, registriert
-  Events und haelt Voicechat-API, Lautstaerkekategorie und lokalen Audiokanal.
-- `simpleVoicechatApi.SimpleVoicechatService` dekodiert, verwaltet und mischt
-  Sounds.
-- `listener.ClientVoicechatConnectionListener` richtet beim Verbinden die
-  clientseitigen Voicechat-Objekte ein und raeumt sie beim Trennen auf.
-- `listener.MergeClientSoundListener` delegiert Audiobloecke an den Service.
-- `util.PlayingSound` ist der veraenderliche Wiedergabezustand eines Sounds.
+- `modMenu.ModMenuApi` exposes `ConfigScreenFactory` to Mod Menu.
+- `simpleVoicechatApi.SimpleVoicechatApi` is the voice-chat plugin and registers
+  events.
+- `simpleVoicechatApi.SimpleVoicechatService` decodes, tracks, and mixes sounds.
+- `listener.ClientVoicechatConnectionListener` creates and clears client
+  voice-chat state on connect and disconnect.
+- `listener.MergeClientSoundListener` delegates audio blocks to the service.
+- `util.PlayingSound` stores mutable playback state.
 
 ### `util.client`
 
-`FocusWatcher` erkennt, wenn Minecraft nach einem Fokusverlust wieder aktiv wird.
-`FocusActionScheduler` fuehrt dann vorgemerkte Aktionen aus. Dies wird verwendet,
-um nach dem Schliessen des extern geoeffneten Sound-Ordners Konfiguration,
-Dateiliste und Config-Screen neu zu laden.
+`FocusWatcher` detects when Minecraft regains focus. `FocusActionScheduler` then
+runs pending actions, such as reloading config, sound files, and the open config
+screen after the external sound folder closes.
 
 ### `util.config`
 
-- `SoundboardConfig` liest und schreibt JSON mit Gson.
-- `SoundboardConfigData` ist das Wurzelobjekt der Konfiguration.
-- `entries.GlobalStateEntry` enthaelt globale Laufzeitoptionen.
-- `entries.SoundEntry` enthaelt persistierte Einstellungen pro Audiodatei.
+- `SoundboardConfig` reads and writes JSON with Gson.
+- `SoundboardConfigData` is the root config object.
+- `entries.GlobalStateEntry` contains global runtime options.
+- `entries.SoundEntry` contains persisted settings per file.
 
 ### `util.keybinding`
 
-- `KeyBindingManager` verarbeitet normale Minecraft-`KeyMapping`-Objekte am Ende
-  eines Client-Ticks.
-- `KeyCombo` repraesentiert ID und Tastenmenge einer Kombination.
-- `KeyComboManager` verwaltet Combo-Zustaende und Callbacks.
-- `KeyHelper` fragt den aktuellen Tastenzustand am Minecraft-Fenster ab.
+- `KeyBindingManager` processes Minecraft `KeyMapping` objects at tick end.
+- `KeyCombo` represents a combo ID and key set.
+- `KeyComboManager` tracks combo state and callbacks.
+- `KeyHelper` reads current key state from the Minecraft window.
 
 ### `util.sound`
 
-- `SoundManager` scannt den Sound-Ordner, verknuepft Dateien mit der
-  Konfiguration und delegiert Start und Stopp an Simple Voice Chat.
-- `Sound` ist das Laufzeitmodell einer Datei mit ID, Pfad, Verstaerkung, Loop und
-  Key Combo.
+- `SoundManager` scans the sound folder, links files to config, and delegates
+  playback to Simple Voice Chat.
+- `Sound` is the runtime model containing ID, path, amplification, loop, and key
+  combo.
 
-## Ressourcen
+## Resources
 
-| Datei | Aufgabe |
+| File | Responsibility |
 | --- | --- |
-| `fabric.mod.json` | Mod-Metadaten, Entrypoints und zwingende Abhaengigkeiten |
-| `soundboard.mixins.json` | Registrierung von `KeyboardMixin`, Java-Level 25 |
-| `assets/soundboard/lang/en_us.json` | Englische Texte und Translation Keys |
-| `assets/soundboard/icon.png` | Mod-Icon |
+| `fabric.mod.json` | Mod metadata, entrypoints, and required dependencies |
+| `soundboard.mixins.json` | Mixin registration and branch-specific Java level |
+| `assets/soundboard/lang/en_us.json` | Base English UI text and translation keys |
+| `assets/soundboard/lang/de_de.json` | German translation of the same UI keys |
+| `assets/soundboard/icon.png` | Mod icon |
