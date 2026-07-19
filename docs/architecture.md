@@ -84,7 +84,7 @@ changes do not retroactively affect an already running instance.
 20 ms at 48 kHz. For each active sound, the service:
 
 1. reads samples from the current position,
-2. multiplies each sample by `amplifier / 100`,
+2. multiplies each sample by `(soundAmplifier / 100) * (amplifier / 100)`,
 3. adds it to the other active sounds,
 4. clamps the result to the Java `short` range,
 5. advances the playback position, and
@@ -135,11 +135,12 @@ remain blocked.
 The wheel and config screen share the Minecraft-inspired palette and rendering
 helpers in `SoundboardUi`. Wheel page controls use Vanilla Minecraft sprites.
 
-Sounds are sorted by file name without case sensitivity and split into pages of
-six. Sectors start at the top and continue clockwise. The mouse wheel and left or
-right arrow keys cycle through pages. Clickable page arrows appear beside the
-wheel when a page exists in that direction. A mouse-wheel icon indicates scroll
-navigation when multiple pages exist.
+Favorite sounds are sorted by file name without case sensitivity and split into
+pages of six. Non-favorite sounds do not appear in the wheel. Sectors start at
+the top and continue clockwise. The mouse wheel and left or right arrow keys
+cycle through pages. Clickable page arrows appear beside the wheel when a page
+exists in that direction. A mouse-wheel icon indicates scroll navigation when
+multiple pages exist.
 
 The mouse angle relative to the screen center selects a sector. The inner dead
 zone has no selection. Primary click starts or stops the selected sound. By
@@ -156,10 +157,12 @@ The custom Vanilla-style screen has two main tabs:
 
 - **General:** collapsible General and Sound Wheel Settings sections. Their
   expansion state is persisted with the other global options. General contains
-  the stop combo, play-while-muted behavior, HUD visibility, and folder actions;
-  Sound Wheel Settings contains the wheel combo and wheel behavior.
+  the stop combo, global amplifier, play-while-muted behavior, HUD visibility,
+  and folder actions; Sound Wheel Settings contains the wheel combo and wheel
+  behavior.
 - **Sound Settings:** search, ascending or descending name sorting, bound and
-  loop filters, and per-file combo, loop, and amplification settings
+  favorite and loop filters, and per-file combo, favorite, loop, and
+  amplification settings
 
 Widgets edit a local `ConfigDraft`. `Apply` writes the draft to the active config,
 saves JSON, and reloads sound and global combo state. `Done` performs the same

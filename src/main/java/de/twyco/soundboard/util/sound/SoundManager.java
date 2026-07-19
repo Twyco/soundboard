@@ -95,6 +95,7 @@ public class SoundManager {
 
             sound.setAmplifier(entry.amplifier);
             sound.setLoop(entry.loop);
+            sound.setFavorite(entry.favorite);
 
             KeyCombo combo;
 
@@ -130,7 +131,13 @@ public class SoundManager {
     }
 
     public static void playSound(@NotNull Sound sound) {
-        LOG.debug("[SoundManager/playSound] Start playing sound [name={}, amplifier={}, loop={}]", sound.getName(), sound.getAmplifier(), sound.isLoop());
+        LOG.debug(
+                "[SoundManager/playSound] Start playing sound [name={}, amplifier={}, globalAmplifier={}, loop={}]",
+                sound.getName(),
+                sound.getAmplifier(),
+                SoundboardConfig.get().globalState.getSoundAmplifier(),
+                sound.isLoop()
+        );
         if(SimpleVoicechatApi.isAvailable()) {
             SimpleVoicechatService.playSound(sound);
         } else {

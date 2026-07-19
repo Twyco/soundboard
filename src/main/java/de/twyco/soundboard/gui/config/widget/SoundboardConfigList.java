@@ -4,6 +4,7 @@ import de.twyco.soundboard.enums.GlobalKeyCombos;
 import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.gui.config.ConfigDraft;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen;
+import de.twyco.soundboard.gui.config.SoundboardConfigScreen.FavoriteFilter;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen.KeybindFilter;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen.LoopFilter;
 import de.twyco.soundboard.gui.config.SoundboardConfigScreen.SoundSort;
@@ -16,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -65,6 +67,17 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         ), DEFAULT_ROW_HEIGHT);
         if (draft.isGeneralCategoryExpanded()) {
             addKeyComboRow(draft, GlobalKeyCombos.SOUND_STOP_ALL, contentWidth);
+
+            addConfigRow(
+                    new AmplifierRow(
+                            font,
+                            Component.translatable("gui.soundboard.config.state.global.sound_amplifier"),
+                            Component.translatable("gui.soundboard.config.state.global.sound_amplifier.description"),
+                            draft.getSoundAmplifier(),
+                            draft::setSoundAmplifier
+                    ),
+                    contentWidth < 388 ? 56 : DEFAULT_ROW_HEIGHT
+            );
 
             CheckboxRow playWhileMuted = new CheckboxRow(
                     font,
@@ -149,6 +162,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             Collection<Sound> sounds,
             String searchQuery,
             SoundSort sort,
+            FavoriteFilter favoriteFilter,
             KeybindFilter keybindFilter,
             LoopFilter loopFilter
     ) {
@@ -167,6 +181,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                 .map(sound -> new SoundRowData(sound, draft.getSound(sound, config)))
                 .filter(data -> normalizedSearch.isEmpty()
                         || data.sound().getName().toLowerCase(Locale.ROOT).contains(normalizedSearch))
+                .filter(data -> matchesFavoriteFilter(data, favoriteFilter))
                 .filter(data -> matchesKeybindFilter(data, keybindFilter))
                 .filter(data -> matchesLoopFilter(data, loopFilter))
                 .sorted(comparator)
@@ -187,15 +202,24 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             return;
         }
 
-        int rowHeight = contentWidth >= 560
+        int layoutWidth = Math.max(1, contentWidth - 8);
+        int rowHeight = layoutWidth >= 560
                 ? DEFAULT_ROW_HEIGHT
-                : contentWidth >= 320 ? 56 : contentWidth >= 140 ? 80 : 104;
+                : layoutWidth >= 320 ? 56 : layoutWidth >= 140 ? 80 : 104;
         for (SoundRowData data : sortedSounds) {
             addConfigRow(
                     new SoundRow(font, data.sound(), data.draft(), screen),
                     rowHeight
             );
         }
+    }
+
+    private static boolean matchesFavoriteFilter(SoundRowData data, FavoriteFilter filter) {
+        return switch (filter) {
+            case ALL -> true;
+            case FAVORITES -> data.draft().isFavorite();
+            case NOT_FAVORITES -> !data.draft().isFavorite();
+        };
     }
 
     private static boolean matchesKeybindFilter(SoundRowData data, KeybindFilter filter) {
@@ -505,6 +529,56 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
     }
 
+    private static final class AmplifierRow extends ConfigRow {
+
+        private final Font font;
+        private final Component label;
+        private final AmplifierSlider slider;
+
+        private AmplifierRow(
+                Font font,
+                Component label,
+                Component tooltip,
+                int amplifier,
+                IntConsumer onChange
+        ) {
+            this.font = font;
+            this.label = label;
+            slider = new AmplifierSlider(amplifier, onChange);
+            slider.setTooltip(Tooltip.create(tooltip));
+            widgets.add(slider);
+        }
+
+        @Override
+        protected void extractRowContent(
+                GuiGraphicsExtractor graphics,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta
+        ) {
+            int x = getPaddedX();
+            int y = getPaddedY();
+            int width = getPaddedWidth();
+
+            if (width >= 380) {
+                int sliderWidth = Math.min(180, Math.max(110, width / 3));
+                setBounds(slider, x + width - sliderWidth, y, sliderWidth, 20);
+                graphics.text(
+                        font,
+                        SoundboardUi.fitText(font, label.getString(), width - sliderWidth - 6),
+                        x,
+                        getPaddedYMiddle() - font.lineHeight / 2,
+                        SoundboardUi.TEXT_PRIMARY
+                );
+            } else {
+                graphics.text(font, label, x, y, SoundboardUi.TEXT_PRIMARY);
+                setBounds(slider, x, y + 18, width, 20);
+            }
+            extractWidgets(graphics, mouseX, mouseY, delta);
+        }
+    }
+
     private static final class ActionRow extends ConfigRow {
 
         private final Button openFolder;
@@ -588,6 +662,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         private final Font font;
         private final Sound sound;
         private final KeyComboButton keyComboButton;
+        private final FavoriteButton favoriteButton;
         private final Checkbox loopCheckbox;
         private final AmplifierSlider amplifierSlider;
 
@@ -613,6 +688,14 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
                             sound.getName()
                     )
             );
+            favoriteButton = new FavoriteButton(
+                    font,
+                    draft.isFavorite(),
+                    value -> {
+                        draft.setFavorite(value);
+                        screen.requestFavoriteFilterRefresh();
+                    }
+            );
             loopCheckbox = Checkbox.builder(
                             Component.translatable("gui.soundboard.config.sound.loop.short"),
                             font
@@ -629,6 +712,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             ));
 
             widgets.add(keyComboButton);
+            widgets.add(favoriteButton);
             widgets.add(loopCheckbox);
             widgets.add(amplifierSlider);
         }
@@ -658,18 +742,20 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private void extractWide(GuiGraphicsExtractor graphics, int x, int y, int width) {
-            int sliderWidth = 110;
+            int sliderWidth = 100;
             int sliderX = x + width - sliderWidth;
             int checkboxWidth = loopCheckbox.getWidth();
             int checkboxX = sliderX - GAP - checkboxWidth;
-            int comboWidth = 150;
+            int comboWidth = 140;
             int comboX = checkboxX - GAP - comboWidth;
-            int textWidth = Math.max(0, comboX - GAP - x);
+            int nameX = x + FavoriteButton.SIZE + GAP;
+            int textWidth = Math.max(0, comboX - GAP - nameX);
 
+            setBounds(favoriteButton, x, y + 2, FavoriteButton.SIZE, FavoriteButton.SIZE);
             graphics.text(
                     font,
                     SoundboardUi.fitText(font, sound.getName(), textWidth),
-                    x,
+                    nameX,
                     getPaddedYMiddle() - font.lineHeight / 2,
                     SoundboardUi.TEXT_PRIMARY
             );
@@ -680,11 +766,13 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private void extractCompact(GuiGraphicsExtractor graphics, int x, int y, int width) {
+            int nameX = x + FavoriteButton.SIZE + GAP;
+            setBounds(favoriteButton, x, y, FavoriteButton.SIZE, FavoriteButton.SIZE);
             graphics.text(
                     font,
-                    SoundboardUi.fitText(font, sound.getName(), width),
-                    x,
-                    y,
+                    SoundboardUi.fitText(font, sound.getName(), width - FavoriteButton.SIZE - GAP),
+                    nameX,
+                    y + (FavoriteButton.SIZE - font.lineHeight) / 2,
                     SoundboardUi.TEXT_PRIMARY
             );
 
@@ -702,11 +790,13 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private void extractNarrow(GuiGraphicsExtractor graphics, int x, int y, int width) {
+            int nameX = x + FavoriteButton.SIZE + GAP;
+            setBounds(favoriteButton, x, y, FavoriteButton.SIZE, FavoriteButton.SIZE);
             graphics.text(
                     font,
-                    SoundboardUi.fitText(font, sound.getName(), width),
-                    x,
-                    y,
+                    SoundboardUi.fitText(font, sound.getName(), width - FavoriteButton.SIZE - GAP),
+                    nameX,
+                    y + (FavoriteButton.SIZE - font.lineHeight) / 2,
                     SoundboardUi.TEXT_PRIMARY
             );
             setBounds(keyComboButton, x, y + 18, width, 20);
@@ -725,11 +815,13 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
         }
 
         private void extractUltraNarrow(GuiGraphicsExtractor graphics, int x, int y, int width) {
+            int nameX = x + FavoriteButton.SIZE + GAP;
+            setBounds(favoriteButton, x, y, FavoriteButton.SIZE, FavoriteButton.SIZE);
             graphics.text(
                     font,
-                    SoundboardUi.fitText(font, sound.getName(), width),
-                    x,
-                    y,
+                    SoundboardUi.fitText(font, sound.getName(), width - FavoriteButton.SIZE - GAP),
+                    nameX,
+                    y + (FavoriteButton.SIZE - font.lineHeight) / 2,
                     SoundboardUi.TEXT_PRIMARY
             );
             setBounds(keyComboButton, x, y + 18, width, 20);
