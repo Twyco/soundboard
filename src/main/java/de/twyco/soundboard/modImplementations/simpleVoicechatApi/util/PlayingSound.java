@@ -11,12 +11,14 @@ public class PlayingSound {
     public final boolean loop;
     public final float gain;
 
-    public PlayingSound(Sound sound, short[] samples) {
+    public PlayingSound(Sound sound, short[] samples, int soundAmplifier) {
         this.soundId = sound.getId();
         this.displayName = sound.getName();
         this.samples = samples;
         this.loop = sound.isLoop();
-        this.gain = Math.max(0f, Math.min(sound.getAmplifier() / 100.0f, 3f));
+        float individualGain = Math.max(0f, Math.min(sound.getAmplifier() / 100.0f, 3f));
+        float globalGain = Math.max(0f, Math.min(soundAmplifier / 100.0f, 3f));
+        this.gain = individualGain * globalGain;
     }
 
     public boolean isFinished() {

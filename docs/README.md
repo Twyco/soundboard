@@ -23,9 +23,9 @@ Simple Voice Chat API.
 - **Playback:** Multiple sounds may play simultaneously. Triggering a running
   sound again stops that sound.
 - **Sound wheel:** Holding a configurable global key combo opens a radial picker
-  with six alphabetically sorted sounds per page. Primary click starts or stops
-  sounds, and playing and looping sounds are marked in the wheel. Player movement
-  remains available while the wheel is open.
+  with six alphabetically sorted favorite sounds per page. Primary click starts
+  or stops sounds, and playing and looping sounds are marked in the wheel. Player
+  movement remains available while the wheel is open.
 - **Input:** Triggered sound combos consume their matching Minecraft keyboard
   event.
 - **Quality assurance:** There are no project-specific automated tests. Changes

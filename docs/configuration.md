@@ -21,6 +21,7 @@ not part of the repository and is not scanned recursively.
     "showPlayingSoundsHud": true,
     "toggleSoundWheel": false,
     "closeSoundWheelOnPlay": false,
+    "soundAmplifier": 100,
     "generalCategoryExpanded": true,
     "soundWheelCategoryExpanded": true
   },
@@ -30,6 +31,7 @@ not part of the repository and is not scanned recursively.
     "example.mp3": {
       "amplifier": 100,
       "loop": false,
+      "favorite": false,
       "keyCombo": [341, 75]
     }
   },
@@ -53,11 +55,13 @@ semantic meaning because they are loaded as a set.
 | `showPlayingSoundsHud` | `true` | Display active sounds in the HUD |
 | `toggleSoundWheel` | `false` | Open and close the sound wheel by pressing its combo instead of holding it |
 | `closeSoundWheelOnPlay` | `false` | In toggle mode, close the sound wheel after starting or stopping a sound |
+| `soundAmplifier` | `100` | Global gain percentage multiplied with every sound's individual amplifier |
 | `generalCategoryExpanded` | `true` | Keep the General section expanded in the config screen |
 | `soundWheelCategoryExpanded` | `true` | Keep the Sound Wheel Settings section expanded in the config screen |
 
-Older configuration files do not contain the two expansion fields. Missing
-values are treated as `true` so updating the mod preserves the previous layout.
+Older configuration files do not contain the global amplifier or the two
+expansion fields. A missing global amplifier is treated as `100`, and missing
+expansion values are treated as `true`.
 
 ### Global sound defaults
 
@@ -77,10 +81,14 @@ Each map key is the exact file name including `.mp3`. Every entry contains:
 | --- | --- | --- |
 | `amplifier` | `0` to `300` | Gain in percent; 100 equals a factor of 1.0 |
 | `loop` | Boolean | Restart playback after reaching the end |
+| `favorite` | Boolean | Include the sound in the sound wheel |
 | `keyCombo` | Set of key codes | Combo that starts or stops the sound |
 
-The runtime `Sound` class also clamps amplification to 0 through 300. Entries for
-removed files remain in JSON and are ignored until that file exists again.
+The runtime `Sound` class also clamps amplification to 0 through 300. The global
+and individual percentages are multiplied: for example, 50 percent globally and
+50 percent on a sound produce 25 percent output. Missing `favorite` fields from
+older configurations default to `false`. Entries for removed files remain in
+JSON and are ignored until that file exists again.
 
 ### `globalKeyCombos`
 

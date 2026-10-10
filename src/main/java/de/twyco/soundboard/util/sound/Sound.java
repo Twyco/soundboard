@@ -13,6 +13,7 @@ public class Sound {
 
     private int amplifier = 100;
     private boolean loop = false;
+    private boolean favorite = false;
     @NotNull
     private KeyCombo keyCombo;
 
@@ -49,6 +50,14 @@ public class Sound {
 
     public void setLoop(boolean loop) {
         this.loop = loop;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
     public @NotNull KeyCombo getKeyCombo() {
