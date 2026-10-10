@@ -38,4 +38,5 @@ release file should make sense without the rest of the repository documentation.
 
 | Version | Status | Notes |
 | --- | --- | --- |
-| [0.3.0](0.3.0.md) | Draft | Custom config UI and sound wheel |
+| [0.3.1](0.3.1.md) | Draft | Global amplification and favorite sounds |
+| [0.3.0](0.3.0.md) | Released (2026-07-19) | Custom config UI and sound wheel |

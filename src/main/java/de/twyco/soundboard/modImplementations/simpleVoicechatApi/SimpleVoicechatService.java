@@ -56,7 +56,11 @@ public class SimpleVoicechatService {
                     return;
                 }
             }
-            activeSounds.add(new PlayingSound(sound, samples));
+            activeSounds.add(new PlayingSound(
+                    sound,
+                    samples,
+                    SoundboardConfig.get().globalState.getSoundAmplifier()
+            ));
             LOG.debug("[SimpleVoicechatService/playSound] Queued sound '{}' (active={})",
                     sound.getName(), activeSounds.size());
         }
