@@ -1,12 +1,12 @@
 package de.twyco.soundboard.util.keybinding;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -89,7 +89,7 @@ public class KeyComboManager {
 
     public static boolean handleRawKeyEvent(int action, KeyEvent input) {
         Minecraft client = Minecraft.getInstance();
-        if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE && action != GLFW.GLFW_REPEAT) {
+        if (action != InputConstants.PRESS && action != InputConstants.RELEASE && action != InputConstants.REPEAT) {
             return false;
         }
 

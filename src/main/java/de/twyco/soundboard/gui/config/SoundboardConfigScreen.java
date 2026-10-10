@@ -1,5 +1,6 @@
 package de.twyco.soundboard.gui.config;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.client.GlobalKeybinds;
 import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.gui.config.widget.SoundboardConfigList;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 public final class SoundboardConfigScreen extends Screen {
 
@@ -189,9 +189,9 @@ public final class SoundboardConfigScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (capturingButton != null) {
-            if (event.key() == GLFW.GLFW_KEY_BACKSPACE
-                    || event.key() == GLFW.GLFW_KEY_DELETE
-                    || event.key() == GLFW.GLFW_KEY_ESCAPE) {
+            if (event.key() == InputConstants.KEY_BACKSPACE
+                    || event.key() == InputConstants.KEY_DELETE
+                    || event.key() == InputConstants.KEY_ESCAPE) {
                 finishKeyComboCapture(KeyCombo.empty(capturingCombo.getId()));
                 return true;
             }

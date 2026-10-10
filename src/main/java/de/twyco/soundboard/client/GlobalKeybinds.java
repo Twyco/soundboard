@@ -17,7 +17,6 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,8 +48,8 @@ public class GlobalKeybinds {
         for (GlobalKeyBindings keybind : GlobalKeyBindings.values()) {
             KeyMapping keyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                     keybind.getTranslationKey(),
-                    InputConstants.Type.KEYSYM,
-                    GLFW.GLFW_KEY_O,
+                    InputConstants.Type.KEYBOARD,
+                    InputConstants.KEY_O,
                     CATEGORY
             ));
             KeyBindingManager.register(keyBinding, getKeyBindingAction(keybind));

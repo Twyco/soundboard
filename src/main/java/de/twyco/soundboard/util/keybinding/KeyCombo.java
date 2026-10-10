@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.enums.KeyComboEventType;
 import de.twyco.soundboard.interfaces.KeyComboCallback;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -63,7 +62,7 @@ public final class KeyCombo {
             if(!sb.isEmpty()) {
                 sb.append(" + ");
             }
-            InputConstants.Key key =InputConstants.Type.KEYSYM.getOrCreate(keyCode);
+            InputConstants.Key key =InputConstants.Type.KEYBOARD.getOrCreate(keyCode);
             String s = key.getName();
             if (!s.isBlank()) {
                 s = s.replace("key.keyboard.", "")
@@ -72,8 +71,11 @@ public final class KeyCombo {
                 sb.append(s.toUpperCase().replace(".", " "));
                 continue;
             }
-            String glfw = GLFW.glfwGetKeyName(keyCode, 0);
-            sb.append(glfw != null ? glfw.toUpperCase() : ("KEY_" + keyCode));
+            String keyName = InputConstants.Type.KEYBOARD
+                    .getOrCreate(keyCode)
+                    .getDisplayName()
+                    .getString();
+            sb.append(keyName.toUpperCase());
         }
         return sb.toString();
     }

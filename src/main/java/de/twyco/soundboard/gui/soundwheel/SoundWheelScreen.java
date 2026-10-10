@@ -19,7 +19,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 public final class SoundWheelScreen extends Screen {
 
@@ -225,11 +224,11 @@ public final class SoundWheelScreen extends Screen {
             onClose();
             return true;
         }
-        if (event.key() == GLFW.GLFW_KEY_LEFT) {
+        if (event.key() == InputConstants.KEY_LEFT) {
             changePage(-1);
             return true;
         }
-        if (event.key() == GLFW.GLFW_KEY_RIGHT) {
+        if (event.key() == InputConstants.KEY_RIGHT) {
             changePage(1);
             return true;
         }
@@ -257,7 +256,7 @@ public final class SoundWheelScreen extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return super.mouseClicked(event, doubleClick);
         }
 
@@ -337,11 +336,11 @@ public final class SoundWheelScreen extends Screen {
             return;
         }
         InputConstants.Key key = InputConstants.getKey(keyMapping.saveString());
-        if (key.getType() != InputConstants.Type.KEYSYM) {
+        if (key.getType() != InputConstants.Type.KEYBOARD) {
             return;
         }
 
-        boolean pressed = InputConstants.isKeyDown(minecraft.getWindow(), key.getValue());
+        boolean pressed = InputConstants.isKeyDown(key.getValue());
         setForwardedMovementKey(keyMapping, pressed);
     }
 

@@ -159,7 +159,6 @@ public class SoundManager {
         }
 
         try {
-            Util.getPlatform().openFile(soundsDir.toFile());
             FocusActionScheduler.addActionNextFocus(() -> {
                 SoundboardConfig.load();
                 SoundManager.reload();

@@ -1,5 +1,6 @@
 package de.twyco.soundboard.gui.config.widget;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import de.twyco.soundboard.enums.GlobalKeyCombos;
 import de.twyco.soundboard.gui.component.SoundboardUi;
 import de.twyco.soundboard.gui.config.ConfigDraft;
@@ -30,7 +31,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+
 
 public final class SoundboardConfigList extends ContainerObjectSelectionList<SoundboardConfigList.ConfigRow> {
 
@@ -383,7 +384,7 @@ public final class SoundboardConfigList extends ContainerObjectSelectionList<Sou
             if (super.mouseClicked(event, doubleClick)) {
                 return true;
             }
-            if (event.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT
+            if (event.button() != InputConstants.MOUSE_BUTTON_LEFT
                     || event.x() < getPaddedX() + BUTTON_SIZE + LINE_GAP
                     || event.x() >= getPaddedX() + getPaddedWidth()
                     || event.y() < getY()
