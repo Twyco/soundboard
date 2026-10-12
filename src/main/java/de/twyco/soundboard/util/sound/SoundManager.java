@@ -1,5 +1,6 @@
 package de.twyco.soundboard.util.sound;
 
+import com.mojang.blaze3d.Blaze3D;
 import de.twyco.soundboard.Soundboard;
 import de.twyco.soundboard.gui.config.ConfigScreenFactory;
 import de.twyco.soundboard.modImplementations.simpleVoicechatApi.SimpleVoicechatApi;
@@ -10,7 +11,6 @@ import de.twyco.soundboard.util.config.SoundboardConfigData;
 import de.twyco.soundboard.util.config.entries.SoundEntry;
 import de.twyco.soundboard.util.keybinding.KeyCombo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -159,12 +159,13 @@ public class SoundManager {
         }
 
         try {
+            Blaze3D.openPath(soundsDir);
             FocusActionScheduler.addActionNextFocus(() -> {
                 SoundboardConfig.load();
                 SoundManager.reload();
                 ConfigScreenFactory.reloadConfigScreen();
             });
-            LOG.debug("[SoundManager/openSoundsFolder] Opened sounds directory '{}'", soundsDir.toAbsolutePath());
+            LOG.debug("[SoundManager/openSoundsFolder] Opening sounds directory '{}'", soundsDir.toAbsolutePath());
         } catch (Exception e) {
             LOG.error("[SoundManager/openSoundsFolder] Failed to open sounds directory '{}': {}",
                     soundsDir.toAbsolutePath(), e.getMessage());
