@@ -8,7 +8,7 @@ Modrinth release.
 
 - Use one Markdown file per **mod version**, named `<version>.md`, for example
   `0.3.0.md`.
-- Do not create separate changelogs for each Minecraft version. Builds for 26.2,
+- Do not create separate changelogs for each Minecraft version. Builds for 26.3, 26.2,
   26.1.x, and 1.21.11 share the same mod-version changelog.
 - List releases below in newest-first order and mark each as `Draft` or
   `Released`.
@@ -38,5 +38,6 @@ release file should make sense without the rest of the repository documentation.
 
 | Version | Status | Notes |
 | --- | --- | --- |
+| [0.4.0](0.4.0.md) | Draft | Automatic keybind migration between supported Minecraft versions |
 | [0.3.1](0.3.1.md) | Draft | Global amplification and favorite sounds |
 | [0.3.0](0.3.0.md) | Released (2026-07-19) | Custom config UI and sound wheel |
