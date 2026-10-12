@@ -9,6 +9,9 @@ import java.util.Set;
 
 public class SoundboardConfigData {
 
+    public static final int CURRENT_CONFIG_VERSION = 1;
+    public int configVersion = CURRENT_CONFIG_VERSION;
+
     public GlobalStateEntry globalState = GlobalStateEntry.fromDefaults();
 
     public boolean defaultLoop = false;
